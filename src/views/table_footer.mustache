@@ -1,0 +1,36 @@
+<div>
+	{{#multiPage}}
+	<nav class="pull-right" style="margin-left: 10px;">
+	{{#size}}
+		<ul class="pagination" style="margin:0">
+			{{^isFirst}}
+			{{^showFirst}}<li class="pagination-first"><a data-page="1" href="javascript:void(0);" aria-label="First"><span aria-hidden="true">&laquo;</span></a></li>{{/showFirst}}
+			<li><a data-page="dec" href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&lsaquo;</span></a></li>
+			{{/isFirst}}
+			{{#pages}}
+				<li class="{{active}}"><a data-page="{{name}}" href="javascript:void(0);">{{name}}</a></li>
+			{{/pages}}
+			{{^isLast}}
+			<li><a data-page="inc" href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&rsaquo;</span></a></li>
+			{{^showLast}}<li class="pagination-last"><a data-page="" href="javascript:void(0);" aria-label="Last"><span aria-hidden="true">&raquo;</span></a></li>{{/showLast}}
+			{{/isLast}}
+
+		</ul>
+	{{/size}}
+	</nav>
+
+	{{/multiPage}}	
+	<h5 class="range badge {{^size}}alert-danger{{/size}} pull-left" style="margin-right:15px;">{{#size}}Showing {{first}} to {{last}} of {{size}} results{{/size}}{{^size}}No matching results{{/size}}</h5>
+		{{#entries.length}}
+		<span class="pull-left">
+			<select class="form-control" style="display:inline-block;width:auto;min-width:50px" name="count">
+			<option value="10000">All</option>
+			{{#entries}}
+			<option value="{{value}}" {{#selected}}selected="selected"{{/selected}}>{{value}}</option>
+			{{/entries}}
+
+			</select>
+			<span class="hidden-xs">results per page</span>
+		</span>
+		{{/entries.length}}
+</div>

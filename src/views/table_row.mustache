@@ -1,0 +1,23 @@
+<tr class="filterable">		
+	{{#options.hasActions}}
+
+	<td data-event="mark" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+<!-- 		<div class="btn-group">
+		  <button type="button" class="btn btn-xs btn-info go">Actions</button>
+		  <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    <span class="caret"></span>
+		    <span class="sr-only">Toggle Dropdown</span>
+		  </button>
+		  <ul class="dropdown-menu dropdown-menu-right">
+		    {{#options.hasEdit}}<li><a href="javascript:void(0);" data-event="edit" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li>{{/options.hasEdit}}
+		    {{#options.hasDelete}}<li><a href="javascript:void(0);" data-event="delete" data-id="{{start}}id{{end}}"><i class="fa fa-times"></i> Delete</a></li>{{/options.hasDelete}}
+		  </ul>
+		</div> -->
+		<span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+   	</td>
+
+		{{/options.hasActions}}
+	{{#items}}
+	{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
+	{{/items}}
+</tr>

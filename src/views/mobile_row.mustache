@@ -1,0 +1,12 @@
+<tr><td colspan="100%" class="filterable">		
+ 	{{#options.hasActions}}
+	<div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+	<span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
+	</div>
+ 		{{/options.hasActions}}
+ <div>
+ 	{{#items}}
+ 	{{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
+ 	{{/items}}
+ 	</div>
+</td></tr>

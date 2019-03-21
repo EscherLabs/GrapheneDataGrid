@@ -1,0 +1,38 @@
+
+<div style="clear:both;">
+
+  {{#options.sort}}
+
+  <div class="row" style="margin-bottom:10px">
+
+    <div class="col-xs-6">
+    {{#options.filter}}
+
+      <div name="reset-search" style="position:relative" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Clear Filters">
+        <i class="fa fa-filter"></i>
+        <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
+      </div>    
+
+    <div class="btn btn-info filterForm">Filter</div>
+  {{/options.filter}}
+    </div>
+    <div class="col-xs-6">
+    		{{#options.search}}<input type="text" name="search" class="form-control" style="" placeholder="Search">{{/options.search}}
+        </div>
+    </div>
+    <div class="input-group">
+      <span class="" style="display: table-cell;width: 1%;white-space: nowrap;vertical-align: middle;padding-right:5px">
+        <button class="btn btn-default reverse" type="button" tabindex="-1"><i class="fa fa-sort text-muted"></i></button>
+      </span>
+        <select class="form-control sortBy">
+          <option value=true>None</option>
+          {{#items}}
+            {{#visible}}
+              <option value="{{id}}">{{label}}</option>
+            {{/visible}}
+          {{/items}}
+        <select>
+    </div>
+  {{/options.sort}}
+
+</div>
