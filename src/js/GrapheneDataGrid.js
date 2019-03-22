@@ -1,5 +1,5 @@
 function GrapheneDataGrid(options) {
-	this.version = '0.1.0';
+	this.version = '0.0.1';
 	options = $.extend(true, {filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.events == 'object' && options.events.length){
 		options.events = _.map(options.events,function(event){
@@ -35,11 +35,6 @@ function GrapheneDataGrid(options) {
 					delete options.search[index];
 				}
 			});
-
-			// options.search = o;
-		// }else{
-		// 	options.search = {};
-		// }
 		var pagebuffer = options.pagebuffer || 2;
 
 		if(this.$el.find('[name="search"]').length && this.$el.find('[name="search"]').val().length){
@@ -155,31 +150,48 @@ function GrapheneDataGrid(options) {
 
 	var options = $.extend({count: options.count || 25, page: 1, sort: 'createdAt', reverse: false}, options);
 	self = this;
-	options.schema = //_.map(
-		_.map(options.schema, function(item){
-		return gform.processOpts(item,{update:function(options){
-			this.item.choices = options.choices; 
-			this.item.options = options.choices; 
-			var schema = this.self.options.schema;
-			_.each(this.self.models,function(model){
-				model.schema = schema;
-				model.pat();
-			})
-			this.self.draw();
+	// options.schema = 
+	// 	_.map(options.schema, function(item){
+	// 	return gform.processOpts(item,{update:function(options){
+	// 		this.item.choices = options.choices; 
+	// 		this.item.options = options.choices; 
+	// 		var schema = this.self.options.schema;
+	// 		_.each(this.self.models,function(model){
+	// 			model.schema = schema;
+	// 			model.pat();
+	// 		})
+	// 		this.self.draw();
 
-		}.bind({item:item,self:self}) });
-	} )
-	// 	, function(item){
-	// 	item.value = item.value || item.default;
-	// 	delete item.default;
-	// 	return item;
-	// });
+	// 	}.bind({item:item,self:self}) });
+	// } )
+	
+
 
 	if(typeof options.filters !== 'undefined'){
-		options.filters = _.map(options.filters, gform.processOpts)
+		options.filters = _.map(options.filters, function(fieldIn){
+			var parent = parent || null;
+			fieldIn.type = fieldIn.type || 'text';
+			//work gform.default in here
+			var field = _.assignIn({
+					name: (gform.renderString(fieldIn.label)||'').toLowerCase().split(' ').join('_'), 
+					id: gform.getUID(), 
+					// type: 'text', 
+					label: fieldIn.legend || fieldIn.name,
+					validate: [],
+					valid: true,
+					parsable:true,
+					visible:true,
+					enabled:true,
+					array:false,
+					offset: 0,
+			}, this.opts, gform.default,(gform.types[fieldIn.type]||gform.types['text']).defaults, fieldIn)
+			if(field.name == ''){field.name = field.id;}
+			field.item = fieldIn;
+			return field;
+	})
 	}
 	options.filterFields = _.map($.extend(true, {}, options.filters || options.schema), function(val){
-		val = gform.normalizeItem(val);
+		val = gform.normalizeField.call({options:{default:{type:'text'}}},val);
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -417,12 +429,12 @@ function GrapheneDataGrid(options) {
 		this.$el.on('click', '.filterForm', function(e) {
 				this.$el.find('[name="search"]').val('');
 
-				$().gform({legend:"Filter By" ,name:'modal_filter'+this.options.id,attributes:this.filterValues, disableMath: true, suppress: true, fields: options.filterFields }).on('save', function(){
-					this.filterValues = Berries['modal_filter'+this.options.id].toJSON();
+				 new gform({legend:"Filter By" ,name:'modal_filter'+this.options.id,attributes:this.filterValues, disableMath: true, suppress: true, fields: options.filterFields }).on('save', function(){
+					this.filterValues = gform.instances['modal_filter'+this.options.id].toJSON();
 					this.draw();					
-					Berries['modal_filter'+this.options.id].trigger('close');
+					gform.instances['modal_filter'+this.options.id].trigger('close');
 
-				}, this);
+				}.bind(this)).modal();
 		}.bind(this));		
 
 		this.$el.on('click','[name="bt-upload"]', function(){
@@ -495,7 +507,7 @@ function GrapheneDataGrid(options) {
 				_.where(this.models, {checked: true}).length >1) {
 				this.editCommon();
 			}else{
-				$().gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: _.where(this.models, {checked: true})[0]}, this.options.gform || {} ) ).on('saved', function() {
+				new gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: _.where(this.models, {checked: true})[0]}, this.options.gform || {} ) ).on('saved', function() {
 					if(typeof this.options.edit == 'function'){
 						this.options.edit(_.where(this.models, {checked: true})[0]);
 					}
@@ -503,7 +515,7 @@ function GrapheneDataGrid(options) {
 						this.options.editComplete(_.where(this.models, {checked: true}), this);
 					}
 					this.draw();
-				}, this)
+				}.bind(this)).modal()
 			}
 		}.bind(this));
 
@@ -518,11 +530,12 @@ function GrapheneDataGrid(options) {
 
 
 		if($el.find('.filter').length) {
-			this.filter = $el.find('.filter').gform({name:'filter'+this.options.id,renderer: 'inline' ,disableMath: true, suppress: true, fields: options.filterFields }).on('change', function(){
+			debugger;
+			this.filter = new gform({name:'filter'+this.options.id,renderer: 'inline' ,disableMath: true, suppress: true, fields: options.filterFields },$el.find('.filter')[0]).on('change', function(){
 				this.$el.find('[name="search"]').val('');
 				this.filterValues = this.filter.toJSON();
 				this.draw();
-			}, this);
+			}.bind(this));
 			silentPopulate.call(this.filter, this.defaults);
 
 			//attributes: this.defaults
@@ -607,9 +620,9 @@ function GrapheneDataGrid(options) {
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
 				event.callback.call(this);
 			}else{
-				$().gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function() {
-					if(Berries.modal.validate()){
-						var newModel = new tableModel(this, Berries.modal.toJSON()).on('check', function() {
+				new gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function() {
+					if(gform.instances.modal.validate()){
+						var newModel = new tableModel(this, gform.instances.modal.toJSON()).on('check', function() {
 							this.updateCount(_.where(this.models, {checked: true}).length);
 							this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
 						}.bind(this));
@@ -624,11 +637,11 @@ function GrapheneDataGrid(options) {
 						if(typeof this.options.add == 'function') {
 							this.options.add(newModel);
 						}
-						if(typeof Berries.modal !== 'undefined'){
-							Berries.modal.trigger('cancel');
+						if(typeof gform.instances.modal !== 'undefined'){
+							gform.instances.modal.trigger('cancel');
 						}
 					}
-				}, this)
+				}.bind(this)).modal()
 			}
 		}.bind(this));
 
@@ -637,7 +650,7 @@ function GrapheneDataGrid(options) {
 	}
 	this.validate = function(item){
 		var status = false;
-		var tempForm = this.$el.find('.hiddenForm').gform({fields: options.schema,attributes:item});
+		var tempForm = new gform({fields: options.schema,attributes:item});
 		if(tempForm.validate()){
 			status = tempForm.toJSON();
 		}else{
@@ -654,7 +667,7 @@ function GrapheneDataGrid(options) {
 			this.owner.updateCount(_.where(this.owner.models, {checked: true}).length);
 			this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
 		});
-		var tempForm = this.$el.find('.hiddenForm').gform({fields: options.schema,model:newModel});
+		var tempForm = new gform({fields: options.schema,model:newModel});
 		if(tempForm.validate()) {
 			this.models.push(newModel);
 			this.draw();
@@ -845,7 +858,7 @@ function GrapheneDataGrid(options) {
 		} else {
 			var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 
-			$().gform({legend:'('+selectedModels.length+') Common Field Editor', fields:newSchema, attributes: $.extend(true,{},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(){
+			new gform({legend:'('+selectedModels.length+') Common Field Editor', fields:newSchema, attributes: $.extend(true,{},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(){
 				var newValues = this.toJSON();
 				_.map(selectedModels,function(model){
 					model.set($.extend(true,{}, model.attributes, newValues));
@@ -857,7 +870,7 @@ function GrapheneDataGrid(options) {
 				if(typeof this.options.editComplete === 'function'){
 					this.options.editComplete(_.where(this.models, {checked: true}), this);
 				}
-			}, this )
+			}.bind(this)).modal()
 		}
 	}
 	this.destroy = function(){
