@@ -122,7 +122,7 @@
 				delete:true,
 				entries:[2,5,10],
 				count:10000,
-				defaultSort: 'order',
+				// defaultSort: 'order',
 				onSort: function(){
 
 				},
@@ -153,13 +153,13 @@
 				],
 				schema:[
 
-				{type:"text", name:"gform_id", label:"gform_id", required:false},
-				{type:"text", name:"order", label:"Order"},
-				{type:"text", name:"order1", label:"Order1"},
-				{type:"text", name:"order6", label:"Order1"},
-				{type:"text", name:"orde7", label:"Order1"},
-				{type:"text", name:"order8", label:"Order1"},
-				{type:"text", name:"order2", label:"Order2",type:'select',options:["asfdasdfnasldfjl;asjdlfka"]},
+				// {type:"text", name:"gform_id", label:"gform_id", required:false},
+				// {type:"text", name:"order", label:"Order"},
+				// {type:"text", name:"order1", label:"Order1"},
+				// {type:"text", name:"order6", label:"Order1"},
+				// {type:"text", name:"orde7", label:"Order1"},
+				// {type:"text", name:"order8", label:"Order1"},
+				{type:"text", name:"order2", label:"Order2",type:'select',placeholder:"Select one",options:["asfdasdfnasldfjl;asjdlfka"]},
 				// {type:"text", name:"order3", label:"Order3"},
 				// {type:"text", name:"order4", label:"Ord"},
 				// {type:"base64", name:"other", label:"Other", required:false, template:'<img style="max-width:100px" src="{{value}}""></b>'},
@@ -178,10 +178,10 @@
         {"name":"profile","label":"Medication Profile long title","type":"fieldset","fields":[
             {"label":"Drug name","name":"drug_name"}
             ],
-            "template":"{{attributes.dob}}"
+            "template":"adf:{{attributes.profile.drug_name}}"
         },
 				// {type:"contenteditable", name:"test", label:"Test", required:false, template:"{{{value}}}"},
-				{type:"select", name:"status", label: "Status", default: {name: 'External (no auth)', value: 'External', target:''}, showColumn: true, choices:'./assets/js/options.json'}
+				{type:"select", name:"status", label: "Status", default: {name: 'External (no auth)', value: 'External', target:''}, showColumn: true,format:{label:'{{label}}'}, options:'./assets/js/options.json'}
 
 			], data: data}
 
