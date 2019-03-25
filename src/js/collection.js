@@ -16,28 +16,28 @@ function tableModel (owner, initial) {
 					}else{
 						var search = {};
 						search[item.value_key] = this.attributes[item.name];
-						option = _.findWhere(item.options, search);
+						option = _.find(item.options, search);
 						if($.isNumeric(this.attributes[item.name])){
 							search[item.value_key] = parseInt(this.attributes[item.name]);
 							if(typeof option === 'undefined'){
-								option = _.findWhere(item.options, search);
+								option = _.find(item.options, search);
 							}
 							if(typeof option === 'undefined'){
-								option = _.findWhere(item.options, search);
+								option = _.find(item.options, search);
 							}
 						}
 					}
 				}else{
-					option =  _.findWhere(item.options, {value:this.attributes[item.name]});
+					option =  _.find(item.options, {value:this.attributes[item.name]});
 					if(typeof option === 'undefined'){
-						option = _.findWhere(item.options, {id:this.attributes[item.name]});
+						option = _.find(item.options, {id:this.attributes[item.name]});
 					}
           if($.isNumeric(this.attributes[item.name])){
             if(typeof option === 'undefined'){
-              option = _.findWhere(item.options, {value:parseInt(this.attributes[item.name], 10)});
+              option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
             }
             if(typeof option === 'undefined'){
-              option = _.findWhere(item.options, {id:parseInt(this.attributes[item.name], 10)});
+              option = _.find(item.options, {id:parseInt(this.attributes[item.name], 10)});
             }
           }
 				}
@@ -83,10 +83,10 @@ function tableModel (owner, initial) {
 		}
 	}
 	this.delete = function(){
-		this.owner.models.splice(_.indexOf(_.pluck(this.owner.models, 'id'), this.id),1);
+		this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
 	}
 	
-	this.events = {initialize: []};
+	this.handlers = {initialize: []};
 	this.addSub = gform.prototype.addSub;
 	this.on = gform.prototype.on;
 	this.off = gform.prototype.off;

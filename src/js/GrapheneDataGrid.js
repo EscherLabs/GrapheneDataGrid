@@ -80,7 +80,7 @@ function GrapheneDataGrid(options) {
 		renderObj.isLast = (options.page == options.pagecount);
 		renderObj.showLast = (options.pagecount == endpage);
 		renderObj.showFirst = (startpage == 1);
-		renderObj.checked_count = _.where(this.models, {checked: true}).length;
+		renderObj.checked_count = _.filter(this.models, {checked: true}).length;
 
 		renderObj.entries = _.map(options.entries,function(item){
 			return {value:item, selected: (item==options.count)}
@@ -88,7 +88,7 @@ function GrapheneDataGrid(options) {
 
 		this.renderObj = renderObj;
 		this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
-		this.summary.checked_count = _.where(this.models, {checked: true}).length;
+		this.summary.checked_count = _.filter(this.models, {checked: true}).length;
 		this.summary.multi_checked = (this.summary.checked_count>1);
 		this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
 		this.fixStyle();
@@ -132,7 +132,7 @@ function GrapheneDataGrid(options) {
 			}else{
 				options.reverse = reverse;
 			}
-			var current = this.$el.find('.reverse, [data-sort=' + _.findWhere(this.options.filterFields,{search:sortField}).id + ']')
+			var current = this.$el.find('.reverse, [data-sort=' + _.find(this.options.filterFields,{search:sortField}).id + ']')
 			if(typeof current !== 'undefined'){
 				if(options.reverse) {
 					current.find('i').attr('class', 'fa fa-sort-asc');
@@ -232,7 +232,7 @@ function GrapheneDataGrid(options) {
 	});
 	if(typeof options.columns == 'object'){
 			options.filterFields = _.filter(options.filterFields, function(item){
-					return (_.contains(options.columns, item.name) || _.contains(options.columns,item.id))
+					return (_.includes(options.columns, item.name) || _.includes(options.columns,item.id))
 			})
 	}
 
@@ -311,7 +311,7 @@ function GrapheneDataGrid(options) {
 	function render(){
 		return template.render();
 	}
-	var silentPopulate = function(attributes,fields) {this.each(function(attributes) {if(!this.isContainer) {this.setValue(gform.search(attributes, this.getPath()));}}, [attributes], this.fields);}
+	// var silentPopulate = function(attributes,fields) {this.each(function(attributes) {if(!this.isContainer) {this.setValue(gform.search(attributes, this.getPath()));}}, [attributes], this.fields);}
 
 	function handleFiles(table, e) {
 		var files = this.files
@@ -339,7 +339,7 @@ function GrapheneDataGrid(options) {
 					var items = [];
 					this.importing = true;
 					temp[0] = _.map(temp[0], function(item){
-						var search = _.findWhere(options.schema, {label:item});
+						var search = _.find(options.schema, {label:item});
 						if(search == null){
 							search = item;
 						}else{
@@ -408,7 +408,7 @@ function GrapheneDataGrid(options) {
 		if(this.options.columns){
 			this.$el.on('click', '.columnEnables label', function(e){
 				e.stopPropagation();
-				_.findWhere(this.summary.items, {id:e.currentTarget.dataset.field}).isEnabled = e.currentTarget.childNodes[0].checked;
+				_.find(this.summary.items, {id:e.currentTarget.dataset.field}).isEnabled = e.currentTarget.childNodes[0].checked;
 				this.draw();
 			}.bind(this));
 		}
@@ -416,7 +416,7 @@ function GrapheneDataGrid(options) {
 		this.$el.on('change', '.csvFileInput', _.partial(handleFiles, this));
 		this.$el.on('change', '.sortBy', function(e) {
 			if($(e.currentTarget).val() !== ''){
-				processSort.call(this,(_.findWhere(this.options.filterFields, {id:$(e.currentTarget).val()}) || {search:true}).search)
+				processSort.call(this,(_.find(this.options.filterFields, {id:$(e.currentTarget).val()}) || {search:true}).search)
 				this.draw();
 			}
 		}.bind(this));		
@@ -443,7 +443,7 @@ function GrapheneDataGrid(options) {
 
 		this.$el.on('click', '[data-event="delete"]', function(e){
 				$(e.target).closest('.dropdown-menu').toggle()
-				var model = _.findWhere(this.models, {id:e.currentTarget.dataset.id});
+				var model = _.find(this.models, {id:e.currentTarget.dataset.id});
 				if(confirm("Are you sure you want to delete? \nThis operation can not be undone.\n\n"+ _.values(model.attributes).join('\n') )){
 		
 					if(typeof this.options.delete == 'function'){
@@ -451,12 +451,12 @@ function GrapheneDataGrid(options) {
 					}
 					model.delete();
 					this.draw();
-					this.updateCount(_.where(this.models, {checked: true}).length)
+					this.updateCount(_.filter(this.models, {checked: true}).length)
 				}
 		}.bind(this));
 
 		this.$el.on('click', '[data-event="delete_all"]', function(e){
-			  var checked_models = _.where(this.models, {checked: true})
+			  var checked_models = _.filter(this.models, {checked: true})
 				if (checked_models.length) {
 					if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
 						_.each(checked_models, function(item){
@@ -466,7 +466,7 @@ function GrapheneDataGrid(options) {
 								item.delete();
 						}.bind(this))
 						this.draw();
-						this.updateCount(_.where(this.models, {checked: true}).length)
+						this.updateCount(_.filter(this.models, {checked: true}).length)
 					}	
 				}
 
@@ -474,18 +474,18 @@ function GrapheneDataGrid(options) {
 
 		this.$el.on('click','[data-event].custom-event-all', function(e){
 			e.stopPropagation();
-			var event = _.findWhere(this.options.events, {name:e.target.dataset.event})
+			var event = _.find(this.options.events, {name:e.target.dataset.event})
 
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
-				if(event.multiEdit	&& _.where(this.models, {checked: true}).length >1) {
-					_.each(_.where(this.models, {checked: true}), function(model){
+				if(event.multiEdit	&& _.filter(this.models, {checked: true}).length >1) {
+					_.each(_.filter(this.models, {checked: true}), function(model){
 						event.callback(model);
 					})
 				}else{
-					event.callback(_.where(this.models, {checked: true})[0]);
+					event.callback(_.filter(this.models, {checked: true})[0]);
 				}
 				if(typeof event.complete == 'function'){
-					event.complete(_.where(this.models, {checked: true}),this);
+					event.complete(_.filter(this.models, {checked: true}),this);
 				}
 
 			}
@@ -493,7 +493,7 @@ function GrapheneDataGrid(options) {
 		}.bind(this));
 		this.$el.on('click','[data-event].custom-event-collection', function(e){
 			e.stopPropagation();
-			var event = _.findWhere(this.options.events, {name:e.target.dataset.event})
+			var event = _.find(this.options.events, {name:e.target.dataset.event})
 
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
 					event.callback.call(this,this.models);
@@ -504,15 +504,15 @@ function GrapheneDataGrid(options) {
 			e.stopPropagation();
 			if(	typeof this.options.multiEdit !== 'undefined' && 
 				this.options.multiEdit.length !== 0 &&
-				_.where(this.models, {checked: true}).length >1) {
+				_.filter(this.models, {checked: true}).length >1) {
 				this.editCommon();
 			}else{
-				new gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: _.where(this.models, {checked: true})[0]}, this.options.gform || {} ) ).on('saved', function() {
+				new gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: _.filter(this.models, {checked: true})[0]}, this.options.gform || {} ) ).on('saved', function() {
 					if(typeof this.options.edit == 'function'){
-						this.options.edit(_.where(this.models, {checked: true})[0]);
+						this.options.edit(_.filter(this.models, {checked: true})[0]);
 					}
 					if(typeof this.options.editComplete === 'function'){
-						this.options.editComplete(_.where(this.models, {checked: true}), this);
+						this.options.editComplete(_.filter(this.models, {checked: true}), this);
 					}
 					this.draw();
 				}.bind(this)).modal()
@@ -530,13 +530,12 @@ function GrapheneDataGrid(options) {
 
 
 		if($el.find('.filter').length) {
-			debugger;
-			this.filter = new gform({name:'filter'+this.options.id,renderer: 'inline' ,disableMath: true, suppress: true, fields: options.filterFields },$el.find('.filter')[0]).on('change', function(){
+			this.filter = new gform({name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },'.filter').on('change', function(){
 				this.$el.find('[name="search"]').val('');
 				this.filterValues = this.filter.toJSON();
 				this.draw();
 			}.bind(this));
-			silentPopulate.call(this.filter, this.defaults);
+			// silentPopulate.call(this.filter, this.defaults);
 
 			//attributes: this.defaults
 		}
@@ -558,14 +557,14 @@ function GrapheneDataGrid(options) {
 		}
 
 		this.$el.on('click', '[data-event="select_all"]', function(e){
-			  var checked_models = _.where(this.models, {checked: true});
+			  var checked_models = _.filter(this.models, {checked: true});
 
 				if (checked_models.length || this.models.length == 0) {						
 					_.each(checked_models, function(item){item.toggle(false)})			
 				} else {
 					_.each(this.filtered, function(item){item.toggle(true)})			
 				}		
-			  checked_models = _.where(this.models, {checked: true})
+			  checked_models = _.filter(this.models, {checked: true})
 				this.updateCount(checked_models.length);
 
 		}.bind(this));
@@ -574,7 +573,7 @@ function GrapheneDataGrid(options) {
 		if(options.data) {
 			for(var i in options.data) {
 				this.models.push(new tableModel(this, options.data[i]).on('check', function(){
-						this.owner.updateCount(_.where(this.owner.models, {checked: true}).length);
+						this.owner.updateCount(_.filter(this.owner.models, {checked: true}).length);
 						this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
 					})
 				);
@@ -590,7 +589,7 @@ function GrapheneDataGrid(options) {
 			this.$el.on('click','[data-sort]', function(e) {
 				e.stopPropagation();
 				e.preventDefault();
-				var sortField = _.findWhere(this.options.filterFields, {name: $(e.currentTarget).data('sort')}).search;
+				var sortField = _.find(this.options.filterFields, {name: $(e.currentTarget).data('sort')}).search;
 				if(this.options.reverse && this.options.sort == sortField){
 					processSort.call(this, true);
 				}else{
@@ -606,7 +605,7 @@ function GrapheneDataGrid(options) {
 			processSort.call(this, true);
 
 			if(this.filter) {
-				silentPopulate.call(this.filter, this.defaults)
+				// silentPopulate.call(this.filter, this.defaults)
 			}
 			this.filterValues = {};
 			this.draw();
@@ -615,7 +614,7 @@ function GrapheneDataGrid(options) {
 			this.getCSV();
 		}.bind(this));
 		this.$el.find('[data-event="add"]').on('click', function(){
-			var event = _.findWhere(this.options.events, {name:'add'});
+			var event = _.find(this.options.events, {name:'add'});
 
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
 				event.callback.call(this);
@@ -623,7 +622,7 @@ function GrapheneDataGrid(options) {
 				new gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function() {
 					if(gform.instances.modal.validate()){
 						var newModel = new tableModel(this, gform.instances.modal.toJSON()).on('check', function() {
-							this.updateCount(_.where(this.models, {checked: true}).length);
+							this.updateCount(_.filter(this.models, {checked: true}).length);
 							this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
 						}.bind(this));
 						this.models.push(newModel);
@@ -664,7 +663,7 @@ function GrapheneDataGrid(options) {
 
 	this.add = function(item){
 		var newModel = new tableModel(this, item).on('check', function(){
-			this.owner.updateCount(_.where(this.owner.models, {checked: true}).length);
+			this.owner.updateCount(_.filter(this.owner.models, {checked: true}).length);
 			this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
 		});
 		var tempForm = new gform({fields: options.schema,model:newModel});
@@ -693,7 +692,7 @@ function GrapheneDataGrid(options) {
 			var keep = $.isEmptyObject(options.search);
 			for(var filter in options.search) {
 					var temp;
-					if(_.where(options.filterFields, {id:filter})[0] && typeof _.where(options.filterFields, {id:filter})[0].options == 'undefined') {
+					if(_.filter(options.filterFields, {id:filter})[0] && typeof _.filter(options.filterFields, {id:filter})[0].options == 'undefined') {
 						temp = ($.score((anyModel.display[this.filterMap[filter]]+'').replace(/\s+/g, " ").toLowerCase(), (options.search[filter]+'').toLowerCase() ) > 0.40);
 					}else{
 						temp = (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'')
@@ -721,7 +720,7 @@ function GrapheneDataGrid(options) {
 		this.$el.find('[data-sort]').removeClass('text-primary');
 		this.$el.find('[data-sort]').find('i').attr('class', 'fa fa-sort text-muted');
 		if(this.filter){
-			silentPopulate.call(this.filter, this.defaults)
+			// silentPopulate.call(this.filter, this.defaults)
 		}
 
 		search = search.toLowerCase()
@@ -846,12 +845,12 @@ function GrapheneDataGrid(options) {
 
 	this.editCommon = function (){
 		if(typeof this.options.multiEdit == 'undefined' || this.options.multiEdit.length == 0){return;}
-		var selectedModels = _.where(this.models, {checked: true});
+		var selectedModels = _.filter(this.models, {checked: true});
 		if(selectedModels.length == 0){ return; }
 		//get the attributes from each model
 		var temp = _.map(selectedModels,function(item){return item.attributes;})//_.pick(item.attributes;})
 		//get the fields that are common between them
-		var common_fields = _.filter(this.options.multiEdit, function(item){return _.unique(_.pluck(temp, item)).length == 1});
+		var common_fields = _.filter(this.options.multiEdit, function(item){return _.unique(_.map(temp, item)).length == 1});
 		//get the schema fields matching from above
 		if(common_fields.length == 0) {
 					$(templates['modal'].render({title: "Common Field Editor ",footer:'<div class="btn btn-danger" data-dismiss="modal">Done</div>', body:'<div class="alert alert-warning">No eligible fields have been found for editing.</div>'})).modal();
@@ -868,7 +867,7 @@ function GrapheneDataGrid(options) {
 			}).on('close', function(){
 				this.draw();
 				if(typeof this.options.editComplete === 'function'){
-					this.options.editComplete(_.where(this.models, {checked: true}), this);
+					this.options.editComplete(_.filter(this.models, {checked: true}), this);
 				}
 			}.bind(this)).modal()
 		}
@@ -894,8 +893,8 @@ function GrapheneDataGrid(options) {
 					}.bind(this.filter.toJSON()))
 				}
 			}
-			temp.columns = _.map(_.pluck(_.filter(this.summary.items, function(item){return item.isEnabled}),'id'),function(id){
-				return _.findWhere(this.options.filterFields, {id:id}).search;
+			temp.columns = _.map(_.map(_.filter(this.summary.items, function(item){return item.isEnabled}),'id'),function(id){
+				return _.find(this.options.filterFields, {id:id}).search;
 			}.bind(this))
 			return temp;
 		}.bind(this),
@@ -903,7 +902,7 @@ function GrapheneDataGrid(options) {
 
 			if(typeof settings.columns !== 'undefined' && settings.columns.length) {
 				this.summary.items = _.map(this.summary.items, function(item) {
-					item.isEnabled = _.contains(settings.columns, this.filterMap[item.cname])
+					item.isEnabled = _.includes(settings.columns, this.filterMap[item.cname])
 					return item;
 				})
 				this.$el.find('.columnEnables [type="checkbox"]').each(function(e) {
@@ -911,7 +910,7 @@ function GrapheneDataGrid(options) {
 				})
 				if(options.columns) {
 					_.each(settings.columns, function(item){
-						var temp = this.$el.find('.columnEnables [data-field="'+_.findWhere(this.options.filterFields, {search: item}).id+'"] [type="checkbox"]');
+						var temp = this.$el.find('.columnEnables [data-field="'+_.find(this.options.filterFields, {search: item}).id+'"] [type="checkbox"]');
 						if(temp.length)temp[0].checked = true;
 					}.bind(this))
 				}
@@ -919,7 +918,7 @@ function GrapheneDataGrid(options) {
 			if(typeof settings.filters !== 'undefined') {
 				this.filterValues = {};
 				_.each(settings.filters, function(item, index) {
-					this.filterValues[_.findWhere(this.options.filterFields, {search: index}).id] = item
+					this.filterValues[_.find(this.options.filterFields, {search: index}).id] = item
 				}.bind(this))
 			}
 
@@ -929,7 +928,7 @@ function GrapheneDataGrid(options) {
 			
 			if(typeof this.filter !== 'undefined') {
 				// this.filter.populate(this.filterValues);
-				silentPopulate.call(this.filter, this.filterValues)
+				// silentPopulate.call(this.filter, this.filterValues)
 			}
 			if(typeof settings.search !== 'undefined' && settings.search !== '') {
 				this.$el.find('[name="search"]').val(settings.search)

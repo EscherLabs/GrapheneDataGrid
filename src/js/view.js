@@ -24,7 +24,7 @@ function viewitem(options){
 		this.$el.find('[data-event].custom-event').on('click', $.proxy(function(e){
 			e.stopPropagation();
 			$(e.target).closest('.dropdown-menu').toggle()
-			var event = _.findWhere(this.model.owner.options.events, {name:e.target.dataset.event})
+			var event = _.find(this.model.owner.options.events, {name:e.target.dataset.event})
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
 				event.callback(this.model);
 			}

@@ -24,6 +24,6 @@ mysortable = Sortable.create($('.row')[0])
 function getOrdered() {
   var items = cb.toJSON(true);
   return _.map(mysortable.toArray(), function(item){
-    return _.findWhere(items, {target: item})['items']
+    return _.find(items, {target: item})['items']
   })
 }
