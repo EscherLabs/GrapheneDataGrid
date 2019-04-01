@@ -1,5 +1,6 @@
 
 function tableModel (owner, initial) {
+	
 	this.owner = owner;
 	this.id = gform.getUID();
 	this.attributes = {};
@@ -70,6 +71,7 @@ function tableModel (owner, initial) {
 		}else{
 			this.checked = !this.checked;
 		}
+		// debugger;
 		this.trigger('check');
 	}
 	$.extend(true, this.attributes, initial);
@@ -93,6 +95,7 @@ function tableModel (owner, initial) {
 	// this.trigger = gform.prototype.pub;
 
 };
+tableModel.prototype.options = {owner:'model',item:'model'}
 tableModel.prototype.handlers = {initialize: []}
 tableModel.prototype.on = gform.prototype.on;
 tableModel.prototype.trigger = gform.prototype.pub;

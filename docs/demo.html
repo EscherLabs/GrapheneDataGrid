@@ -87,13 +87,13 @@
 		<!-- // <script type='text/javascript' src='assets/js/form.cob.js'></script>		 -->
 		<script type='text/javascript' src='data/data.js'></script>
 		<script type='text/javascript' src='../src/js/GrapheneDataGrid.js'></script>
-		<script type='text/javascript' src='../src/js/collection.js'></script>
+		<script type='text/javascript' src='../src/js/model'></script>
 		<script type='text/javascript' src='../src/js/view.js'></script>
 		<script type='text/javascript' src='../src/js/utils.js'></script>
 
 		<script type='text/javascript' src='../src/js/views.js'></script>
 		<!-- <script type='text/javascript' src='src/js/view.js'></script>
-		<script type='text/javascript' src='src/js/collection.js'></script>
+		<script type='text/javascript' src='src/js/model'></script>
 		<script type='text/javascript' src='src/js/utils.js'></script>
 		<script type='text/javascript' src='src/js/views.js'></script>-->
 
@@ -186,6 +186,11 @@
 			], data: data}
 
 			bt = new GrapheneDataGrid(options)
+			bt.on('manage',function(e){
+				debugger;
+				console.log(e.model.attributes);
+
+			})
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
 			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))
 			// bt = new GrapheneDataGrid({
