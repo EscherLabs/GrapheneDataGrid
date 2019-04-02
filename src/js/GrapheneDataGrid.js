@@ -602,8 +602,8 @@ function GrapheneDataGrid(options) {
 		if(options.data) {
 			for(var i in options.data) {
 				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
-						e.form.owner.updateCount(_.filter(e.form.owner.models, {checked: true}).length);
-						e.form.owner.$el.find('[name="events"]').html(templates['events'].render(e.form.owner.summary, templates));
+						e.model.owner.updateCount(_.filter(e.model.owner.models, {checked: true}).length);
+						e.model.owner.$el.find('[name="events"]').html(templates['events'].render(e.model.owner.summary, templates));
 					})
 				);
 			}
@@ -976,8 +976,8 @@ debugger;
 	}
 	this.models = [];
 	this.options = options;
-	this.owner ='table';
-	this.item ='model';
+	this.options.owner ='table';
+	this.options.item ='model';
 	this.filterMap = {}
 	_.map(options.filterFields, function(item){
 			this.filterMap[item.id] = item.search ;
