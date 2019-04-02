@@ -7,7 +7,8 @@ function viewitem(options){
 		if(typeof this.model.owner.options.preDraw !== 'undefined'){
 			this.model.owner.options.preDraw(this.model);
 		}
-		this.$el.replaceWith(this.setElement(options.view.render(this.model , templates)).$el);
+		// this.$el.replaceWith(this.setElement(options.view.render(this.model , templates)).$el);
+		this.$el.replaceWith(this.setElement(GrapheneDataGrid.renderString(options.view,this.model)).$el);
 
 		if(this.$el.find('[data-popins]').length > 0){
 			this.gform = this.$el.gform({ popins: {container: '#first', viewport:{ selector: 'body', padding: 20 }}, renderer: 'popins', model: this.model});

@@ -49,7 +49,9 @@ function tableModel (owner, initial) {
 				}
 			}else{
 				if(item.template){
-					this.display[item.name] = Hogan.compile(item.template).render(this);
+					// this.display[item.name] = Hogan.compile(item.template).render(this);	
+					this.display[item.name] = GrapheneDataGrid.renderString(item.template)
+					
 				}else{
 					this.display[item.name] = this.attributes[item.name];
 				}
@@ -65,14 +67,16 @@ function tableModel (owner, initial) {
 		processAtts.call(this);
 	}
 	this.checked = false;
-	this.toggle = function(state) {
+	this.toggle = function(state,silent) {
 		if(typeof state === 'bool') {
 			this.checked = state;
 		}else{
 			this.checked = !this.checked;
 		}
 		// debugger;
-		this.trigger('check');
+		if(!silent){
+			this.trigger('check');
+		}
 	}
 	$.extend(true, this.attributes, initial);
 	processAtts.call(this);

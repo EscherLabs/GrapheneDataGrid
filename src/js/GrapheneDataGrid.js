@@ -1,5 +1,5 @@
 function GrapheneDataGrid(options) {
-	this.version = '0.0.1';
+	this.version = '0.0.2';
 	this.handlers = [];
 
 	this.on =  gform.prototype.sub;
@@ -20,7 +20,11 @@ function GrapheneDataGrid(options) {
 		loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
 		}catch(e){};
 	}
-	if(options.item_template ){options.item_template= Hogan.compile(options.item_template)}else{
+	if(options.item_template ){
+		// options.item_template= Hogan.compile(options.item_template)
+		options.item_template = GrapheneDataGrid.renderString(options.item_template)
+
+	}else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
 			options.item_template = templates['table_row'];
 		}else{
@@ -58,8 +62,8 @@ function GrapheneDataGrid(options) {
 		var showing = (this.lastGrabbed>(options.count * options.page))? (options.count * options.page) : this.lastGrabbed;
 
 		var newContainer = $('<tbody class="list-group">');
-		var view = Hogan.compile(options.item_template.render(summary, templates));
-
+		// var view = Hogan.compile(options.item_template.render(summary, templates));
+		var view = GrapheneDataGrid.renderString(options.item_template,summary)
 		_.each(this.grab(options), function(model) {
 			new viewitem({ 'model': model, container: newContainer, view: view});
 		});
@@ -85,26 +89,24 @@ function GrapheneDataGrid(options) {
 		renderObj.isLast = (options.page == options.pagecount);
 		renderObj.showLast = (options.pagecount == endpage);
 		renderObj.showFirst = (startpage == 1);
-		renderObj.checked_count = _.filter(this.models, {checked: true}).length;
+		renderObj.checked_count = this.getSelected().length;
 
 		renderObj.entries = _.map(options.entries,function(item){
 			return {value:item, selected: (item==options.count)}
 		},options)
 
 		this.renderObj = renderObj;
-		this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
-		this.summary.checked_count = _.filter(this.models, {checked: true}).length;
-		this.summary.multi_checked = (this.summary.checked_count>1);
-		this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
+		// this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
+		this.updateCount();
+
+		this.$el.find('.paginate-footer').html(GrapheneDataGrid.render('table_footer',this.renderObj));
+
 		this.fixStyle();
 		if (window.localStorage && options.name) {
 			localStorage.setItem('bt_'+options.name, JSON.stringify(this.state.get())) ;
 		}
 	}
 
-	this.drawHead = function(){
-
-	}
 
 	var changePage = function(e) {
 		e.stopPropagation();
@@ -314,17 +316,23 @@ function GrapheneDataGrid(options) {
 	this.summary = summary;
 	var template;
 	if(options.template ){
-		template= Hogan.compile(Hogan.compile(options.template).render(summary, templates));  
+		// template= Hogan.compile(Hogan.compile(options.template).render(summary, templates));  
+		template= template = GrapheneDataGrid.renderString(options.template,summary)
+
 	}else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
-			template = Hogan.compile(templates['table'].render(summary, templates));
+			// template = Hogan.compile(templates['table'].render(summary, templates));
+			template = GrapheneDataGrid.render('table',summary)
 		}else{
-			template = Hogan.compile(templates['mobile_table'].render(summary, templates));
+			// template = Hogan.compile(templates['mobile_table'].render(summary, templates));
+			template = GrapheneDataGrid.render('mobile_table',summary)
+
 		}
 	}
 
 	function render(){
-		return template.render();
+		return GrapheneDataGrid.renderString(template,summary)
+		// return template.render();
 	}
 	// var silentPopulate = function(attributes,fields) {this.each(function(attributes) {if(!this.isContainer) {this.setValue(gform.search(attributes, this.getPath()));}}, [attributes], this.fields);}
 
@@ -466,12 +474,12 @@ function GrapheneDataGrid(options) {
 					}
 					model.delete();
 					this.draw();
-					this.updateCount(_.filter(this.models, {checked: true}).length)
+					// this.updateCount()
 				}
 		}.bind(this));
 
 		this.$el.on('click', '[data-event="delete_all"]', function(e){
-			  var checked_models = _.filter(this.models, {checked: true})
+			  var checked_models = this.getSelected()
 				if (checked_models.length) {
 					if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
 						_.each(checked_models, function(item){
@@ -481,63 +489,38 @@ function GrapheneDataGrid(options) {
 								item.delete();
 						}.bind(this))
 						this.draw();
-						this.updateCount(_.filter(this.models, {checked: true}).length)
+						// this.updateCount()
 					}	
 				}
 
 		}.bind(this));
 
-		this.$el.on('click','[data-event].custom-event-all', function(e){
+		this.$el.on('click','[data-event].custom-event', function(e){
 			e.stopPropagation();
-			// var event = _.find(this.options.events, {name:e.target.dataset.event})
-			// debugger;
-			// if(typeof event !== 'undefined' && typeof event.callback == 'function'){
-
-			// 	if(event.multiEdit	&& _.filter(this.models, {checked: true}).length >1) {
-			// 		_.each(_.filter(this.models, {checked: true}), function(model){
-			// 			event.callback(model);
-			// 		})
-			// 	}else{
-			// 		event.callback(_.filter(this.models, {checked: true})[0]);
-			// 	}
-			// 	if(typeof event.complete == 'function'){
-			// 		event.complete(_.filter(this.models, {checked: true}),this);
-			// 	}
-
-
-			// }
-			
-			_.each(_.filter(this.models, {checked: true}),function(event,model){
-				this.dispatch(event,model)
-			}.bind(this,e.target.dataset.event))
-
-		}.bind(this));
-		this.$el.on('click','[data-event].custom-event-collection', function(e){
-			e.stopPropagation();
-			debugger;
-			var event = _.find(this.options.events, {name:e.target.dataset.event})
-
-			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
-					event.callback.call(this,this.models);
+			var selectedModels = this.getSelected();
+			if(selectedModels.length){
+				_.each(selectedModels,function(event,model){
+					this.dispatch(event,model)
+				}.bind(this,e.target.dataset.event))
+			}else{
+				this.dispatch(e.target.dataset.event)
 			}
-
 		}.bind(this));
+
 		this.$el.on('click','[data-event="edit_all"]', function(e){
 			e.stopPropagation();
 			if(	typeof this.options.multiEdit !== 'undefined' && 
 				this.options.multiEdit.length !== 0 &&
-				_.filter(this.models, {checked: true}).length >1) {
+				this.getSelected().length >1) {
 				this.editCommon();
 			}else{
-				// debugger;
-				// this.options.fields = this.options.schema;
-				new gform($.extend(true,{},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: _.filter(this.models, {checked: true})[0].attributes,fields:_.filter(this.models, {checked: true})[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
-					_.filter(this.models, {checked: true})[0].set(e.form.toJSON());
+				new gform($.extend(true,{},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
+					this.getSelected()[0].set(e.form.toJSON());
 					if(typeof this.options.edit == 'function'){
-						this.options.edit(_.filter(this.models, {checked: true})[0]);
+						this.options.edit(this.getSelected()[0]);
 					}
 					if(typeof this.options.editComplete === 'function'){
-						this.options.editComplete(_.filter(this.models, {checked: true}), this);
+						this.options.editComplete(this.getSelected(), this);
 					}
 					this.draw();
 					e.form.pub('close')
@@ -564,14 +547,19 @@ function GrapheneDataGrid(options) {
 			}.bind(this));
 
 			this.filter.set()
-			// silentPopulate.call(this.filter, this.defaults);
-
-			//attributes: this.defaults
 		}
 
 		this.updateCount =function(count) {
+			var count = count || this.getSelected().length;
 			this.summary.checked_count = count;
-			this.summary.multi_checked = (count>1);
+			this.summary.multi_checked = count>1;
+
+			// this.summary.checked_count = this.getSelected().length;
+			// this.summary.multi_checked = (this.summary.checked_count>1);
+			// this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
+			this.$el.find('[name="events"]').html(GrapheneDataGrid.render('events',this.summary));
+			this.$el.find('[name="count"]').html(GrapheneDataGrid.render('count',this.summary));
+
 
 			var checkbox = this.$el.find('[data-event="select_all"].fa');
 
@@ -586,15 +574,15 @@ function GrapheneDataGrid(options) {
 		}
 
 		this.$el.on('click', '[data-event="select_all"]', function(e){
-			  var checked_models = _.filter(this.models, {checked: true});
+			  var checked_models = this.getSelected();
 
 				if (checked_models.length || this.models.length == 0) {						
-					_.each(checked_models, function(item){item.toggle(false)})			
+					_.each(checked_models, function(item){item.toggle(false,true)})			
 				} else {
-					_.each(this.filtered, function(item){item.toggle(true)})			
+					_.each(this.filtered, function(item){item.toggle(true,true)})			
 				}		
-			  checked_models = _.filter(this.models, {checked: true})
-				this.updateCount(checked_models.length);
+				this.draw();
+				// this.updateCount();
 
 		}.bind(this));
 
@@ -602,8 +590,9 @@ function GrapheneDataGrid(options) {
 		if(options.data) {
 			for(var i in options.data) {
 				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
-						e.model.owner.updateCount(_.filter(e.model.owner.models, {checked: true}).length);
-						e.model.owner.$el.find('[name="events"]').html(templates['events'].render(e.model.owner.summary, templates));
+						e.model.owner.updateCount();
+						// e.model.owner.$el.find('[name="events"]').html(templates['events'].render(e.model.owner.summary, templates));
+						// e.model.owner.$el.find('[name="events"]').html(GrapheneDataGrid.render('events',e.model.owner.summary));
 					})
 				);
 			}
@@ -624,7 +613,6 @@ function GrapheneDataGrid(options) {
 				}else{
 					processSort( sortField);
 				}
-				//this.drawHead();
 				this.draw();
 			}.bind(this))
 		}
@@ -652,8 +640,8 @@ function GrapheneDataGrid(options) {
 				new gform($.extend(true,{},{name:'modal', actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
 					if(e.form.validate()){
 						var newModel = new tableModel(this, e.form.get()).on('check', function() {
-							this.updateCount(_.filter(this.models, {checked: true}).length);
-							this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
+							this.updateCount();
+							// this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
 						}.bind(this));
 						this.models.push(newModel);
 						if(typeof this.options.defaultSort !== 'undefined'){
@@ -661,7 +649,7 @@ function GrapheneDataGrid(options) {
 						}
 
 						this.draw();
-						this.updateCount(this.summary.checked_count);
+						// this.updateCount(this.summary.checked_count);
 						
 						if(typeof this.options.add == 'function') {
 							this.options.add(newModel);
@@ -693,8 +681,8 @@ function GrapheneDataGrid(options) {
 
 	this.add = function(item){
 		var newModel = new tableModel(this, item).on('check', function(){
-			this.owner.updateCount(_.filter(this.owner.models, {checked: true}).length);
-			this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
+			this.owner.updateCount();
+			// this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
 		});
 		var tempForm = new gform({fields: options.schema,model:newModel});
 		if(tempForm.validate()) {
@@ -773,40 +761,9 @@ function GrapheneDataGrid(options) {
 		this.lastGrabbed = this.filtered.length;
 	}
 
-	// this.fixStyle = function(){
-	// 	if(this.options.autoSize){
-	// 		try{
-	// 			var container = this.$el.find('.table-container > div');
-	// 			var headers = this.$el.find('.table-container > table tr th:visible');
-	// 			container.css('width', 'auto') 
-	// 			container.css('minWidth', 'auto') 
-	// 			headers.css('width','auto')
-	// 			headers.css('minWidth','85px')
-	// 			this.$el.find('.list-group tr:first td').css('width','auto')
-	// 			this.$el.find('.list-group tr:first td').css('minWidth','auto')
-	// 			container.css('height', $(window).height() - container.offset().top - (88+ this.options.autoSize) +'px');
-	// 			_.each(	this.$el.find('.list-group tr:first td'), function(item, index){
-	// 				if(headers[index].offsetWidth > item.offsetWidth){
-	// 					item.width = headers[index].offsetWidth+'px';
-	// 					item.minWidth = headers[index].offsetWidth+'px';
-	// 				}
-	// 				headers[index].style.width = item.offsetWidth+'px';
-	// 				headers[index].style.minWidth = item.offsetWidth+'px';
-	// 			}.bind(this))
-
-	// 			var target = this.$el.find('.table-container > div table')[0].offsetWidth;
-	// 			if(this.$el.find('.table-container > table')[0].offsetWidth > target){target = this.$el.find('.table-container > table')[0].offsetWidth;}
-
-	// 			container.css('width', target + 'px') 
-	// 			container.css('minWidth', target + 'px') 
-
-	// 		}catch(e){}
-	// 	}
-	// }
 
 
 	this.fixStyle = function(){
-		// debugger;
 		if(this.options.autoSize){
 			try{
 				var container = this.$el.find('.table-container > div');
@@ -847,9 +804,6 @@ function GrapheneDataGrid(options) {
 							
 						}
 					}else{
-// debugger;
-						// $(column).css('width', 'auto') 
-						// $(column).css('minWidth', 'auto') 
 						column.style.display = 'none';
 					}
 				}.bind(this))
@@ -875,10 +829,10 @@ function GrapheneDataGrid(options) {
 	this.grab = function(options) {
 		return this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
 	};
-
+	this.getSelected = function(){return _.filter(this.models, {checked: true})}
 	this.editCommon = function (){
 		if(typeof this.options.multiEdit == 'undefined' || this.options.multiEdit.length == 0){return;}
-		var selectedModels = _.filter(this.models, {checked: true});
+		var selectedModels = this.getSelected();
 		if(selectedModels.length == 0){ return; }
 		//get the attributes from each model
 		var temp = _.map(selectedModels,function(item){return item.attributes;})//_.pick(item.attributes;})
@@ -890,7 +844,6 @@ function GrapheneDataGrid(options) {
 		} else {
 			var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 			new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel'},{type:'save'}], fields:newSchema, data: $.extend(true,{},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
-debugger;
 				var newValues = e.form.get();
 				_.map(selectedModels,function(model){
 					model.set($.extend(true,{}, model.attributes, newValues));
@@ -900,8 +853,9 @@ debugger;
 			}).on('close', function(){
 				this.draw();
 				if(typeof this.options.editComplete === 'function'){
-					this.options.editComplete(_.filter(this.models, {checked: true}), this);
+					this.options.editComplete(this.getSelected(), this);
 				}
+				this.dispatch('')
 			}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
 		}
 	}
@@ -1007,4 +961,12 @@ debugger;
 	if(loaded){
 		this.state.set(loaded);
 	}
+}
+GrapheneDataGrid.render = function(template, options) {
+	return gform.m(templates[template || 'row'] || templates['row'], _.extend({}, templates, options))
+}
+GrapheneDataGrid.renderString = function(string,options) {
+	return gform.m(string, _.extend({}, templates, options))
+
+	// return gform.m(string || '', options || {})
 }

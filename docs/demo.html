@@ -73,7 +73,7 @@
 
 
 		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
-		<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js'></script>
+		<!-- <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js'></script> -->
 
 		<!-- // <script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3//jquery-ui.min.js'></script> -->
 
@@ -190,6 +190,10 @@
 				debugger;
 				console.log(e.model.attributes);
 
+			}).on('sort',function(e){
+				
+				console.log(e.table.models[0].attributes);
+					
 			})
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
 			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))

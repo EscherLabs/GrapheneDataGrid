@@ -1,9 +1,340 @@
-if (!!!templates) var templates = {};
-templates["events"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div>");t.b("\n" + i);t.b("	<span class=\"hidden-xs\">");t.b("\n" + i);if(t.s(t.d("options.hasDelete",c,p,1),c,p,0,55,245,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	<a href=\"javascript:void(0);\" data-event=\"delete_all\" class=\"btn btn-danger ");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};t.b("\" style=\"margin-right:15px\"><i class=\"fa fa-times\"></i> Delete</a>");t.b("\n" + i);});c.pop();}t.b("	<div class=\"btn-group\"role=\"group\" aria-label=\"...\">");t.b("\n");t.b("\n" + i);t.b("	    ");if(t.s(t.d("options.hasEdit",c,p,1),c,p,0,348,607,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<a href=\"javascript:void(0);\" data-event=\"edit_all\" class=\"btn btn-primary ");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};if(!t.s(t.f("multiEdit",c,p,1),c,p,1,0,0,"")){if(t.s(t.f("multi_checked",c,p,1),c,p,0,499,507,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("disabled");});c.pop();}};t.b("\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\"><i class=\"fa fa-pencil\"></i> Edit</a>");});c.pop();}t.b("\n");t.b("\n" + i);if(t.s(t.d("options.events",c,p,1),c,p,0,653,942,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	    	");if(!t.s(t.f("global",c,p,1),c,p,1,0,0,"")){t.b("<a href=\"javascript:void(0);\" data-event=\"");t.b(t.v(t.f("name",c,p,0)));t.b("\" class=\"custom-event-all btn btn-default ");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};if(!t.s(t.f("multiEdit",c,p,1),c,p,1,0,0,"")){if(t.s(t.f("multi_checked",c,p,1),c,p,0,839,847,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("disabled");});c.pop();}};t.b("\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\">");t.b(t.t(t.f("label",c,p,0)));t.b("</a>");};t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("	</div>");t.b("\n" + i);t.b("	</span>");t.b("\n" + i);t.b("	<div class=\"btn-group visible-xs\">");t.b("\n" + i);t.b("		<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">");t.b("\n" + i);t.b("			<i class=\"fa fa-cogs\"></i> <span class=\"caret\"></span>");t.b("\n" + i);t.b("		</button>");t.b("\n" + i);t.b("		<ul class=\"dropdown-menu\">");t.b("\n" + i);t.b("				");if(t.s(t.d("options.hasEdit",c,p,1),c,p,0,1270,1525,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<li  class=\" ");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};if(!t.s(t.f("multiEdit",c,p,1),c,p,1,0,0,"")){if(t.s(t.f("multi_checked",c,p,1),c,p,0,1359,1367,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("disabled");});c.pop();}};t.b("\"><a href=\"javascript:void(0);\" data-event=\"edit_all\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\"><i class=\"fa fa-pencil\"></i> Edit</a></li> ");});c.pop();}t.b("\n");t.b("\n" + i);if(t.s(t.d("options.events",c,p,1),c,p,0,1570,1858,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("					");if(!t.s(t.f("global",c,p,1),c,p,1,0,0,"")){t.b("<li class=\"");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};if(!t.s(t.f("multiEdit",c,p,1),c,p,1,0,0,"")){if(t.s(t.f("multi_checked",c,p,1),c,p,0,1674,1682,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("disabled");});c.pop();}};t.b("\"><a href=\"javascript:void(0);\" data-event=\"");t.b(t.v(t.f("name",c,p,0)));t.b("\" class=\"custom-event-all\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\">");t.b(t.t(t.f("label",c,p,0)));t.b("</a></li>");};t.b("\n" + i);});c.pop();}if(t.s(t.d("options.hasDelete",c,p,1),c,p,0,1904,2144,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("					<li role=\"separator\" class=\"divider\"></li>");t.b("\n" + i);t.b("					<li class=\" ");if(!t.s(t.f("checked_count",c,p,1),c,p,1,0,0,"")){t.b("disabled");};t.b("\"><a href=\"javascript:void(0);\" data-event=\"delete_all\" style=\"margin-right:15px\"><i class=\"fa fa-times\"></i> Delete</a></li>");t.b("\n" + i);});c.pop();}t.b("		</ul>");t.b("\n" + i);t.b("	</div>");t.b("\n" + i);t.b("	");if(t.s(t.f("checked_count",c,p,1),c,p,0,2202,2315,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<h5 class=\"range label label-info checked_count\" style=\"margin:7px 15px;\">");t.b(t.v(t.f("checked_count",c,p,0)));t.b(" item(s) selected</h5>");});c.pop();}t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {}, subs: {  }});
-templates["mobile_head"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div style=\"clear:both;\">");t.b("\n");t.b("\n" + i);if(t.s(t.d("options.sort",c,p,1),c,p,0,46,1261,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("\n" + i);t.b("  <div class=\"row\" style=\"margin-bottom:10px\">");t.b("\n");t.b("\n" + i);t.b("    <div class=\"col-xs-6\">");t.b("\n" + i);if(t.s(t.d("options.filter",c,p,1),c,p,0,146,494,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("\n" + i);t.b("      <div name=\"reset-search\" style=\"position:relative\" class=\"btn btn-default\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Clear Filters\">");t.b("\n" + i);t.b("        <i class=\"fa fa-filter\"></i>");t.b("\n" + i);t.b("        <i class=\"fa fa-times text-danger\" style=\"position: absolute;right: 5px;\"></i>");t.b("\n" + i);t.b("      </div>    ");t.b("\n");t.b("\n" + i);t.b("    <div class=\"btn btn-info filterForm\">Filter</div>");t.b("\n" + i);});c.pop();}t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"col-xs-6\">");t.b("\n" + i);t.b("    		");if(t.s(t.d("options.search",c,p,1),c,p,0,577,661,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<input type=\"text\" name=\"search\" class=\"form-control\" style=\"\" placeholder=\"Search\">");});c.pop();}t.b("\n" + i);t.b("        </div>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    <div class=\"input-group\">");t.b("\n" + i);t.b("      <span class=\"\" style=\"display: table-cell;width: 1%;white-space: nowrap;vertical-align: middle;padding-right:5px\">");t.b("\n" + i);t.b("        <button class=\"btn btn-default reverse\" type=\"button\" tabindex=\"-1\"><i class=\"fa fa-sort text-muted\"></i></button>");t.b("\n" + i);t.b("      </span>");t.b("\n" + i);t.b("        <select class=\"form-control sortBy\">");t.b("\n" + i);t.b("          <option value=true>None</option>");t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,1103,1220,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,1128,1197,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("              <option value=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\">");t.b(t.v(t.f("label",c,p,0)));t.b("</option>");t.b("\n" + i);});c.pop();}});c.pop();}t.b("        <select>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {}, subs: {  }});
-templates["mobile_row"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<tr><td colspan=\"100%\" class=\"filterable\">		");t.b("\n" + i);if(t.s(t.d("options.hasActions",c,p,1),c,p,0,70,497,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	<div data-event=\"mark\" style=\"text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;\">");t.b("\n" + i);t.b("	<span class=\"text-muted fa ");t.b(t.v(t.f("start",c,p,0)));t.b("#checked");t.b(t.v(t.f("end",c,p,0)));t.b("fa-check-square-o");t.b(t.v(t.f("start",c,p,0)));t.b("/checked");t.b(t.v(t.f("end",c,p,0)));t.b(" ");t.b(t.v(t.f("start",c,p,0)));t.b("^checked");t.b(t.v(t.f("end",c,p,0)));t.b("fa-square-o");t.b(t.v(t.f("start",c,p,0)));t.b("/checked");t.b(t.v(t.f("end",c,p,0)));t.b("\" style=\"margin:6px; cursor:pointer;font-size:24px\"></span>");t.b("\n" + i);t.b("	</div>");t.b("\n" + i);});c.pop();}t.b(" <div>");t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,540,740,"{{ }}")){t.rs(c,p,function(c,p,t){t.b(" 	");if(t.s(t.f("visible",c,p,1),c,p,0,555,725,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("isEnabled",c,p,1),c,p,0,569,711,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<div class=\"row\" style=\"min-width:85px\"><span class=\"col-sm-3\"><b>");t.b(t.v(t.f("label",c,p,0)));t.b("</b></span><span class=\"col-sm-9 col-xs-12\">");t.b(t.t(t.f("name",c,p,0)));t.b("</span></div>");});c.pop();}});c.pop();}t.b("\n" + i);});c.pop();}t.b(" 	</div>");t.b("\n" + i);t.b("</td></tr>");return t.fl(); },partials: {}, subs: {  }});
-templates["mobile_table"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"well table-well\">");t.b("\n" + i);t.b("	<div style=\"height:40px;\">");t.b("\n" + i);t.b("    <div name=\"events\" class=\" pull-left\" style=\"margin-bottom:10px;width:62%\" ></div>");t.b("\n");t.b("\n" + i);t.b("		<input type=\"file\" class=\"csvFileInput\" accept=\".csv\" style=\"display:none\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"hiddenForm\" style=\"display:none\"></div>");t.b("\n" + i);t.b("		<div class=\"btn-group pull-right\" style=\"margin-bottom:10px\" role=\"group\" aria-label=\"...\">");t.b("\n" + i);if(t.s(t.f("showAdd",c,p,1),c,p,0,388,489,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div data-event=\"add\" class=\"btn btn-success\"><i class=\"fa fa-pencil-square-o\"></i> New</div>");t.b("\n" + i);});c.pop();}t.b("\n" + i);if(t.s(t.d("options.events",c,p,1),c,p,0,526,678,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("				");if(t.s(t.f("global",c,p,1),c,p,0,542,663,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<div class=\"btn btn-default custom-event-collection\" data-event=\"");t.b(t.v(t.f("name",c,p,0)));t.b("\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\">");t.b(t.t(t.f("label",c,p,0)));t.b("</div>");});c.pop();}t.b("\n" + i);});c.pop();}if(t.s(t.d("options.download",c,p,1),c,p,0,722,885,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn btn-default hidden-xs\" name=\"bt-download\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Download\"><i class=\"fa fa-download\"></i></div>");t.b("\n" + i);});c.pop();}if(t.s(t.d("options.upload",c,p,1),c,p,0,929,1086,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn btn-default hidden-xs\" name=\"bt-upload\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Upload\"><i class=\"fa fa-upload\"></i></div>");t.b("\n" + i);});c.pop();}t.b("\n");t.b("\n" + i);if(t.s(t.d("options.columns",c,p,1),c,p,0,1131,1892,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn-group columnEnables\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Display Columns\">");t.b("\n" + i);t.b("			  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"enables_");t.b(t.v(t.d("options.id",c,p,0)));t.b("\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">");t.b("\n" + i);t.b("			    <i class=\"fa fa-list\"></i>");t.b("\n" + i);t.b("			    <span class=\"caret\"></span>");t.b("\n" + i);t.b("			  </button>");t.b("\n" + i);t.b("			  <ul class=\"dropdown-menu pull-right\" style=\"padding-top:10px\" aria-labelledby=\"enables_");t.b(t.v(t.d("options.id",c,p,0)));t.b("\">");t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,1611,1857,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,1630,1837,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			    <li><label data-field=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" style=\"width:100%;font-weight:normal\"><input type=\"checkbox\" ");if(t.s(t.f("isEnabled",c,p,1),c,p,0,1744,1761,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("checked=\"checked\"");});c.pop();}t.b(" style=\"margin: 5px 0 5px 15px;\"> ");t.b(t.v(t.f("label",c,p,0)));t.b("</label></li>");t.b("\n" + i);});c.pop();}});c.pop();}t.b("			  </ul>");t.b("\n" + i);t.b("			</div>");t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>	");t.b("\n" + i);t.b(t.rp("<mobile_head0",c,p,"			"));t.b("\n");t.b("\n" + i);if(t.s(t.d("options.hasActions",c,p,1),c,p,0,1979,2086,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("  <div style=\"padding: 16px 0 0 15px;\"><i data-event=\"select_all\" class=\"fa fa-2x fa-square-o\"></i></div>");t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("	<div class=\"table-container\" style=\"width:100%;overflow:auto\">");t.b("\n");t.b("\n" + i);t.b("	<div style=\"min-height:100px\">");t.b("\n" + i);t.b("		<table class=\"table ");if(!t.s(t.d("options.noborder",c,p,1),c,p,1,0,0,"")){t.b("table-bordered");};t.b(" table-striped table-hover dataTable\" style=\"margin-bottom:0px\">");t.b("\n" + i);t.b("			<tbody class=\"list-group\">");t.b("\n" + i);t.b("				<tr><td>");t.b("\n" + i);t.b("					<div class=\"alert alert-info\" role=\"alert\">You have no items.</div>");t.b("\n" + i);t.b("				</td></tr>");t.b("\n" + i);t.b("			</tbody>");t.b("\n");t.b("\n" + i);t.b("		</table>");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n" + i);t.b("	<div class=\"paginate-footer\" style=\"overflow:hidden;margin-top:10px\"></div>");t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {"<mobile_head0":{name:"mobile_head", partials: {}, subs: {  }}}, subs: {  }});
-templates["table"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"well table-well\">");t.b("\n" + i);t.b("	<div style=\"height:40px\">");t.b("\n" + i);t.b("		<div name=\"events\" class=\" pull-left\" style=\"margin-bottom:10px;width:62%\" ></div>");t.b("\n");t.b("\n" + i);t.b("		<input type=\"file\" class=\"csvFileInput\" accept=\".csv\" style=\"display:none\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"hiddenForm\" style=\"display:none\"></div>");t.b("\n" + i);t.b("		<div class=\"btn-group pull-right\" style=\"margin-bottom:10px;margin-left:10px\" role=\"group\" aria-label=\"...\">");t.b("\n" + i);if(t.s(t.f("showAdd",c,p,1),c,p,0,402,503,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div data-event=\"add\" class=\"btn btn-success\"><i class=\"fa fa-pencil-square-o\"></i> New</div>");t.b("\n" + i);});c.pop();}if(t.s(t.d("options.events",c,p,1),c,p,0,540,703,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("				");if(t.s(t.f("global",c,p,1),c,p,0,556,688,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<div class=\"btn btn-default custom-event-collection ");t.b(t.v(t.f("global",c,p,0)));t.b("\" data-event=\"");t.b(t.v(t.f("name",c,p,0)));t.b("\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\">");t.b(t.t(t.f("label",c,p,0)));t.b("</div>");});c.pop();}t.b("\n" + i);});c.pop();}if(t.s(t.d("options.download",c,p,1),c,p,0,747,910,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn btn-default hidden-xs\" name=\"bt-download\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Download\"><i class=\"fa fa-download\"></i></div>");t.b("\n" + i);});c.pop();}if(t.s(t.d("options.upload",c,p,1),c,p,0,954,1111,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn btn-default hidden-xs\" name=\"bt-upload\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Upload\"><i class=\"fa fa-upload\"></i></div>");t.b("\n" + i);});c.pop();}t.b("\n");t.b("\n" + i);if(t.s(t.d("options.columns",c,p,1),c,p,0,1156,1903,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<div class=\"btn-group columnEnables\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Display Columns\">");t.b("\n" + i);t.b("			  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"enables_");t.b(t.v(t.d("options.id",c,p,0)));t.b("\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">");t.b("\n" + i);t.b("			    <i class=\"fa fa-list\"></i>");t.b("\n" + i);t.b("			    <span class=\"caret\"></span>");t.b("\n" + i);t.b("			  </button>");t.b("\n" + i);t.b("			  <ul class=\"dropdown-menu pull-right\" style=\"padding-top:10px;padding-left:10px\" aria-labelledby=\"enables_");t.b(t.v(t.d("options.id",c,p,0)));t.b("\">");t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,1654,1868,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,1673,1848,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			    <li><label data-field=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\" style=\"width:100%;font-weight:normal\"><input type=\"checkbox\" ");if(t.s(t.f("isEnabled",c,p,1),c,p,0,1787,1804,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("checked=\"checked\"");});c.pop();}t.b("> ");t.b(t.v(t.f("label",c,p,0)));t.b("</label></li>");t.b("\n" + i);});c.pop();}});c.pop();}t.b("			  </ul>");t.b("\n" + i);t.b("			</div>");t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n" + i);t.b("		");if(t.s(t.d("options.search",c,p,1),c,p,0,1956,2086,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<input type=\"text\" name=\"search\" class=\"form-control pull-right\" style=\"max-width:300px; margin-bottom:10px\" placeholder=\"Search\">");});c.pop();}t.b("\n");t.b("\n" + i);t.b("	</div>	");t.b("\n");t.b("\n" + i);if(!t.s(t.d("options.autoSize",c,p,1),c,p,1,0,0,"")){t.b("	<div class=\"paginate-footer hidden-xs\" style=\"overflow:hidden;margin-top:10px;clear:both\"></div>");t.b("\n" + i);};t.b("\n" + i);t.b("	<div class=\"table-container\" style=\"width:100%;overflow:auto\">");t.b("\n" + i);if(t.s(t.d("options.autoSize",c,p,1),c,p,0,2348,2515,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	<table class=\"table ");if(!t.s(t.d("options.noborder",c,p,1),c,p,1,0,0,"")){t.b("table-bordered");};t.b("\" style=\"margin-bottom:0px\">");t.b("\n" + i);t.b("	<thead class=\"head\">");t.b("\n" + i);t.b(t.rp("<table_head0",c,p,"	"));t.b("	</thead>");t.b("\n" + i);t.b("	</table>");t.b("\n" + i);});c.pop();}t.b("\n");t.b("\n" + i);t.b("	<div style=\"min-height:100px\">");t.b("\n" + i);t.b("		<table class=\"table ");if(!t.s(t.d("options.noborder",c,p,1),c,p,1,0,0,"")){t.b("table-bordered");};t.b(" table-striped table-hover dataTable\" style=\"margin-bottom:0px;");if(t.s(t.d("options.autoSize",c,p,1),c,p,0,2733,2751,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("margin-top: -19px;");});c.pop();}t.b("\">");t.b("\n" + i);if(!t.s(t.d("options.autoSize",c,p,1),c,p,1,0,0,"")){t.b("			<thead class=\"head\">");t.b("\n" + i);t.b(t.rp("<table_head1",c,p,"			"));t.b("			</thead>");t.b("\n" + i);};if(t.s(t.d("options.autoSize",c,p,1),c,p,0,2901,3181,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<thead>");t.b("\n" + i);t.b("						<tr  class=\"list-group-row\">");t.b("\n" + i);if(t.s(t.d("options.hasActions",c,p,1),c,p,0,2981,3041,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("    <th style=\"width:60px\" class=\"select-column\"></th>");t.b("\n" + i);});c.pop();}if(t.s(t.f("items",c,p,1),c,p,0,3082,3151,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,3099,3134,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	<th  style=\"min-width:85px\">");t.b("\n" + i);});c.pop();}});c.pop();}t.b("		</tr>");t.b("\n" + i);t.b("		</thead>");t.b("\n" + i);});c.pop();}t.b("			<tbody class=\"list-group\">");t.b("\n" + i);t.b("				<tr><td>");t.b("\n" + i);t.b("					<div class=\"alert alert-info\" role=\"alert\">You have no items.</div>");t.b("\n" + i);t.b("				</td></tr>");t.b("\n" + i);t.b("			</tbody>");t.b("\n");t.b("\n" + i);t.b("		</table>");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n" + i);t.b("	<div class=\"paginate-footer\" style=\"overflow:hidden;margin-top:10px\"></div>");t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {"<table_head0":{name:"table_head", partials: {}, subs: {  }},"<table_head1":{name:"table_head", partials: {}, subs: {  }}}, subs: {  }});
-templates["table_footer"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div>");t.b("\n" + i);if(t.s(t.f("multiPage",c,p,1),c,p,0,21,930,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	<nav class=\"pull-right\" style=\"margin-left: 10px;\">");t.b("\n" + i);if(t.s(t.f("size",c,p,1),c,p,0,85,910,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("		<ul class=\"pagination\" style=\"margin:0\">");t.b("\n" + i);if(!t.s(t.f("isFirst",c,p,1),c,p,1,0,0,"")){t.b("			");if(!t.s(t.f("showFirst",c,p,1),c,p,1,0,0,"")){t.b("<li class=\"pagination-first\"><a data-page=\"1\" href=\"javascript:void(0);\" aria-label=\"First\"><span aria-hidden=\"true\">&laquo;</span></a></li>");};t.b("\n" + i);t.b("			<li><a data-page=\"dec\" href=\"javascript:void(0);\" aria-label=\"Previous\"><span aria-hidden=\"true\">&lsaquo;</span></a></li>");t.b("\n" + i);};if(t.s(t.f("pages",c,p,1),c,p,0,471,571,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("				<li class=\"");t.b(t.v(t.f("active",c,p,0)));t.b("\"><a data-page=\"");t.b(t.v(t.f("name",c,p,0)));t.b("\" href=\"javascript:void(0);\">");t.b(t.v(t.f("name",c,p,0)));t.b("</a></li>");t.b("\n" + i);});c.pop();}if(!t.s(t.f("isLast",c,p,1),c,p,1,0,0,"")){t.b("			<li><a data-page=\"inc\" href=\"javascript:void(0);\" aria-label=\"Next\"><span aria-hidden=\"true\">&rsaquo;</span></a></li>");t.b("\n" + i);t.b("			");if(!t.s(t.f("showLast",c,p,1),c,p,1,0,0,"")){t.b("<li class=\"pagination-last\"><a data-page=\"\" href=\"javascript:void(0);\" aria-label=\"Last\"><span aria-hidden=\"true\">&raquo;</span></a></li>");};t.b("\n" + i);};t.b("\n" + i);t.b("		</ul>");t.b("\n" + i);});c.pop();}t.b("	</nav>");t.b("\n");t.b("\n" + i);});c.pop();}t.b("	<h5 class=\"range badge ");if(!t.s(t.f("size",c,p,1),c,p,1,0,0,"")){t.b("alert-danger");};t.b(" pull-left\" style=\"margin-right:15px;\">");if(t.s(t.f("size",c,p,1),c,p,0,1048,1097,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("Showing ");t.b(t.v(t.f("first",c,p,0)));t.b(" to ");t.b(t.v(t.f("last",c,p,0)));t.b(" of ");t.b(t.v(t.f("size",c,p,0)));t.b(" results");});c.pop();}if(!t.s(t.f("size",c,p,1),c,p,1,0,0,"")){t.b("No matching results");};t.b("</h5>");t.b("\n" + i);if(t.s(t.d("entries.length",c,p,1),c,p,0,1170,1540,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("		<span class=\"pull-left\">");t.b("\n" + i);t.b("			<select class=\"form-control\" style=\"display:inline-block;width:auto;min-width:50px\" name=\"count\">");t.b("\n" + i);t.b("			<option value=\"10000\">All</option>");t.b("\n" + i);if(t.s(t.f("entries",c,p,1),c,p,0,1352,1450,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("			<option value=\"");t.b(t.v(t.f("value",c,p,0)));t.b("\" ");if(t.s(t.f("selected",c,p,1),c,p,0,1395,1414,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("selected=\"selected\"");});c.pop();}t.b(">");t.b(t.v(t.f("value",c,p,0)));t.b("</option>");t.b("\n" + i);});c.pop();}t.b("\n" + i);t.b("			</select>");t.b("\n" + i);t.b("			<span class=\"hidden-xs\">results per page</span>");t.b("\n" + i);t.b("		</span>");t.b("\n" + i);});c.pop();}t.b("</div>");return t.fl(); },partials: {}, subs: {  }});
-templates["table_head"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<tr style=\"cursor:pointer\" class=\"noselect table-sort\">");t.b("\n" + i);if(t.s(t.d("options.hasActions",c,p,1),c,p,0,83,240,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("    <th style=\"width: 60px;min-width:60px;padding: 0 0 0 20px;\" class=\"select-column\"><i data-event=\"select_all\" class=\"fa fa-2x fa-square-o\"></i></th>");t.b("\n" + i);});c.pop();}t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,279,499,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,296,482,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("    <th data-sort=\"");t.b(t.v(t.f("cname",c,p,0)));t.b("\"><h6 style=\"margin: 2px;font-size:13px;white-space: nowrap\">");if(t.s(t.d("options.sort",c,p,1),c,p,0,403,441,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<i class=\"fa fa-sort text-muted\"></i> ");});c.pop();}t.b(t.v(t.f("label",c,p,0)));t.b("</h6></th>");t.b("\n" + i);});c.pop();}});c.pop();}t.b("  </tr>");t.b("\n" + i);if(t.s(t.d("options.filter",c,p,1),c,p,0,539,1040,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("  <tr class=\"filter\">");t.b("\n" + i);t.b("    ");if(t.s(t.d("options.hasActions",c,p,1),c,p,0,589,868,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<td>");t.b("\n" + i);t.b("    <div name=\"reset-search\" style=\"position:relative\" class=\"btn\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"Clear Filters\">");t.b("\n" + i);t.b("      <i class=\"fa fa-filter\"></i>");t.b("\n" + i);t.b("      <i class=\"fa fa-times text-danger\" style=\"position: absolute;right: 5px;\"></i>");t.b("\n" + i);t.b("    </div>");t.b("\n" + i);t.b("    </td>");});c.pop();}t.b("\n");t.b("\n" + i);if(t.s(t.f("items",c,p,1),c,p,0,907,1019,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("visible",c,p,1),c,p,0,924,1002,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("    <td data-inline=\"");t.b(t.v(t.f("cname",c,p,0)));t.b("\" style=\"min-width:85px\" id=\"");t.b(t.v(t.f("id",c,p,0)));t.b("\"></td>");t.b("\n" + i);});c.pop();}});c.pop();}t.b("  </tr>");t.b("\n" + i);});c.pop();}return t.fl(); },partials: {}, subs: {  }});
-templates["table_row"] = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<tr class=\"filterable\">		");t.b("\n" + i);if(t.s(t.d("options.hasActions",c,p,1),c,p,0,50,1280,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("\n" + i);t.b("	<td data-event=\"mark\" style=\"width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;\">");t.b("\n" + i);t.b("<!-- 		<div class=\"btn-group\">");t.b("\n" + i);t.b("		  <button type=\"button\" class=\"btn btn-xs btn-info go\">Actions</button>");t.b("\n" + i);t.b("		  <button type=\"button\" class=\"btn btn-xs btn-info dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">");t.b("\n" + i);t.b("		    <span class=\"caret\"></span>");t.b("\n" + i);t.b("		    <span class=\"sr-only\">Toggle Dropdown</span>");t.b("\n" + i);t.b("		  </button>");t.b("\n" + i);t.b("		  <ul class=\"dropdown-menu dropdown-menu-right\">");t.b("\n" + i);t.b("		    ");if(t.s(t.d("options.hasEdit",c,p,1),c,p,0,698,821,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<li><a href=\"javascript:void(0);\" data-event=\"edit\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\"><i class=\"fa fa-pencil\"></i> Edit</a></li>");});c.pop();}t.b("\n" + i);t.b("		    ");if(t.s(t.d("options.hasDelete",c,p,1),c,p,0,870,996,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<li><a href=\"javascript:void(0);\" data-event=\"delete\" data-id=\"");t.b(t.v(t.f("start",c,p,0)));t.b("id");t.b(t.v(t.f("end",c,p,0)));t.b("\"><i class=\"fa fa-times\"></i> Delete</a></li>");});c.pop();}t.b("\n" + i);t.b("		  </ul>");t.b("\n" + i);t.b("		</div> -->");t.b("\n" + i);t.b("		<span class=\"text-muted fa ");t.b(t.v(t.f("start",c,p,0)));t.b("#checked");t.b(t.v(t.f("end",c,p,0)));t.b("fa-check-square-o");t.b(t.v(t.f("start",c,p,0)));t.b("/checked");t.b(t.v(t.f("end",c,p,0)));t.b(" ");t.b(t.v(t.f("start",c,p,0)));t.b("^checked");t.b(t.v(t.f("end",c,p,0)));t.b("fa-square-o");t.b(t.v(t.f("start",c,p,0)));t.b("/checked");t.b(t.v(t.f("end",c,p,0)));t.b("\" style=\"margin:6px 0 6px 20px; cursor:pointer;font-size:24px\"></span>");t.b("\n" + i);t.b("   	</td>");t.b("\n");t.b("\n" + i);});c.pop();}if(t.s(t.f("items",c,p,1),c,p,0,1315,1413,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("	");if(t.s(t.f("visible",c,p,1),c,p,0,1329,1399,"{{ }}")){t.rs(c,p,function(c,p,t){if(t.s(t.f("isEnabled",c,p,1),c,p,0,1343,1385,"{{ }}")){t.rs(c,p,function(c,p,t){t.b("<td style=\"min-width:85px\">");t.b(t.t(t.f("name",c,p,0)));t.b("</td>");});c.pop();}});c.pop();}t.b("\n" + i);});c.pop();}t.b("</tr>");return t.fl(); },partials: {}, subs: {  }});
+templates = {
+events:`<div>
+<span class="hidden-xs">
+{{#options.hasDelete}}
+<a href="javascript:void(0);" data-event="delete_all" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
+{{/options.hasDelete}}
+<div class="btn-group"role="group" aria-label="...">
+
+    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit_all" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
+
+    {{#options.events}}
+      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}">{{{label}}}</a>{{/global}}
+    {{/options.events}}
+
+</div>
+</span>
+<div class="btn-group visible-xs">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fa fa-cogs"></i> <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit_all" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
+
+      {{#options.events}}
+        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{start}}id{{end}}">{{{label}}}</a></li>{{/global}}
+      {{/options.events}}
+      {{#options.hasDelete}}
+        <li role="separator" class="divider"></li>
+        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete_all" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
+      {{/options.hasDelete}}
+  </ul>
+</div>
+</div>
+`,
+count:`		{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 15px;">{{checked_count}} item(s) selected</h5>{{/checked_count}}`,
+mobile_head:`
+<div style="clear:both;">
+
+  {{#options.sort}}
+
+  <div class="row" style="margin-bottom:10px">
+
+    <div class="col-xs-6">
+    {{#options.filter}}
+
+      <div name="reset-search" style="position:relative" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Clear Filters">
+        <i class="fa fa-filter"></i>
+        <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
+      </div>    
+
+    <div class="btn btn-info filterForm">Filter</div>
+  {{/options.filter}}
+    </div>
+    <div class="col-xs-6">
+    		{{#options.search}}<input type="text" name="search" class="form-control" style="" placeholder="Search">{{/options.search}}
+        </div>
+    </div>
+    <div class="input-group">
+      <span class="" style="display: table-cell;width: 1%;white-space: nowrap;vertical-align: middle;padding-right:5px">
+        <button class="btn btn-default reverse" type="button" tabindex="-1"><i class="fa fa-sort text-muted"></i></button>
+      </span>
+        <select class="form-control sortBy">
+          <option value=true>None</option>
+          {{#items}}
+            {{#visible}}
+              <option value="{{id}}">{{label}}</option>
+            {{/visible}}
+          {{/items}}
+        <select>
+    </div>
+  {{/options.sort}}
+
+</div>
+`,
+mobile_row:`<tr><td colspan="100%" class="filterable">		
+{{#options.hasActions}}
+<div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+<span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
+</div>
+  {{/options.hasActions}}
+<div>
+{{#items}}
+{{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
+{{/items}}
+</div>
+</td></tr>`,
+mobile_table:`<div class="well table-well">
+<div style="height:40px;">
+  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+
+  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
+
+  <div class="hiddenForm" style="display:none"></div>
+  <div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
+    {{#showAdd}}
+    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
+    {{/showAdd}}	
+
+    {{#options.events}}
+      {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+    {{/options.events}}
+    {{#options.download}}
+    <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
+    {{/options.download}}
+    {{#options.upload}}
+    <div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
+    {{/options.upload}}
+
+
+    {{#options.columns}}
+    <div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+      <button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="fa fa-list"></i>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right" style="padding-top:10px" aria-labelledby="enables_{{options.id}}">
+        {{#items}}
+        {{#visible}}
+        <li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}} style="margin: 5px 0 5px 15px;"> {{label}}</label></li>
+        {{/visible}}
+        {{/items}}
+      </ul>
+    </div>
+    {{/options.columns}}
+
+  </div>
+
+
+</div>	
+    {{>mobile_head}}
+
+
+{{#options.hasActions}}
+<div style="padding: 16px 0 0 15px;"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></div>
+{{/options.hasActions}}
+
+<div class="table-container" style="width:100%;overflow:auto">
+
+<div style="min-height:100px">
+  <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
+    <tbody class="list-group">
+      <tr><td>
+        <div class="alert alert-info" role="alert">You have no items.</div>
+      </td></tr>
+    </tbody>
+
+  </table>
+</div>
+
+</div>
+<div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
+</div>`,
+
+table:`<div class="well table-well">
+<div style="overflow:hidden">
+  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+
+  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
+
+  <div class="hiddenForm" style="display:none"></div>
+  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
+    {{#showAdd}}
+    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
+    {{/showAdd}}		
+    {{#options.events}}
+      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+    {{/options.events}}
+
+  </div>
+ 
+</div>	
+<div>
+
+  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
+
+    {{#options.download}}
+    <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
+    {{/options.download}}
+    {{#options.upload}}
+    <div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
+    {{/options.upload}}
+
+
+    {{#options.columns}}
+    <div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+      <button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="fa fa-list"></i>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right" style="padding-top:10px;padding-left:10px" aria-labelledby="enables_{{options.id}}">
+        {{#items}}
+        {{#visible}}
+        <li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}}> {{label}}</label></li>
+        {{/visible}}
+        {{/items}}
+      </ul>
+    </div>
+    {{/options.columns}}
+  </div>
+  {{#options.search}}<input type="text" name="search" class="form-control pull-right" style="max-width:300px; margin-bottom:10px" placeholder="Search">{{/options.search}}
+
+  <span name="count"></span>
+</div>
+
+{{^options.autoSize}}
+<div class="paginate-footer hidden-xs" style="overflow:hidden;margin-top:10px;clear:both"></div>
+{{/options.autoSize}}
+
+<div class="table-container" style="width:100%;overflow:auto">
+{{#options.autoSize}}
+<table class="table {{^options.noborder}}table-bordered{{/options.noborder}}" style="margin-bottom:0px">
+<thead class="head">
+{{>table_head}}
+</thead>
+</table>
+{{/options.autoSize}}
+
+
+<div style="min-height:100px">
+  <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px;{{#options.autoSize}}margin-top: -19px;{{/options.autoSize}}">
+    {{^options.autoSize}}
+    <thead class="head">
+    {{>table_head}}
+    </thead>
+    {{/options.autoSize}}
+{{#options.autoSize}}
+    <thead>
+          <tr  class="list-group-row">
+              {{#options.hasActions}}
+  <th style="width:60px" class="select-column"></th>
+  {{/options.hasActions}}
+        {{#items}}
+  {{#visible}}
+<th  style="min-width:85px">
+  {{/visible}}
+  {{/items}}
+  </tr>
+  </thead>
+{{/options.autoSize}}
+    <tbody class="list-group">
+      <tr><td>
+        <div class="alert alert-info" role="alert">You have no items.</div>
+      </td></tr>
+    </tbody>
+
+  </table>
+</div>
+
+</div>
+<div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
+</div>`,
+table_footer:`<div>
+{{#multiPage}}
+<nav class="pull-right" style="margin-left: 10px;">
+{{#size}}
+  <ul class="pagination" style="margin:0">
+    {{^isFirst}}
+    {{^showFirst}}<li class="pagination-first"><a data-page="1" href="javascript:void(0);" aria-label="First"><span aria-hidden="true">&laquo;</span></a></li>{{/showFirst}}
+    <li><a data-page="dec" href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&lsaquo;</span></a></li>
+    {{/isFirst}}
+    {{#pages}}
+      <li class="{{active}}"><a data-page="{{name}}" href="javascript:void(0);">{{name}}</a></li>
+    {{/pages}}
+    {{^isLast}}
+    <li><a data-page="inc" href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&rsaquo;</span></a></li>
+    {{^showLast}}<li class="pagination-last"><a data-page="" href="javascript:void(0);" aria-label="Last"><span aria-hidden="true">&raquo;</span></a></li>{{/showLast}}
+    {{/isLast}}
+
+  </ul>
+{{/size}}
+</nav>
+
+{{/multiPage}}	
+<h5 class="range badge {{^size}}alert-danger{{/size}} pull-left" style="margin-right:15px;">{{#size}}Showing {{first}} to {{last}} of {{size}} results{{/size}}{{^size}}No matching results{{/size}}</h5>
+  {{#entries.length}}
+  <span class="pull-left">
+    <select class="form-control" style="display:inline-block;width:auto;min-width:50px" name="count">
+    <option value="10000">All</option>
+    {{#entries}}
+    <option value="{{value}}" {{#selected}}selected="selected"{{/selected}}>{{value}}</option>
+    {{/entries}}
+
+    </select>
+    <span class="hidden-xs">results per page</span>
+  </span>
+  {{/entries.length}}
+</div>`,
+table_head:`  <tr style="cursor:pointer" class="noselect table-sort">
+{{#options.hasActions}}
+<th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></th>
+{{/options.hasActions}}
+
+{{#items}}
+{{#visible}}
+<th data-sort="{{cname}}"><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
+{{/visible}}
+{{/items}}
+</tr>
+{{#options.filter}}
+<tr class="filter">
+{{#options.hasActions}}<td>
+<div name="reset-search" style="position:relative" class="btn" data-toggle="tooltip" data-placement="left" title="Clear Filters">
+  <i class="fa fa-filter"></i>
+  <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
+</div>
+</td>{{/options.hasActions}}
+
+{{#items}}
+{{#visible}}
+<td data-inline="{{cname}}" style="min-width:85px" id="{{id}}"></td>
+{{/visible}}
+{{/items}}
+</tr>
+{{/options.filter}}`,
+table_row:`<tr class="filterable">		
+{{#options.hasActions}}
+
+<td data-event="mark" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+<!-- 		<div class="btn-group">
+    <button type="button" class="btn btn-xs btn-info go">Actions</button>
+    <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      {{#options.hasEdit}}<li><a href="javascript:void(0);" data-event="edit" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li>{{/options.hasEdit}}
+      {{#options.hasDelete}}<li><a href="javascript:void(0);" data-event="delete" data-id="{{start}}id{{end}}"><i class="fa fa-times"></i> Delete</a></li>{{/options.hasDelete}}
+    </ul>
+  </div> -->
+  <span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+   </td>
+
+  {{/options.hasActions}}
+{{#items}}
+{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
+{{/items}}
+</tr>`
+
+
+}
