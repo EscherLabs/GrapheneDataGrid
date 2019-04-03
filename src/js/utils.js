@@ -52,8 +52,8 @@
 
 csvify = function(data, columns, title){
 
-  var csv = '"'+_.pluck(columns,'label').join('","')+'"\n';
-  this.labels = _.pluck(columns,'name')
+  var csv = '"'+_.map(columns,'label').join('","')+'"\n';
+  this.labels = _.map(columns,'name')
 	var empty = _.zipObject(this.labels, _.map(this.labels, function() { return '';}))
   csv += _.map(data,function(d){
       return JSON.stringify(_.values(_.extend(empty,_.pick(d,this.labels))))

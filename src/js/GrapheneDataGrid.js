@@ -591,6 +591,8 @@ function GrapheneDataGrid(options) {
 			for(var i in options.data) {
 				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
 						e.model.owner.updateCount();
+						e.model.owner.draw();
+						debugger;
 						// e.model.owner.$el.find('[name="events"]').html(templates['events'].render(e.model.owner.summary, templates));
 						// e.model.owner.$el.find('[name="events"]').html(GrapheneDataGrid.render('events',e.model.owner.summary));
 					})
