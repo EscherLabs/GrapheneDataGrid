@@ -19,11 +19,11 @@ function GrapheneDataGrid(options) {
 		loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
 		}catch(e){};
 	}
-	if(typeof options.item_template !== 'string' ){
+	if(options.item_template ){
 		// options.item_template= Hogan.compile(options.item_template)
-		// options.item_template = options.item_template;//GrapheneDataGrid.renderString(options.item_template)
+		options.item_template = GrapheneDataGrid.renderString(options.item_template)
 
-	// }else{
+	}else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
 			options.item_template = templates['table_row'];
 		}else{
@@ -64,8 +64,7 @@ function GrapheneDataGrid(options) {
 		// var view = Hogan.compile(options.item_template.render(summary, templates));
 		var view = GrapheneDataGrid.renderString(options.item_template,summary)
 		_.each(this.grab(options), function(model) {
-			// new viewitem({ 'model': model, container: newContainer, view: view});
-			newContainer.append(GrapheneDataGrid.renderString(view,model))
+			new viewitem({ 'model': model, container: newContainer, view: view});
 		});
 		// var container = 
 		this.$el.find('.list-group').empty().replaceWith(newContainer);
@@ -430,14 +429,6 @@ function GrapheneDataGrid(options) {
 	function onload($el){
 		this.$el = $el;
 
-		this.$el.on('click', '[data-event="mark"]', function(e) {
-			_.find(this.models,{id:e.currentTarget.dataset.id}).toggle(e.currentTarget.checked);
-		}.bind(this));
-		// this.$el.on('click', '.grid-row', function(e) {
-
-		// 	// _.find(this.models,{id:e.currentTarget.dataset.id}).toggle(e.currentTarget.checked);
-		// }.bind(this));
-
 		if(this.options.columns){
 			this.$el.on('click', '.columnEnables label', function(e){
 				e.stopPropagation();
@@ -637,7 +628,7 @@ function GrapheneDataGrid(options) {
 				new gform($.extend(true,{},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
 					if(e.form.validate()){
 						this.add(e.form.get(),{validate:false})
-						e.form.pub('close');
+							e.form.pub('close');
 					}
 				}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
 			}
@@ -961,4 +952,678 @@ GrapheneDataGrid.renderString = function(string,options) {
 	return gform.m(string, _.extend({}, templates, options))
 
 	// return gform.m(string || '', options || {})
+}
+(function($) {
+  $.score = function(base, abbr, offset) {
+    
+    offset = offset || 0; // TODO: I think this is unused... remove
+    
+    if(abbr.length === 0) return 0.9;
+    if(abbr.length > base.length) return 0.0;
+    
+    for (var i = abbr.length; i > 0; i--) {
+      var sub_abbr = abbr.substring(0,i);
+      var index = base.indexOf(sub_abbr);
+      
+      if(index < 0) continue;
+      if(index + abbr.length > base.length + offset) continue;
+      
+      var next_string = base.substring(index+sub_abbr.length);
+      var next_abbr = null;
+      
+      if(i >= abbr.length) {
+        next_abbr = '';
+      } else {
+        next_abbr = abbr.substring(i);
+      }
+      // Changed to fit new (jQuery) format (JSK)
+      var remaining_score   = $.score(next_string, next_abbr,offset+index);
+      
+      if (remaining_score > 0) {
+        var score = base.length-next_string.length;
+        
+        if(index !== 0) {     
+          var c = base.charCodeAt(index-1);
+          if(c==32 || c == 9) {
+            for(var j=(index-2); j >= 0; j--) {
+              c = base.charCodeAt(j);
+              score -= ((c == 32 || c == 9) ? 1 : 0.15);
+            }
+          } else {
+            score -= index;
+          }
+        }
+        
+        score += remaining_score * next_string.length;
+        score /= base.length;
+        return score;
+      }
+    }
+    return 0.0;
+  };
+})(jQuery);
+
+
+csvify = function(data, columns, title){
+
+  var csv = '"'+_.map(columns,'label').join('","')+'"\n';
+  this.labels = _.map(columns,'name')
+	var empty = _.zipObject(this.labels, _.map(this.labels, function() { return '';}))
+  csv += _.map(data,function(d){
+      return JSON.stringify(_.values(_.extend(empty,_.pick(d,this.labels))))
+  },this)
+  .join('\n') 
+  .replace(/(^\[)|(\]$)/mg, '')
+  .split('\"').join("")
+
+  var link = document.createElement("a");
+  link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+  link.setAttribute("download", (title||"GrapheneDataGrid")+".csv");
+  document.body.appendChild(link); // Required for FF
+  link.click();
+  document.body.removeChild(link); 
+}
+
+
+function CSVToArray( strData, strDelimiter ){
+    // Check to see if the delimiter is defined. If not,
+    // then default to comma.
+    strDelimiter = (strDelimiter || ",");
+
+    // Create a regular expression to parse the CSV values.
+    var objPattern = new RegExp(
+        (
+            // Delimiters.
+            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+            // Quoted fields.
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+            // Standard fields.
+            "([^\"\\" + strDelimiter + "\\r\\n]*))"
+        ),
+        "gi"
+        );
+
+
+    // Create an array to hold our data. Give the array
+    // a default empty first row.
+    var arrData = [[]];
+
+    // Create an array to hold our individual pattern
+    // matching groups.
+    var arrMatches = null;
+
+
+    // Keep looping over the regular expression matches
+    // until we can no longer find a match.
+    while (arrMatches = objPattern.exec( strData )){
+
+        // Get the delimiter that was found.
+        var strMatchedDelimiter = arrMatches[ 1 ];
+
+        // Check to see if the given delimiter has a length
+        // (is not the start of string) and if it matches
+        // field delimiter. If id does not, then we know
+        // that this delimiter is a row delimiter.
+        if ( strMatchedDelimiter.length &&
+            strMatchedDelimiter !== strDelimiter ){
+            // Since we have reached a new row of data,
+            // add an empty row to our data array.
+            arrData.push( [] );
+        }
+
+        var strMatchedValue;
+
+        // Now that we have our delimiter out of the way,
+        // let's check to see which kind of value we
+        // captured (quoted or unquoted).
+        if (arrMatches[ 2 ]){
+
+            // We found a quoted value. When we capture
+            // this value, unescape any double quotes.
+            strMatchedValue = arrMatches[ 2 ].replace(
+                new RegExp( "\"\"", "g" ),
+                "\""
+                );
+
+        } else {
+
+            // We found a non-quoted value.
+            strMatchedValue = arrMatches[ 3 ];
+
+        }
+
+
+        // Now that we have our value string, let's add
+        // it to the data array.
+
+        // if(arrData.length >1){
+        //  var temp = {};
+        //  temp[arrData[0][arrData[ arrData.length - 1 ].length]] = strMatchedValue;
+    //        arrData[ arrData.length - 1 ].push( temp );
+    //        strMatchedValue = temp;
+
+    //      }
+        arrData[ arrData.length - 1 ].push( strMatchedValue );
+
+    }
+
+    // Return the parsed data.
+    return( arrData );
+}
+function tableModel (owner, initial) {
+	
+	this.owner = owner;
+	this.id = gform.getUID();
+	this.attributes = {};
+	this.display = {};
+	this.attribute_history = [];
+	this.schema = owner.options.schema;
+	var processAtts = function() {
+		_.each(this.schema, function(item){
+			if(typeof item.options !== 'undefined'){
+				var option;
+				if(typeof item.value_key !== 'undefined'){
+										if(item.value_key == 'index'){
+						option = item.options[this.attributes[item.name]]
+					}else{
+						var search = {};
+						search[item.value_key] = this.attributes[item.name];
+						option = _.find(item.options, search);
+						if($.isNumeric(this.attributes[item.name])){
+							search[item.value_key] = parseInt(this.attributes[item.name]);
+							if(typeof option === 'undefined'){
+								option = _.find(item.options, search);
+							}
+							if(typeof option === 'undefined'){
+								option = _.find(item.options, search);
+							}
+						}
+					}
+				}else{
+					option =  _.find(item.options, {value:this.attributes[item.name]});
+					if(typeof option === 'undefined'){
+						option = _.find(item.options, {id:this.attributes[item.name]});
+					}
+          if($.isNumeric(this.attributes[item.name])){
+            if(typeof option === 'undefined'){
+              option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
+            }
+            if(typeof option === 'undefined'){
+              option = _.find(item.options, {id:parseInt(this.attributes[item.name], 10)});
+            }
+          }
+				}
+				if(typeof option === 'object') {
+					this.display[item.name] = option[item.label_key] || option.label || option.name;
+				}else{
+					this.display[item.name] = this.attributes[item.name];
+				}
+			}else{
+				if(item.template){
+					// this.display[item.name] = Hogan.compile(item.template).render(this);	
+					this.display[item.name] = GrapheneDataGrid.renderString(item.template)
+					
+				}else{
+					this.display[item.name] = this.attributes[item.name];
+				}
+			}
+		}.bind(this))
+	}
+	this.set = function(newAtts){
+		this.attribute_history.push($.extend(true, {}, this.attributes));
+		this.attributes = newAtts;
+		processAtts.call(this);
+	}
+	this.pat =function(){
+		processAtts.call(this);
+	}
+	this.checked = false;
+	this.deleted = false;
+	this.toggle = function(state,silent) {
+		if(typeof state === 'bool') {
+			this.checked = state;
+		}else{
+			this.checked = !this.checked;
+		}
+		if(!silent){
+			this.dispatch('check');
+		}
+	}
+	this.set(initial)
+	processAtts.call(this);
+	this.toJSON = function() {return this.attributes}
+	this.undo = function() {
+		if(this.deleted){this.deleted = false;this.owner.draw();}else{
+			if(this.attribute_history.length){
+				this.attributes = this.attribute_history.pop();
+				processAtts.call(this);
+				this.owner.draw();
+			}
+		}
+	}
+	this.delete = function(){
+		this.deleted = true;
+		// this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
+	}
+	this.eventBus = new gform.eventBus({owner:'model',item:'model'}, this)
+	this.on = this.eventBus.on;
+	this.dispatch = this.eventBus.dispatch;
+};function viewitem(options){
+	this.update = function() {
+		if(typeof this.gform !== 'undefined'){this.gform.destroy();}
+
+		this.$el.find('[data-event]').off();
+		this.$el.off();
+		if(typeof this.model.owner.options.preDraw !== 'undefined'){
+			this.model.owner.options.preDraw(this.model);
+		}
+		// this.$el.replaceWith(this.setElement(options.view.render(this.model , templates)).$el);
+		this.$el.replaceWith(this.setElement(GrapheneDataGrid.renderString(options.view,this.model)).$el);
+
+		if(this.$el.find('[data-popins]').length > 0){
+			this.gform = this.$el.gform({ popins: {container: '#first', viewport:{ selector: 'body', padding: 20 }}, renderer: 'popins', model: this.model});
+		}
+
+		if(typeof this.model.owner.options.click == 'function'){
+			this.$el.on('click',function(e){
+				if(typeof e.target.dataset.event ==  'undefined'){
+					this.model.owner.options.click(this.model, this);
+				}
+			}.bind(this))
+		}
+
+		this.$el.find('[data-event].custom-event').on('click', function(e){
+			e.stopPropagation();
+			$(e.target).closest('.dropdown-menu').toggle()
+			var event = _.find(this.model.owner.options.events, {name:e.target.dataset.event})
+			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
+				event.callback(this.model);
+			}
+		}.bind(this));
+
+
+		this.$el.find(".btn-group > .dropdown-toggle").on('click',function(e) {
+		    e.stopPropagation();
+		    $(this).next('.dropdown-menu').toggle();
+		})
+
+		this.$el.find('[data-event="edit"]').on('click', function(e){
+			e.stopPropagation();
+			$(e.target).closest('.dropdown-menu').toggle()
+			this.edit();
+		}.bind(this));
+
+		this.edit = function(){
+			$().gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: this.model}, this.model.owner.options.gform || {} ) ).on('saved', function() {
+				if(typeof this.model.owner.options.edit == 'function') {
+					this.model.owner.options.edit(this.model);
+				}
+				this.update();
+			}, this)
+		}
+
+		this.$el.find('[data-event="mark"]').on('click', $.proxy(function(e){
+			e.stopPropagation();
+			this.model.toggle(e.currentTarget.checked);
+		},this));
+
+		this.$el.find("[data-moment]").each(function(item){
+			$(this).html(moment.utc($(this).data('moment')).format($(this).data('format')) );
+		});
+		this.$el.find(".sparkline").each(function(){
+			$(this).peity($(this).data('type'), {radius: $(this).data('radius')});
+		});
+	}
+
+	this.setElement = function(html){
+		this.$el = $(html);
+		return this;
+	}
+
+	this.model = options.model;
+	this.model.on('check', this.update.bind(this))
+
+	this.$el  = $('<tr>');
+	if(options.container){
+		options.container.append(this.$el);
+	}
+	this.model.on('change', this.update, this);
+	this.model.on('destroy', function(){
+		this.$el.fadeOut('fast', function() {
+			this.remove();
+		}.bind(this));
+	}.bind(this) );
+	this.update();
+}
+
+templates = {
+events:`<div>
+<span class="hidden-xs">
+{{#options.hasDelete}}
+<a href="javascript:void(0);" data-event="delete_all" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
+{{/options.hasDelete}}
+<div class="btn-group"role="group" aria-label="...">
+
+    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit_all" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
+
+    {{#options.events}}
+      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}">{{{label}}}</a>{{/global}}
+    {{/options.events}}
+
+</div>
+</span>
+<div class="btn-group visible-xs">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fa fa-cogs"></i> <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit_all" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
+
+      {{#options.events}}
+        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{start}}id{{end}}">{{{label}}}</a></li>{{/global}}
+      {{/options.events}}
+      {{#options.hasDelete}}
+        <li role="separator" class="divider"></li>
+        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete_all" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
+      {{/options.hasDelete}}
+  </ul>
+</div>
+</div>
+`,
+count:`		{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 15px;">{{checked_count}} item(s) selected</h5>{{/checked_count}}`,
+mobile_head:`
+<div style="clear:both;">
+
+  {{#options.sort}}
+
+  <div class="row" style="margin-bottom:10px">
+
+    <div class="col-xs-6">
+    {{#options.filter}}
+
+      <div name="reset-search" style="position:relative" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Clear Filters">
+        <i class="fa fa-filter"></i>
+        <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
+      </div>    
+
+    <div class="btn btn-info filterForm">Filter</div>
+  {{/options.filter}}
+    </div>
+    <div class="col-xs-6">
+    		{{#options.search}}<input type="text" name="search" class="form-control" style="" placeholder="Search">{{/options.search}}
+        </div>
+    </div>
+    <div class="input-group">
+      <span class="" style="display: table-cell;width: 1%;white-space: nowrap;vertical-align: middle;padding-right:5px">
+        <button class="btn btn-default reverse" type="button" tabindex="-1"><i class="fa fa-sort text-muted"></i></button>
+      </span>
+        <select class="form-control sortBy">
+          <option value=true>None</option>
+          {{#items}}
+            {{#visible}}
+              <option value="{{id}}">{{label}}</option>
+            {{/visible}}
+          {{/items}}
+        <select>
+    </div>
+  {{/options.sort}}
+
+</div>
+`,
+mobile_row:`<tr><td colspan="100%" class="filterable">		
+{{#options.hasActions}}
+<div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+<span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
+</div>
+  {{/options.hasActions}}
+<div>
+{{#items}}
+{{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
+{{/items}}
+</div>
+</td></tr>`,
+mobile_table:`<div class="well table-well">
+<div style="height:40px;">
+  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+
+  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
+
+  <div class="hiddenForm" style="display:none"></div>
+  <div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
+    {{#showAdd}}
+    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
+    {{/showAdd}}	
+
+    {{#options.events}}
+      {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+    {{/options.events}}
+    {{#options.download}}
+    <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
+    {{/options.download}}
+    {{#options.upload}}
+    <div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
+    {{/options.upload}}
+
+
+    {{#options.columns}}
+    <div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+      <button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="fa fa-list"></i>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right" style="padding-top:10px" aria-labelledby="enables_{{options.id}}">
+        {{#items}}
+        {{#visible}}
+        <li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}} style="margin: 5px 0 5px 15px;"> {{label}}</label></li>
+        {{/visible}}
+        {{/items}}
+      </ul>
+    </div>
+    {{/options.columns}}
+
+  </div>
+
+
+</div>	
+    {{>mobile_head}}
+
+
+{{#options.hasActions}}
+<div style="padding: 16px 0 0 15px;"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></div>
+{{/options.hasActions}}
+
+<div class="table-container" style="width:100%;overflow:auto">
+
+<div style="min-height:100px">
+  <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
+    <tbody class="list-group">
+      <tr><td>
+        <div class="alert alert-info" role="alert">You have no items.</div>
+      </td></tr>
+    </tbody>
+
+  </table>
+</div>
+
+</div>
+<div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
+</div>`,
+
+table:`<div class="well table-well">
+<div style="overflow:hidden">
+  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+
+  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
+
+  <div class="hiddenForm" style="display:none"></div>
+  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
+    {{#showAdd}}
+    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
+    {{/showAdd}}		
+    {{#options.events}}
+      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+    {{/options.events}}
+
+  </div>
+ 
+</div>	
+<div>
+
+  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
+
+    {{#options.download}}
+    <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
+    {{/options.download}}
+    {{#options.upload}}
+    <div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
+    {{/options.upload}}
+
+
+    {{#options.columns}}
+    <div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+      <button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="fa fa-list"></i>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right" style="padding-top:10px;padding-left:10px" aria-labelledby="enables_{{options.id}}">
+        {{#items}}
+        {{#visible}}
+        <li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}}> {{label}}</label></li>
+        {{/visible}}
+        {{/items}}
+      </ul>
+    </div>
+    {{/options.columns}}
+  </div>
+  {{#options.search}}<input type="text" name="search" class="form-control pull-right" style="max-width:300px; margin-bottom:10px" placeholder="Search">{{/options.search}}
+
+  <span name="count"></span>
+</div>
+
+{{^options.autoSize}}
+<div class="paginate-footer hidden-xs" style="overflow:hidden;margin-top:10px;clear:both"></div>
+{{/options.autoSize}}
+
+<div class="table-container" style="width:100%;overflow:auto">
+{{#options.autoSize}}
+<table class="table {{^options.noborder}}table-bordered{{/options.noborder}}" style="margin-bottom:0px">
+<thead class="head">
+{{>table_head}}
+</thead>
+</table>
+{{/options.autoSize}}
+
+
+<div style="min-height:100px">
+  <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px;{{#options.autoSize}}margin-top: -19px;{{/options.autoSize}}">
+    {{^options.autoSize}}
+    <thead class="head">
+    {{>table_head}}
+    </thead>
+    {{/options.autoSize}}
+{{#options.autoSize}}
+    <thead>
+          <tr  class="list-group-row">
+              {{#options.hasActions}}
+  <th style="width:60px" class="select-column"></th>
+  {{/options.hasActions}}
+        {{#items}}
+  {{#visible}}
+<th  style="min-width:85px">
+  {{/visible}}
+  {{/items}}
+  </tr>
+  </thead>
+{{/options.autoSize}}
+    <tbody class="list-group">
+      <tr><td>
+        <div class="alert alert-info" role="alert">You have no items.</div>
+      </td></tr>
+    </tbody>
+
+  </table>
+</div>
+
+</div>
+<div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
+</div>`,
+table_footer:`<div>
+{{#multiPage}}
+<nav class="pull-right" style="margin-left: 10px;">
+{{#size}}
+  <ul class="pagination" style="margin:0">
+    {{^isFirst}}
+    {{^showFirst}}<li class="pagination-first"><a data-page="1" href="javascript:void(0);" aria-label="First"><span aria-hidden="true">&laquo;</span></a></li>{{/showFirst}}
+    <li><a data-page="dec" href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&lsaquo;</span></a></li>
+    {{/isFirst}}
+    {{#pages}}
+      <li class="{{active}}"><a data-page="{{name}}" href="javascript:void(0);">{{name}}</a></li>
+    {{/pages}}
+    {{^isLast}}
+    <li><a data-page="inc" href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&rsaquo;</span></a></li>
+    {{^showLast}}<li class="pagination-last"><a data-page="" href="javascript:void(0);" aria-label="Last"><span aria-hidden="true">&raquo;</span></a></li>{{/showLast}}
+    {{/isLast}}
+
+  </ul>
+{{/size}}
+</nav>
+
+{{/multiPage}}	
+<h5 class="range badge {{^size}}alert-danger{{/size}} pull-left" style="margin-right:15px;">{{#size}}Showing {{first}} to {{last}} of {{size}} results{{/size}}{{^size}}No matching results{{/size}}</h5>
+  {{#entries.length}}
+  <span class="pull-left">
+    <select class="form-control" style="display:inline-block;width:auto;min-width:50px" name="count">
+    <option value="10000">All</option>
+    {{#entries}}
+    <option value="{{value}}" {{#selected}}selected="selected"{{/selected}}>{{value}}</option>
+    {{/entries}}
+
+    </select>
+    <span class="hidden-xs">results per page</span>
+  </span>
+  {{/entries.length}}
+</div>`,
+table_head:`  <tr style="cursor:pointer" class="noselect table-sort">
+{{#options.hasActions}}
+<th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></th>
+{{/options.hasActions}}
+
+{{#items}}
+{{#visible}}
+<th data-sort="{{cname}}"><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
+{{/visible}}
+{{/items}}
+</tr>
+{{#options.filter}}
+<tr class="filter">
+{{#options.hasActions}}<td>
+<div name="reset-search" style="position:relative" class="btn" data-toggle="tooltip" data-placement="left" title="Clear Filters">
+  <i class="fa fa-filter"></i>
+  <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
+</div>
+</td>{{/options.hasActions}}
+
+{{#items}}
+{{#visible}}
+<td data-inline="{{cname}}" style="min-width:85px" id="{{id}}"></td>
+{{/visible}}
+{{/items}}
+</tr>
+{{/options.filter}}`,
+table_row:`<tr class="filterable">		
+{{#options.hasActions}}
+
+<td data-event="mark" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+  <span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+   </td>
+
+  {{/options.hasActions}}
+{{#items}}
+{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
+{{/items}}
+</tr>`
+
+
 }

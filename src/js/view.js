@@ -22,14 +22,14 @@ function viewitem(options){
 			}.bind(this))
 		}
 
-		this.$el.find('[data-event].custom-event').on('click', $.proxy(function(e){
+		this.$el.find('[data-event].custom-event').on('click', function(e){
 			e.stopPropagation();
 			$(e.target).closest('.dropdown-menu').toggle()
 			var event = _.find(this.model.owner.options.events, {name:e.target.dataset.event})
 			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
 				event.callback(this.model);
 			}
-		},this));
+		}.bind(this));
 
 
 		this.$el.find(".btn-group > .dropdown-toggle").on('click',function(e) {
@@ -37,11 +37,11 @@ function viewitem(options){
 		    $(this).next('.dropdown-menu').toggle();
 		})
 
-		this.$el.find('[data-event="edit"]').on('click', $.proxy(function(e){
+		this.$el.find('[data-event="edit"]').on('click', function(e){
 			e.stopPropagation();
 			$(e.target).closest('.dropdown-menu').toggle()
 			this.edit();
-		},this));
+		}.bind(this));
 
 		this.edit = function(){
 			$().gform($.extend(true,{},{name:'modal', legend: '<i class="fa fa-pencil-square-o"></i> Edit', model: this.model}, this.model.owner.options.gform || {} ) ).on('saved', function() {
@@ -52,10 +52,11 @@ function viewitem(options){
 			}, this)
 		}
 
-		this.$el.find('[data-event="mark"]').on('click', $.proxy(function(e){
+		this.$el.find('[data-event="mark"]').on('click', function(e){
 			e.stopPropagation();
+			debugger;
 			this.model.toggle(e.currentTarget.checked);
-		},this));
+		}.bind(this));
 
 		this.$el.find("[data-moment]").each(function(item){
 			$(this).html(moment.utc($(this).data('moment')).format($(this).data('format')) );
@@ -78,11 +79,11 @@ function viewitem(options){
 		options.container.append(this.$el);
 	}
 	this.model.on('change', this.update, this);
-	this.model.on('destroy', $.proxy(function(){
-		this.$el.fadeOut('fast', $.proxy(function() {
+	this.model.on('destroy', function(){
+		this.$el.fadeOut('fast', function() {
 			this.remove();
-		}, this));
-	}, this) );
+		}.bind(this));
+	}.bind(this) );
 	this.update();
 }
 

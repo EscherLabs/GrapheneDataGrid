@@ -67,39 +67,34 @@ function tableModel (owner, initial) {
 		processAtts.call(this);
 	}
 	this.checked = false;
+	this.deleted = false;
 	this.toggle = function(state,silent) {
 		if(typeof state === 'bool') {
 			this.checked = state;
 		}else{
 			this.checked = !this.checked;
 		}
-		// debugger;
 		if(!silent){
-			this.trigger('check');
+			this.dispatch('check');
 		}
 	}
-	$.extend(true, this.attributes, initial);
+	this.set(initial)
 	processAtts.call(this);
 	this.toJSON = function() {return this.attributes}
 	this.undo = function() {
-		if(this.attribute_history.length){
-			this.attributes = this.attribute_history.pop();
-			processAtts.call(this);
-			this.owner.draw();
+		if(this.deleted){this.deleted = false;this.owner.draw();}else{
+			if(this.attribute_history.length){
+				this.attributes = this.attribute_history.pop();
+				processAtts.call(this);
+				this.owner.draw();
+			}
 		}
 	}
 	this.delete = function(){
-		this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
+		this.deleted = true;
+		// this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
 	}
-	
-	// this.handlers = {initialize: []};
-	// this.addSub = gform.prototype.addSub;
-	// this.on = gform.prototype.on;
-	// this.off = gform.prototype.off;
-	// this.trigger = gform.prototype.pub;
-
+	this.eventBus = new gform.eventBus({owner:'model',item:'model'}, this)
+	this.on = this.eventBus.on;
+	this.dispatch = this.eventBus.dispatch;
 };
-tableModel.prototype.options = {owner:'model',item:'model'}
-tableModel.prototype.handlers = {initialize: []}
-tableModel.prototype.on = gform.prototype.on;
-tableModel.prototype.trigger = gform.prototype.pub;

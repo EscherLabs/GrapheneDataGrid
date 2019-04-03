@@ -312,22 +312,11 @@ table_head:`  <tr style="cursor:pointer" class="noselect table-sort">
 {{/items}}
 </tr>
 {{/options.filter}}`,
-table_row:`<tr class="filterable">		
+table_row:`<tr data-id="{{start}}id{{end}}" class="filterable grid-row {{start}}#waiting{{end}}.warning{{start}}/waiting{{end}}">		
 {{#options.hasActions}}
 
-<td data-event="mark" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
-<!-- 		<div class="btn-group">
-    <button type="button" class="btn btn-xs btn-info go">Actions</button>
-    <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="caret"></span>
-      <span class="sr-only">Toggle Dropdown</span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-right">
-      {{#options.hasEdit}}<li><a href="javascript:void(0);" data-event="edit" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li>{{/options.hasEdit}}
-      {{#options.hasDelete}}<li><a href="javascript:void(0);" data-event="delete" data-id="{{start}}id{{end}}"><i class="fa fa-times"></i> Delete</a></li>{{/options.hasDelete}}
-    </ul>
-  </div> -->
-  <span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+<td data-event="mark" data-id="{{start}}id{{end}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+  <span class="text-muted fa {{start}}#waiting{{end}}fa-spinner fa-spin {{start}}/waiting{{end}} {{start}}^waiting{{end}} {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}{{start}}/waiting{{end}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
    </td>
 
   {{/options.hasActions}}
