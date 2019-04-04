@@ -18,7 +18,7 @@ function tableModel (owner, initial) {
 						var search = {};
 						search[item.value_key] = this.attributes[item.name];
 						option = _.find(item.options, search);
-						if($.isNumeric(this.attributes[item.name])){
+						if(_.isFinite(this.attributes[item.name])){
 							search[item.value_key] = parseInt(this.attributes[item.name]);
 							if(typeof option === 'undefined'){
 								option = _.find(item.options, search);
@@ -33,7 +33,7 @@ function tableModel (owner, initial) {
 					if(typeof option === 'undefined'){
 						option = _.find(item.options, {id:this.attributes[item.name]});
 					}
-          if($.isNumeric(this.attributes[item.name])){
+          if(_.isFinite(this.attributes[item.name])){
             if(typeof option === 'undefined'){
               option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
             }
@@ -50,7 +50,7 @@ function tableModel (owner, initial) {
 			}else{
 				if(item.template){
 					// this.display[item.name] = Hogan.compile(item.template).render(this);	
-					this.display[item.name] = GrapheneDataGrid.renderString(item.template)
+					this.display[item.name] = gform.renderString(item.template)
 					
 				}else{
 					this.display[item.name] = this.attributes[item.name];
@@ -59,16 +59,15 @@ function tableModel (owner, initial) {
 		}.bind(this))
 	}
 	this.set = function(newAtts){
-		this.attribute_history.push($.extend(true, {}, this.attributes));
-		this.attributes = newAtts;
-		processAtts.call(this);
-	}
-	this.pat =function(){
+		if(typeof newAtts !== 'undefined'){
+			this.attribute_history.push(_.extend( {}, this.attributes));
+			this.attributes = newAtts;
+		}
 		processAtts.call(this);
 	}
 	this.checked = false;
 	this.deleted = false;
-	this.toggle = function(state,silent) {
+	this.toggle = function(state, silent) {
 		if(typeof state === 'bool') {
 			this.checked = state;
 		}else{

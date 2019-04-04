@@ -89,7 +89,7 @@
 		<script type='text/javascript' src='../src/js/GrapheneDataGrid.js'></script>
 		<script type='text/javascript' src='../src/js/model'></script>
 		<!-- <script type='text/javascript' src='../src/js/view.js'></script> -->
-		<script type='text/javascript' src='../src/js/utils.js'></script>
+		<script type='text/javascript' src='../src/js/mixin.js'></script>
 
 		<script type='text/javascript' src='../src/js/views.js'></script>
 		<!-- <script type='text/javascript' src='src/js/view.js'></script>
@@ -186,16 +186,20 @@
 			], data: data}
 
 			bt = new GrapheneDataGrid(options).on('manage',function(e){
+				debugger;
 				console.log(e.model.attributes);
 
+				console.log(e.table.models[0].attributes);
 			}).on('sort',function(e){
 				
 				console.log(e.table.models[0].attributes);
 					
 			}).on('added',function(e){
-				debugger;
-e.model.waiting = true;
-e.model.dispatch('change');
+				e.model.waiting = true;
+				e.model.dispatch('change');
+			}).on('click',function(e){
+				e.model.toggle();
+
 			})
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
 			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))

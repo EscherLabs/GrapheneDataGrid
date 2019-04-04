@@ -1,15 +1,15 @@
-templates = {
-events:`<div>
+
+gform.stencils.events = `<div>
 <span class="hidden-xs">
 {{#options.hasDelete}}
-<a href="javascript:void(0);" data-event="delete_all" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
+<a href="javascript:void(0);" data-event="delete" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
 {{/options.hasDelete}}
 <div class="btn-group"role="group" aria-label="...">
 
-    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit_all" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
+    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
 
     {{#options.events}}
-      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{start}}id{{end}}">{{{label}}}</a>{{/global}}
+      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}">{{{label}}}</a>{{/global}}
     {{/options.events}}
 
 </div>
@@ -19,21 +19,21 @@ events:`<div>
     <i class="fa fa-cogs"></i> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit_all" data-id="{{start}}id{{end}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
+      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
 
       {{#options.events}}
-        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{start}}id{{end}}">{{{label}}}</a></li>{{/global}}
+        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{[[}}id{{]]}}">{{{label}}}</a></li>{{/global}}
       {{/options.events}}
       {{#options.hasDelete}}
         <li role="separator" class="divider"></li>
-        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete_all" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
+        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
       {{/options.hasDelete}}
   </ul>
 </div>
 </div>
-`,
-count:`		{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 15px;">{{checked_count}} item(s) selected</h5>{{/checked_count}}`,
-mobile_head:`
+`;
+gform.stencils.count=`{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 0">{{checked_count}} item(s) selected</h5>{{/checked_count}}`;
+gform.stencils.mobile_head=`
 <div style="clear:both;">
 
   {{#options.sort}}
@@ -71,11 +71,11 @@ mobile_head:`
   {{/options.sort}}
 
 </div>
-`,
-mobile_row:`<tr><td colspan="100%" class="filterable">		
+`
+gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">		
 {{#options.hasActions}}
 <div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
-<span class="text-muted fa {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
+<span class="text-muted fa {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
 </div>
   {{/options.hasActions}}
 <div>
@@ -83,8 +83,8 @@ mobile_row:`<tr><td colspan="100%" class="filterable">
 {{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
 {{/items}}
 </div>
-</td></tr>`,
-mobile_table:`<div class="well table-well">
+</td></tr>`
+gform.stencils.mobile_table=`<div class="well table-well">
 <div style="height:40px;">
   <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
 
@@ -97,7 +97,7 @@ mobile_table:`<div class="well table-well">
     {{/showAdd}}	
 
     {{#options.events}}
-      {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+      {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
     {{/options.events}}
     {{#options.download}}
     <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
@@ -149,9 +149,8 @@ mobile_table:`<div class="well table-well">
 
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
-</div>`,
-
-table:`<div class="well table-well">
+</div>`
+gform.stencils.table=`<div class="well table-well">
 <div style="overflow:hidden">
   <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
 
@@ -163,7 +162,7 @@ table:`<div class="well table-well">
     <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
     {{/showAdd}}		
     {{#options.events}}
-      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{start}}id{{end}}">{{{label}}}</div>{{/global}}
+      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
     {{/options.events}}
 
   </div>
@@ -248,8 +247,8 @@ table:`<div class="well table-well">
 
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
-</div>`,
-table_footer:`<div>
+</div>`
+gform.stencils.table_footer=`<div>
 {{#multiPage}}
 <nav class="pull-right" style="margin-left: 10px;">
 {{#size}}
@@ -284,15 +283,15 @@ table_footer:`<div>
     <span class="hidden-xs">results per page</span>
   </span>
   {{/entries.length}}
-</div>`,
-table_head:`  <tr style="cursor:pointer" class="noselect table-sort">
+</div>`
+gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
 {{#options.hasActions}}
 <th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></th>
 {{/options.hasActions}}
 
 {{#items}}
 {{#visible}}
-<th data-sort="{{cname}}"><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
+<th {{#options.sort}}data-sort="{{cname}}"{{/options.sort}}><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
 {{/visible}}
 {{/items}}
 </tr>
@@ -311,19 +310,14 @@ table_head:`  <tr style="cursor:pointer" class="noselect table-sort">
 {{/visible}}
 {{/items}}
 </tr>
-{{/options.filter}}`,
-table_row:`<tr data-id="{{start}}id{{end}}" class="filterable grid-row {{start}}#waiting{{end}}.warning{{start}}/waiting{{end}}">		
-{{#options.hasActions}}
+{{/options.filter}}`
+gform.stencils.table_row=`{{#options.hasActions}}
 
-<td data-event="mark" data-id="{{start}}id{{end}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
-  <span class="text-muted fa {{start}}#waiting{{end}}fa-spinner fa-spin {{start}}/waiting{{end}} {{start}}^waiting{{end}} {{start}}#checked{{end}}fa-check-square-o{{start}}/checked{{end}} {{start}}^checked{{end}}fa-square-o{{start}}/checked{{end}}{{start}}/waiting{{end}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+<td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+  <span class="text-muted fa {{[[}}#waiting{{]]}}fa-spinner fa-spin {{[[}}/waiting{{]]}} {{[[}}^waiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/waiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
    </td>
 
   {{/options.hasActions}}
 {{#items}}
 {{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
-{{/items}}
-</tr>`
-
-
-}
+{{/items}}`

@@ -4,10 +4,10 @@ function GrapheneDataGrid(options) {
 	this.on = this.eventBus.on;
 	this.dispatch = this.eventBus.dispatch;
 
-	options = $.extend(true, {filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
+	options = _.extend({filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.events == 'object' && options.events.length){
 		options.events = _.map(options.events,function(event){
-			return $.extend(true, {global:false},event)
+			return _.extend({global:false},event)
 		})
 	}else{
 		options.events = false;
@@ -21,22 +21,22 @@ function GrapheneDataGrid(options) {
 	}
 	if(typeof options.item_template !== 'string' ){
 		// options.item_template= Hogan.compile(options.item_template)
-		// options.item_template = options.item_template;//GrapheneDataGrid.renderString(options.item_template)
+		// options.item_template = options.item_template;//gform.renderString(options.item_template)
 
 	// }else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
-			options.item_template = templates['table_row'];
+			options.item_template = gform.stencils['table_row'];
 		}else{
-			options.item_template = templates['mobile_row'];
+			options.item_template = gform.stencils['mobile_row'];
 		}
 	}
 
 	this.filterValues = {};
 	this.draw = function() {
 		_.each(this.summary.items, function(item){
-			this.$el.find('.filter #'+item.id+',[data-sort='+item.id+']').toggle(item.isEnabled);
+			this.containerEl.find('.filter #'+item.id+',[data-sort='+item.id+']').toggle(item.isEnabled);
 		}.bind(this))
-		// if(this.$el.find('.filter').length){
+		// if(this.containerEl.find('.filter').length){
 			options.search = this.filterValues;
 			_.each(options.search, function(item, index) {
 				if(!item && (item !== 0)) {
@@ -45,8 +45,8 @@ function GrapheneDataGrid(options) {
 			});
 		var pagebuffer = options.pagebuffer || 2;
 
-		if(this.$el.find('[name="search"]').length && this.$el.find('[name="search"]').val().length){
-			this.searchAll(this.$el.find('[name="search"]').val());
+		if(this.containerEl.find('[name="search"]').length && this.containerEl.find('[name="search"]').val().length){
+			this.searchAll(this.containerEl.find('[name="search"]').val());
 		}else{
 			this.search(options);
 		}
@@ -60,15 +60,19 @@ function GrapheneDataGrid(options) {
 		}
 		var showing = (this.lastGrabbed>(options.count * options.page))? (options.count * options.page) : this.lastGrabbed;
 
-		var newContainer = $('<tbody class="list-group">');
-		// var view = Hogan.compile(options.item_template.render(summary, templates));
-		var view = GrapheneDataGrid.renderString(options.item_template,summary)
+		var fragment = document.createDocumentFragment();
+		var view = gform.renderString(options.item_template,summary)
 		_.each(this.grab(options), function(model) {
-			// new viewitem({ 'model': model, container: newContainer, view: view});
-			newContainer.append(GrapheneDataGrid.renderString(view,model))
+			var row = document.createElement('tr');
+			row.innerHTML =gform.renderString(view,model)
+			row.setAttribute("class", 'filterable grid-row');
+			row.setAttribute('data-id', model.id);
+			fragment.appendChild(row);
 		});
-		// var container = 
-		this.$el.find('.list-group').empty().replaceWith(newContainer);
+		
+		this.containerEl[0].querySelector('.list-group').innerHTML = '';
+		this.containerEl[0].querySelector('.list-group').appendChild(fragment)
+
 		var startpage = options.page - pagebuffer;
 		if(startpage < 1){startpage = 1;}
 		var endpage = options.page + pagebuffer;
@@ -97,10 +101,10 @@ function GrapheneDataGrid(options) {
 		},options)
 
 		this.renderObj = renderObj;
-		// this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
+		// this.containerEl.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
 		this.updateCount();
 
-		this.$el.find('.paginate-footer').html(GrapheneDataGrid.render('table_footer',this.renderObj));
+		this.containerEl.find('.paginate-footer').html(gform.render('table_footer',this.renderObj));
 
 		this.fixStyle();
 		if (window.localStorage && options.name) {
@@ -111,24 +115,26 @@ function GrapheneDataGrid(options) {
 
 	var changePage = function(e) {
 		e.stopPropagation();
-		e.preventDefault();
-		if($(e.currentTarget).data('page') == 'inc') {
-			options.page++;
-			if(options.page > options.pagecount){options.page = options.pagecount}
+		switch(e.currentTarget.dataset.page){
+			case 'inc':
+				options.page++;
+				if(options.page > options.pagecount){options.page = options.pagecount}
+				break;
+			case 'dec':
+				options.page--;
+				if(options.page < 1){options.page = 1}
+				break;
+			default:
+			options.page = e.currentTarget.dataset.page || options.pagecount;
 
-		}else if($(e.currentTarget).data('page') == 'dec') {
-			options.page--;
-			if(options.page < 1){options.page = 1}
-		}else{
-			options.page = $(e.currentTarget).data('page') || options.pagecount;
 		}
 		this.draw();
 	}
 
 	var processSort = function(sortField, reverse) {
-		if(sortField == true){
-			this.$el.find('.reverse, [data-sort]').removeClass('text-primary').find('i').attr('class', 'fa fa-sort text-muted')
-			this.$el.find('.sortBy').val('true');
+		if(typeof sortField == 'undefined' || sortField == true){
+			this.containerEl.find('.reverse, [data-sort]').removeClass('text-primary').find('i').attr('class', 'fa fa-sort text-muted')
+			this.containerEl.find('.sortBy').val('true');
 			options.reverse = false;
 		}else{
 			if(typeof reverse == 'undefined') {
@@ -140,7 +146,7 @@ function GrapheneDataGrid(options) {
 			}else{
 				options.reverse = reverse;
 			}
-			var current = this.$el.find('.reverse, [data-sort=' + _.find(this.options.filterFields,{search:sortField}).id + ']')
+			var current = this.containerEl.find('.reverse, [data-sort=' + _.find(this.options.filterFields,{search:sortField}).id + ']')
 			if(typeof current !== 'undefined'){
 				if(options.reverse) {
 					current.find('i').attr('class', 'fa fa-sort-asc');
@@ -153,11 +159,11 @@ function GrapheneDataGrid(options) {
 			}
 		}
 		options.sort = sortField;
-
+		this.draw();
 	}.bind(this)
 
-	var options = $.extend({count: options.count || 25, page: 1, sort: 'createdAt', reverse: false}, options);
-	self = this;
+	var options = _.extend({count: options.count || 25, page: 1, sort: 'createdAt', reverse: false}, options);
+	// self = this;
 	// options.schema = 
 	// 	_.map(options.schema, function(item){
 	// 	return gform.processOpts(item,{update:function(options){
@@ -196,9 +202,9 @@ function GrapheneDataGrid(options) {
 			if(field.name == ''){field.name = field.id;}
 			field.item = fieldIn;
 			return field;
-	})
+		})
 	}
-	options.filterFields = _.map($.extend(true, {}, options.filters || options.schema), function(val){
+	options.filterFields = _.map(_.extend({}, options.filters || options.schema), function(val){
 		val = gform.normalizeField.call({options:{default:{type:'text'}}},val);
 		name = val.name;
 		val.value = '';
@@ -254,36 +260,39 @@ function GrapheneDataGrid(options) {
 			})
 	}
 
-	var summary = {'start':'{{', 'end':'}}',checked_count:0,multi_checked:false,multiEdit:!!options.multiEdit ,'items': _.map(options.filterFields, function(val){
+	var summary = {'[[':'{{', ']]':'}}',checked_count:0,multi_checked:false,multiEdit:!!options.multiEdit ,'items': _.map(options.filterFields, function(val){
 		var name = (val.search|| val.label.split(' ').join('_').toLowerCase());
 
 		if(val.template){
 			name = val.template.replace(/{{value}}/gi, '{{attributes.'+ name + '}}');
 
 		}else{
-			switch(val.type){
-				case 'date':
-					name = '<span data-moment="{{attributes.'+name+'}}" data-format="L"></span>'
-					break;
-				case 'select':
-						if(options.inlineEdit){
-							name = '<span data-popins="'+name+'"></span>';
-						}else{
-							name = '{{display.'+ name + '}}'
-						}
-					break;
-				case 'color':
-					name = '<div class="btn btn-default" style="background-color:{{attributes.'+name+'}}">{{attributes.'+name+'}}</div> {{attributes.'+name+'}}'
-					break;
-				default:
-					// name = '{{attributes.'+ name + '}}'
-					if(options.inlineEdit){
-						name = '<span data-popins="'+name+'"></span>';
-					}else{
-						name = '{{attributes.'+ name + '}}'
-					}
-			}
+			name = '{{attributes.'+ name + '}}'
 		}
+		// else{
+		// 	switch(val.type){
+		// 		case 'date':
+		// 			name = '<span data-moment="{{attributes.'+name+'}}" data-format="L"></span>'
+		// 			break;
+		// 		case 'select':
+		// 				if(options.inlineEdit){
+		// 					name = '<span data-popins="'+name+'"></span>';
+		// 				}else{
+		// 					name = '{{display.'+ name + '}}'
+		// 				}
+		// 			break;
+		// 		case 'color':
+		// 			name = '<div class="btn btn-default" style="background-color:{{attributes.'+name+'}}">{{attributes.'+name+'}}</div> {{attributes.'+name+'}}'
+		// 			break;
+		// 		default:
+		// 			// name = '{{attributes.'+ name + '}}'
+		// 			if(options.inlineEdit){
+		// 				name = '<span data-popins="'+name+'"></span>';
+		// 			}else{
+		// 				name = '{{attributes.'+ name + '}}'
+		// 			}
+		// 	}
+		// }
 		return {'isEnabled': (typeof val.showColumn =='undefined' || val.showColumn), 'label': val.label, 'name': name, 'cname': (val.name|| val.label.split(' ').join('_').toLowerCase()), 'id': val.id, 'visible':!(val.type == 'hidden')} 
 	})};
 	options.hasActions = !!(options.edit || options.delete || options.events);
@@ -297,45 +306,22 @@ function GrapheneDataGrid(options) {
 	summary.options = options;
 	summary.showAdd = !!(options.add) || options.showAdd;
 
-	this.defaults = {};
-	_.map(options.filterFields, function(val){
-		switch(val.type){
-			case 'text':
-				val.value = '';
-				break;
-			case 'checkbox':
-				val.value = 'false';
-			case 'radio':
-				val.value = '';
-			case 'select':
-				val.value = '';
-				break;
-			default:
-		}
-		this.defaults[val.name] = val.value;
-	}.bind(this));
 	this.summary = summary;
 	var template;
 	if(options.template ){
 		// template= Hogan.compile(Hogan.compile(options.template).render(summary, templates));  
-		template= template = GrapheneDataGrid.renderString(options.template,summary)
+		template= template = gform.renderString(options.template,summary)
 
 	}else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
 			// template = Hogan.compile(templates['table'].render(summary, templates));
-			template = GrapheneDataGrid.render('table',summary)
+			template = gform.render('table',summary)
 		}else{
 			// template = Hogan.compile(templates['mobile_table'].render(summary, templates));
-			template = GrapheneDataGrid.render('mobile_table',summary)
+			template = gform.render('mobile_table',summary)
 
 		}
 	}
-
-	function render(){
-		return GrapheneDataGrid.renderString(template,summary)
-		// return template.render();
-	}
-	// var silentPopulate = function(attributes,fields) {this.each(function(attributes) {if(!this.isContainer) {this.setValue(gform.search(attributes, this.getPath()));}}, [attributes], this.fields);}
 
 	function handleFiles(table, e) {
 		var files = this.files
@@ -352,7 +338,7 @@ function GrapheneDataGrid(options) {
 		      var valid = true;
 
 					$('#myModal').remove();
-					var ref = $(templates['modal'].render({title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
+					var ref = $(gform.stencils['modal'].render({title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
 					ref.modal();
 					ref.on('hidden.bs.modal', function () {
 		      	this.importing = false;
@@ -427,71 +413,76 @@ function GrapheneDataGrid(options) {
 		table.draw();
   }
 
-	function onload($el){
-		this.$el = $el;
+	function onload(containerEl){
+		this.containerEl = containerEl;
 
-		this.$el.on('click', '[data-event="mark"]', function(e) {
-			_.find(this.models,{id:e.currentTarget.dataset.id}).toggle(e.currentTarget.checked);
-		}.bind(this));
-		// this.$el.on('click', '.grid-row', function(e) {
-
-		// 	// _.find(this.models,{id:e.currentTarget.dataset.id}).toggle(e.currentTarget.checked);
-		// }.bind(this));
-
-		if(this.options.columns){
-			this.$el.on('click', '.columnEnables label', function(e){
-				e.stopPropagation();
-				_.find(this.summary.items, {id:e.currentTarget.dataset.field}).isEnabled = e.currentTarget.childNodes[0].checked;
+		if(containerEl.find('.filter').length) {
+			this.filter = new gform({name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },'.filter').on('change', function(){
+				this.containerEl.find('[name="search"]').val('');
+				this.filterValues = this.filter.toJSON();
 				this.draw();
 			}.bind(this));
+
+			this.filter.set()
 		}
 
-		this.$el.on('change', '.csvFileInput', _.partial(handleFiles, this));
-		this.$el.on('change', '.sortBy', function(e) {
-			if($(e.currentTarget).val() !== ''){
-				processSort((_.find(this.options.filterFields, {id:$(e.currentTarget).val()}) || {search:true}).search)
-				this.draw();
+		this.updateCount =function(count) {
+			var count = count || this.getSelected().length;
+			this.summary.checked_count = count;
+			this.summary.multi_checked = count>1;
+
+			this.containerEl.find('[name="events"]').html(gform.render('events',this.summary));
+			this.containerEl.find('[name="count"]').html(gform.render('count',this.summary));
+
+			var checkbox = this.containerEl.find('[data-event="select_all"].fa');
+
+			if(count>0 && count == this.getModels().length){
+				checkbox.attr('class', 'fa fa-2x fa-check-square-o');
+			}else if(count == 0){
+				checkbox.attr('class', 'fa fa-2x fa-square-o');
+			}else{
+				checkbox.attr('class', 'fa fa-2x fa-minus-square-o');
 			}
-		}.bind(this));		
+		}
 
-		this.$el.on('click', '.reverse', function(e) {
-				processSort( this.options.sort)
-				this.draw();
+		if(options.data) {
+			for(var i in options.data) {
+				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
+						e.model.owner.updateCount();
+					})
+				);
+			}
+		}
+		if(typeof this.options.defaultSort !== 'undefined'){
+			this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(this)).reverse();
+		}
+
+		this.containerEl.on('change', '.csvFileInput', _.partial(handleFiles, this));
+		this.containerEl.on('click','[name="bt-upload"]', function(){
+			this.containerEl.find('.csvFileInput').click();
 		}.bind(this));
-
-		this.$el.on('click', '.filterForm', function(e) {
-				this.$el.find('[name="search"]').val('');
-
-				 new gform({legend:"Filter By" ,name:'modal_filter'+this.options.id,attributes:this.filterValues, disableMath: true, suppress: true, fields: options.filterFields }).on('save', function(){
-					this.filterValues = gform.instances['modal_filter'+this.options.id].toJSON();
-					this.draw();					
-					gform.instances['modal_filter'+this.options.id].trigger('close');
-
-				}.bind(this)).modal();
-		}.bind(this));		
-
-		this.$el.on('click','[name="bt-upload"]', function(){
-			this.$el.find('.csvFileInput').click();
+		this.containerEl.on('click','[name="bt-download"]', this.getCSV.bind(this));
+		this.containerEl.on('click', '.grid-row', function(e) {
+			this.dispatch('click',_.find(this.models,{id:e.currentTarget.dataset.id}))
 		}.bind(this));
+		this.containerEl.on('click','[data-page]', changePage.bind(this));
 
-		this.$el.on('click', '[data-event="delete_all"]', function(e){
-			  var checked_models = this.getSelected()
-				if (checked_models.length) {
-					if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
-						_.each(checked_models, function(item){
-							if(typeof this.options.delete == 'function'){
-								this.options.delete(item);
-							}
-								item.delete();
-						}.bind(this))
-						this.draw();
-						// this.updateCount()
-					}	
-				}
 
+
+		this.containerEl.on('click', '.columnEnables label', function(e){
+			e.stopPropagation();
+			_.find(this.summary.items, {id:e.currentTarget.dataset.field}).isEnabled = e.currentTarget.childNodes[0].checked;
+			this.draw();
 		}.bind(this));
+		this.containerEl.on('click', '[data-event="mark"]', function(e) {
+			e.stopPropagation();
+			_.find(this.models,{id:e.currentTarget.dataset.id}).toggle(e.currentTarget.checked);
+		}.bind(this));
+	
 
-		this.$el.on('click','[data-event].custom-event', function(e){
+
+
+		this.containerEl.on('click','[data-event].custom-event', function(e){
 			e.stopPropagation();
 			var selectedModels = this.getSelected();
 			if(selectedModels.length){
@@ -502,15 +493,72 @@ function GrapheneDataGrid(options) {
 				this.dispatch(e.target.dataset.event)
 			}
 		}.bind(this));
+		this.containerEl.on('change', '[name="count"]', function(e) {
+			options.count = parseInt(e.currentTarget.value,10);
+			this.draw();
+		}.bind(this))
+		this.containerEl.on('input', '[name="search"]', _.debounce(function(e) {
+			this.draw();
+		}.bind(this), 300));
+		
+		this.containerEl.on('click', '[data-event="select_all"]', function(e){
+			var checked_models = this.getSelected();
 
-		this.$el.on('click','[data-event="edit_all"]', function(e){
+			if (checked_models.length || this.getModels().length == 0) {						
+				_.each(checked_models, function(item){item.toggle(false,true)})			
+			} else {
+				_.each(this.filtered, function(item){item.toggle(true,true)})			
+			}		
+			this.draw();
+		}.bind(this));
+		this.containerEl.on('click','[name="reset-search"]', function(){
+			this.containerEl.find('[name="search"]').val('');
+
+			if(this.filter) {
+				this.filter.set()
+			}
+			this.filterValues = {};
+
+			processSort();
+		}.bind(this));
+		
+
+		this.containerEl.on('click','[data-event="add"]', function(){
+			var event = _.find(this.options.events, {name:'add'});
+
+			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
+				event.callback.call(this);
+			}else{
+				new gform(_.extend({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
+					if(e.form.validate()){
+						this.add(e.form.get(),{validate:false})
+						e.form.pub('close');
+					}
+				}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
+			}
+		}.bind(this));
+		this.containerEl.on('click', '[data-event="delete"]', function(e){
+			var checked_models = this.getSelected()
+			if (checked_models.length) {
+				if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
+					_.each(checked_models, function(item){
+						if(typeof this.options.delete == 'function'){
+							this.options.delete(item);
+						}
+							item.delete();
+					}.bind(this))
+					this.draw();
+				}
+			}
+		}.bind(this));
+		this.containerEl.on('click','[data-event="edit"]', function(e){
 			e.stopPropagation();
 			if(	typeof this.options.multiEdit !== 'undefined' && 
 				this.options.multiEdit.length !== 0 &&
 				this.getSelected().length >1) {
 				this.editCommon();
 			}else{
-				new gform($.extend(true,{},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
+				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
 					this.getSelected()[0].set(e.form.toJSON());
 					if(typeof this.options.edit == 'function'){
 						this.options.edit(this.getSelected()[0]);
@@ -525,127 +573,43 @@ function GrapheneDataGrid(options) {
 			}
 		}.bind(this));
 
-		this.$el.on('change', '[name="count"]', function(e) {
-			options.count = parseInt($(e.currentTarget).val(),10);
-			this.draw();
+		
+		this.containerEl.on('click', '.reverse', function(e) {
+				processSort(this.options.sort)
+		}.bind(this));
+		this.containerEl.on('click','[data-sort]', function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			var sortField = _.find(this.options.filterFields, {name: e.currentTarget.dataset.sort}).search;
+			if(this.options.reverse && this.options.sort == sortField){
+				processSort();
+			}else{
+				processSort( sortField);
+			}
 		}.bind(this))
 
-		this.$el.on('input', '[name="search"]', _.debounce(function(e) {
-			this.draw();
-		}.bind(this), 300));
 
+		//Mobile
+		// this.containerEl.on('change', '.sortBy', function(e) {
+		// 	if($(e.currentTarget).val() !== ''){
+		// 		processSort((_.find(this.options.filterFields, {id:$(e.currentTarget).val()}) || {search:true}).search)
+		// 	}
+		// }.bind(this));
+		// this.containerEl.on('click', '.filterForm', function(e) {
+		// 	this.containerEl.find('[name="search"]').val('');
 
-		if($el.find('.filter').length) {
-			this.filter = new gform({name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },'.filter').on('change', function(){
-				this.$el.find('[name="search"]').val('');
-				this.filterValues = this.filter.toJSON();
-				this.draw();
-			}.bind(this));
+		// 	new gform({legend:"Filter By" ,name:'modal_filter'+this.options.id,attributes:this.filterValues, disableMath: true, suppress: true, fields: options.filterFields }).on('save', function(){
+		// 		this.filterValues = gform.instances['modal_filter'+this.options.id].toJSON();
+		// 		this.draw();					
+		// 		gform.instances['modal_filter'+this.options.id].trigger('close');
 
-			this.filter.set()
-		}
-
-		this.updateCount =function(count) {
-			var count = count || this.getSelected().length;
-			this.summary.checked_count = count;
-			this.summary.multi_checked = count>1;
-
-			// this.summary.checked_count = this.getSelected().length;
-			// this.summary.multi_checked = (this.summary.checked_count>1);
-			// this.$el.find('[name="events"]').html(templates['events'].render(this.summary, templates));
-			this.$el.find('[name="events"]').html(GrapheneDataGrid.render('events',this.summary));
-			this.$el.find('[name="count"]').html(GrapheneDataGrid.render('count',this.summary));
-
-
-			var checkbox = this.$el.find('[data-event="select_all"].fa');
-
-			if(count>0 && count == this.getModels().length){
-				checkbox.attr('class', 'fa fa-2x fa-check-square-o');
-			}else if(count == 0){
-				checkbox.attr('class', 'fa fa-2x fa-square-o');
-			}else{
-				checkbox.attr('class', 'fa fa-2x fa-minus-square-o');
-			}
-
-		}
-
-		this.$el.on('click', '[data-event="select_all"]', function(e){
-			  var checked_models = this.getSelected();
-
-				if (checked_models.length || this.getModels().length == 0) {						
-					_.each(checked_models, function(item){item.toggle(false,true)})			
-				} else {
-					_.each(this.filtered, function(item){item.toggle(true,true)})			
-				}		
-				this.draw();
-				// this.updateCount();
-
-		}.bind(this));
-
-
-		if(options.data) {
-			for(var i in options.data) {
-				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
-						e.model.owner.updateCount();
-						e.model.owner.draw();
-						// e.model.owner.$el.find('[name="events"]').html(templates['events'].render(e.model.owner.summary, templates));
-						// e.model.owner.$el.find('[name="events"]').html(GrapheneDataGrid.render('events',e.model.owner.summary));
-					})
-				);
-			}
-		}
-		if(typeof this.options.defaultSort !== 'undefined'){
-			this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(this)).reverse();
-		}
-
-
-		this.$el.on('click','[data-page]', changePage.bind(this));
-		if(options.sort){
-			this.$el.on('click','[data-sort]', function(e) {
-				e.stopPropagation();
-				e.preventDefault();
-				var sortField = _.find(this.options.filterFields, {name: $(e.currentTarget).data('sort')}).search;
-				if(this.options.reverse && this.options.sort == sortField){
-					processSort( true);
-				}else{
-					processSort( sortField);
-				}
-				this.draw();
-			}.bind(this))
-		}
-		this.$el.on('click','[name="reset-search"]', function(){
-			this.$el.find('[name="search"]').val('');
-			// options.sort = null;
-			processSort( true);
-
-			if(this.filter) {
-				this.filter.set()
-				// silentPopulate.call(this.filter, this.defaults)
-			}
-			this.filterValues = {};
-			this.draw();
-		}.bind(this));
-		this.$el.on('click','[name="bt-download"]', function(){
-			this.getCSV();
-		}.bind(this));
-		this.$el.find('[data-event="add"]').on('click', function(){
-			var event = _.find(this.options.events, {name:'add'});
-
-			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
-				event.callback.call(this);
-			}else{
-				new gform($.extend(true,{},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
-					if(e.form.validate()){
-						this.add(e.form.get(),{validate:false})
-						e.form.pub('close');
-					}
-				}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
-			}
-		}.bind(this));
-
+		// 	}.bind(this)).modal();
+		// }.bind(this));	
 
 		this.draw();
 	}
+
+
 	this.validate = function(item){
 		var status = false;
 		var tempForm = new gform({fields: options.schema,attributes:item});
@@ -661,14 +625,9 @@ function GrapheneDataGrid(options) {
 
 
 	this.add = function(item,config){
-		var newModel = new tableModel(this, item).on('check', function(){
-			this.owner.updateCount();
-			// this.owner.$el.find('[name="events"]').html(templates['events'].render(this.owner.summary, templates));
-		});
-		if(config.validate !== false){
-			var tempForm = new gform({fields: options.schema,model:newModel});
-		}
-		if(config.validate == false || tempForm.validate()) {
+		var newModel = new tableModel(this, item)
+
+		if(config.validate == false || 	this.validate(item)) {
 			this.models.push(newModel);
 			if(typeof this.options.defaultSort !== 'undefined'){
 				this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(this)).reverse();
@@ -684,13 +643,12 @@ function GrapheneDataGrid(options) {
 			// 	this.options.add(newModel);
 			// }
 		}else{
-			console.log('Model not valid');
 			return false
 		}
-		if(typeof tempForm !== 'undefined'){
-			tempForm.destroy();
-		}
-		return newModel;
+		return newModel.on('check', function(){
+			this.owner.updateCount();
+		});
+		
 	}
 	this.search = function(options) {
 		var ordered = _.sortBy(this.getModels(), function(obj) { return obj.attributes[options.sort]; });
@@ -700,11 +658,11 @@ function GrapheneDataGrid(options) {
 		filterMap = this.filterMap;
 		ordered = _.filter(ordered, function(anyModel) {
 
-			var keep = $.isEmptyObject(options.search);
+			var keep = _.isEmpty(options.search);
 			for(var filter in options.search) {
 					var temp;
 					if(_.filter(options.filterFields, {id:filter})[0] && typeof _.filter(options.filterFields, {id:filter})[0].options == 'undefined') {
-						temp = ($.score((anyModel.display[this.filterMap[filter]]+'').replace(/\s+/g, " ").toLowerCase(), (options.search[filter]+'').toLowerCase() ) > 0.40);
+						temp = (_.score((anyModel.display[this.filterMap[filter]]+'').replace(/\s+/g, " ").toLowerCase(), (options.search[filter]+'').toLowerCase() ) > 0.40);
 					}else{
 						temp = (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'')
 					}
@@ -728,8 +686,8 @@ function GrapheneDataGrid(options) {
 	this.searchAll = function(search) {
 		//reset sorts and filters
 		options.sort = null;
-		this.$el.find('[data-sort]').removeClass('text-primary');
-		this.$el.find('[data-sort]').find('i').attr('class', 'fa fa-sort text-muted');
+		this.containerEl.find('[data-sort]').removeClass('text-primary');
+		this.containerEl.find('[data-sort]').find('i').attr('class', 'fa fa-sort text-muted');
 		if(this.filter){
 
 			this.filter.set()
@@ -741,7 +699,7 @@ function GrapheneDataGrid(options) {
 		_.map(this.getModels(), function(model){
 			model.score = 0;
 			for(var filter in options.filterFields) {
-				model.score += $.score((model.display[options.filterFields[filter].search]+'').replace(/\s+/g, " ").toLowerCase(), search);
+				model.score += _.score((model.display[options.filterFields[filter].search]+'').replace(/\s+/g, " ").toLowerCase(), search);
 			}
 			
 		})
@@ -759,28 +717,24 @@ function GrapheneDataGrid(options) {
 	this.fixStyle = function(){
 		if(this.options.autoSize){
 			try{
-				var container = this.$el.find('.table-container > div');
-				var headers = this.$el.find('.table-container > table tr th:visible');
-				var columns = this.$el.find('.list-group-row th');
-				this.$el.find('.table-container table').removeClass('table-fixed')
+				var container = this.containerEl.find('.table-container > div');
+				var headers = this.containerEl.find('.table-container > table tr th:visible');
+				var columns = this.containerEl.find('.list-group-row th');
+				this.containerEl.find('.table-container table').removeClass('table-fixed')
 				
 				container.css('width', 'auto') 
 				container.css('minWidth', 'auto') 
-				headers.css('width','auto')
-				headers.css('minWidth','85px')
-				this.$el.find('.table-container > table tr th.select-column').css('minWidth','60px')
-				this.$el.find('.table-container > table tr th.select-column').css('width','60px')
-				columns.css('width','auto')
-				columns.css('minWidth','auto')
-				// this.$el.find('.list-group tr:first td').css('width','auto')
-				// this.$el.find('.list-group tr:first td').css('minWidth','auto')
-				// $('table td').css({wordWrap:"break-word"});
+				headers.css('width', 'auto')
+				headers.css('minWidth', '85px')
+				this.containerEl.find('.table-container > table tr th.select-column').css('minWidth', '60px')
+				this.containerEl.find('.table-container > table tr th.select-column').css('width', '60px')
+				columns.css('width', 'auto')
+				columns.css('minWidth', 'auto')
+
 				container.css('height', $(window).height() - container.offset().top - (88+ this.options.autoSize) +'px');
 				_.each(	columns, function(column, index){
 					if(typeof headers[index] !== 'undefined'){
 
-						// $(column).css('width', 'auto') 
-						// $(column).css('minWidth', 'auto') 
 						column.style.display = 'table-cell';
 						if(headers[index].offsetWidth > column.offsetWidth){
 							$(column).css('width',headers[index].offsetWidth+'px');
@@ -800,17 +754,17 @@ function GrapheneDataGrid(options) {
 					}
 				}.bind(this))
 
-				this.$el.find('.table-container table').addClass('table-fixed')
+				this.containerEl.find('.table-container table').addClass('table-fixed')
 				
-				var target = this.$el.find('.table-container > div table')[0].offsetWidth;
-				if(this.$el.find('.table-container > table')[0].offsetWidth > target){target = this.$el.find('.table-container > table')[0].offsetWidth;}
+				var target = this.containerEl.find('.table-container > div table')[0].offsetWidth;
+				if(this.containerEl.find('.table-container > table')[0].offsetWidth > target){target = this.containerEl.find('.table-container > table')[0].offsetWidth;}
 
 				container.css('width', target + 'px') 
 				container.css('minWidth', target + 'px') 
-				if(target > this.$el.find('.table-container')[0].offsetWidth){
-					this.$el.find('.table-container').css('overflow','auto');
+				if(target > this.containerEl.find('.table-container')[0].offsetWidth){
+					this.containerEl.find('.table-container').css('overflow','auto');
 				}else{
-					this.$el.find('.table-container').css('overflow','hidden');					
+					this.containerEl.find('.table-container').css('overflow','hidden');					
 				}
 
 			}catch(e){}
@@ -821,8 +775,13 @@ function GrapheneDataGrid(options) {
 	this.grab = function(options) {
 		return this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
 	};
-	this.getModels = function(){return _.filter(this.models, {deleted: false})}
-	this.getSelected = function(){return _.filter(this.models, {checked: true, deleted: false})}
+	this.getModels = function(search){
+		var search = search || {deleted: false};
+		return _.filter(this.models, search)
+	}
+	this.getSelected = function(){return this.getModels({checked: true, deleted: false})}//_.filter(this.models, {checked: true, deleted: false})}
+
+
 	this.editCommon = function (){
 		if(typeof this.options.multiEdit == 'undefined' || this.options.multiEdit.length == 0){return;}
 		var selectedModels = this.getSelected();
@@ -833,13 +792,13 @@ function GrapheneDataGrid(options) {
 		var common_fields = _.filter(this.options.multiEdit, function(item){return _.uniq(_.map(temp, item)).length == 1});
 		//get the schema fields matching from above
 		if(common_fields.length == 0) {
-					$(templates['modal'].render({title: "Common Field Editor ",footer:'<div class="btn btn-danger" data-dismiss="modal">Done</div>', body:'<div class="alert alert-warning">No eligible fields have been found for editing.</div>'})).modal();
+					$(gform.stencils['modal'].render({title: "Common Field Editor ",footer:'<div class="btn btn-danger" data-dismiss="modal">Done</div>', body:'<div class="alert alert-warning">No eligible fields have been found for editing.</div>'})).modal();
 		} else {
 			var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
-			new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel'},{type:'save'}], fields:newSchema, data: $.extend(true,{},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+			new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel'},{type:'save'}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 				var newValues = e.form.get();
 				_.map(selectedModels,function(model){
-					model.set($.extend(true,{}, model.attributes, newValues));
+					model.set(_.extend({}, model.attributes, newValues));
 				})
 
 				e.form.pub('close');
@@ -853,16 +812,16 @@ function GrapheneDataGrid(options) {
 		}
 	}
 	this.destroy = function(){
-		this.$el.find('.list-group').empty();
-		this.$el.off();
-		this.$el.empty();
+		this.containerEl.find('.list-group').empty();
+		this.containerEl.off();
+		this.containerEl.empty();
 	}
 
-		this.state = {
+	this.state = {
 		get:function(){
 			var temp = {count:this.options.count,page:this.options.page};
-			if(this.$el.find('[name="search"]').length && this.$el.find('[name="search"]').val().length){
-				temp.search = this.$el.find('[name="search"]').val();
+			if(this.containerEl.find('[name="search"]').length && this.containerEl.find('[name="search"]').val().length){
+				temp.search = this.containerEl.find('[name="search"]').val();
 			}else{
 				temp.sort = options.sort;
 				temp.reverse = options.reverse;
@@ -885,12 +844,12 @@ function GrapheneDataGrid(options) {
 					item.isEnabled = _.includes(settings.columns, this.filterMap[item.cname])
 					return item;
 				})
-				this.$el.find('.columnEnables [type="checkbox"]').each(function(e) {
+				this.containerEl.find('.columnEnables [type="checkbox"]').each(function(e) {
 					this.checked = false
 				})
 				if(options.columns) {
 					_.each(settings.columns, function(item){
-						var temp = this.$el.find('.columnEnables [data-field="'+_.find(this.options.filterFields, {search: item}).id+'"] [type="checkbox"]');
+						var temp = this.containerEl.find('.columnEnables [data-field="'+_.find(this.options.filterFields, {search: item}).id+'"] [type="checkbox"]');
 						if(temp.length)temp[0].checked = true;
 					}.bind(this))
 				}
@@ -898,7 +857,7 @@ function GrapheneDataGrid(options) {
 			if(typeof settings.filters !== 'undefined') {
 				this.filterValues = {};
 				_.each(settings.filters, function(item, index) {
-//					this.filterValues[_.find(this.options.filterFields, {search: index}).id] = item
+					this.filterValues[_.find(this.options.filterFields, {search: index}).id] = item
 				}.bind(this))
 			}
 
@@ -907,13 +866,10 @@ function GrapheneDataGrid(options) {
 			}
 			
 			if(typeof this.filter !== 'undefined') {
-				// this.filter.populate(this.filterValues);
-				// silentPopulate.call(this.filter, this.filterValues)
-
 				this.filter.set(this.filterValues)
 			}
 			if(typeof settings.search !== 'undefined' && settings.search !== '') {
-				this.$el.find('[name="search"]').val(settings.search)
+				this.containerEl.find('[name="search"]').val(settings.search)
 			}
 
 			this.options.page = settings.page || this.options.page;
@@ -929,36 +885,36 @@ function GrapheneDataGrid(options) {
 			this.filterMap[item.id] = item.search ;
 	}.bind(this));
 	
-	var fields = {
-		Title: {},
-		Feed: {type: 'select', label_key: 'title', value_key: '_id', required: true, default: {title: 'Current Collection', _id: 'collection'}},
-	}
-	$(options.container).html(render.call(this));
-	onload.call(this, $(options.container));
+	// var fields = {
+	// 	Title: {},
+	// 	Feed: {type: 'select', label_key: 'title', value_key: '_id', required: true, default: {title: 'Current Collection', _id: 'collection'}},
+	// }
+	
 	this.getCSV = function(title){
-		var lookup = this.filterMap
-		csvify(
+		if(typeof title !== "string") {
+			title =this.options.title
+		}
+		_.csvify(
 			_.map(this.filtered, function(item){return item.attributes}),
 			_.map(_.filter(this.summary.items, function(item){return item.isEnabled}) ,function(item){
-				return {label:item.label,name:lookup[item.cname]} 
+				return {label:item.label,name:this.filterMap[item.cname]} 
 			}),
-			title || this.options.title 
+			title 
 		)
 	}
+	var container = document.querySelector(options.container);
+	
+	if(container !== null) {
+		container.innerHTML = gform.renderString(template, summary);
+	
+		onload.call(this, $(container));
+	}
 
-	this.$el.find('[name="search"]').focus();
+	this.containerEl.find('[name="search"]').focus();
 
-	this.$el.find('.table-container > div').css('overflow', 'auto');
+	this.containerEl.find('.table-container > div').css('overflow', 'auto');
 	$(window).on('resize orientationChange', this.fixStyle.bind(this));
 	if(loaded){
 		this.state.set(loaded);
 	}
-}
-GrapheneDataGrid.render = function(template, options) {
-	return gform.m(templates[template || 'row'] || templates['row'], _.extend({}, templates, options))
-}
-GrapheneDataGrid.renderString = function(string,options) {
-	return gform.m(string, _.extend({}, templates, options))
-
-	// return gform.m(string || '', options || {})
 }
