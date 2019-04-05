@@ -631,22 +631,28 @@ gform.eventBus = function(options, owner){
 		var a = a || {};
 		a[this.options.owner] = this.owner;
 		if(typeof f !== 'undefined'){
-				a[this.options.item] = f;
+		    a[this.options.item] = f;
 		}
-	
-		var events = []
+        // debugger;
+        a.default = true;
+        a.continue = true;
+        a.preventDefault = function(){a.default = false;}.bind(this)
+        a.stopPropagation = function(){a.continue = false;}.bind(this)
+		var events = [];
 		if(typeof e == 'string'){
-				events.push(e)
+		    events.push(e)
 		}else{events = events.concat(e)}
 		_.each(events, function(args,event){
-				args.event = event;
-				var f = function (handler) {
-						handler.call(null,args);
-				}.bind(this)
-				_.each(this.handlers[event], f);
-				_.each(this.handlers['*'], f);
+            args.event = event;
+            var f = function (handler) {
+                if(a.continue){
+                    handler.call(null, args);
+                }
+            }.bind(this)
+            _.each(this.handlers[event], f);
+            _.each(this.handlers['*'], f);
 		}.bind(this, a))
-		return this.owner;
+		return a
 	}.bind(this)
 	this.on = function (event, handler) {
 		var events = event.split(' ');

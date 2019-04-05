@@ -1,5 +1,5 @@
 
-function tableModel (owner, initial) {
+function tableModel (owner, initial, events) {
 	
 	this.owner = owner;
 	this.id = gform.getUID();
@@ -7,12 +7,20 @@ function tableModel (owner, initial) {
 	this.display = {};
 	this.attribute_history = [];
 	this.schema = owner.options.schema;
+	this.iswaiting;
+	this.waiting = function(state){
+		if(typeof state !== 'undefined'){this.iswaiting = state;this.owner.draw();}
+		return this.iswaiting;
+	}
+	this.eventBus = new gform.eventBus({owner:'model',item:'model',handlers:events||{}}, this)
+	this.on = this.eventBus.on;
+	this.dispatch = this.eventBus.dispatch;
 	var processAtts = function() {
 		_.each(this.schema, function(item){
 			if(typeof item.options !== 'undefined'){
 				var option;
 				if(typeof item.value_key !== 'undefined'){
-										if(item.value_key == 'index'){
+					if(item.value_key == 'index'){
 						option = item.options[this.attributes[item.name]]
 					}else{
 						var search = {};
@@ -58,12 +66,16 @@ function tableModel (owner, initial) {
 			}
 		}.bind(this))
 	}
-	this.set = function(newAtts){
+	this.set = function(newAtts, silent){
 		if(typeof newAtts !== 'undefined'){
 			this.attribute_history.push(_.extend( {}, this.attributes));
 			this.attributes = newAtts;
 		}
 		processAtts.call(this);
+		if(!silent){
+			// debugger;
+			this.dispatch('set');
+		}
 	}
 	this.checked = false;
 	this.deleted = false;
@@ -93,7 +105,4 @@ function tableModel (owner, initial) {
 		this.deleted = true;
 		// this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
 	}
-	this.eventBus = new gform.eventBus({owner:'model',item:'model'}, this)
-	this.on = this.eventBus.on;
-	this.dispatch = this.eventBus.dispatch;
 };

@@ -139,9 +139,9 @@
 // 	{{/items}}
 // 	</div>
 // </td></tr>`,
-				preDraw: function(model){
-					model.stuff = 'yippe';
-				},
+				// preDraw: function(model){
+				// 	model.stuff = 'yippe';
+				// },
 				events:[
 					{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
 						console.log(model.attributes);
@@ -151,6 +151,9 @@
 						console.log(collection[0].attributes);
 					}, global: true}
 				],
+				events:{'model:set':[function(e){
+					e.model.stuff = 'yippe';
+				}]},
 				schema:[
 
 				// {type:"text", name:"gform_id", label:"gform_id", required:false},
@@ -173,7 +176,7 @@
             "template":'{{#attributes.COMPLETE}}<span class="fa fa-check-square-o"></span>{{/attributes.COMPLETE}}{{^attributes.COMPLETE}}<span class="fa fa-square-o"></span>{{/attributes.COMPLETE}}'
         },           				// {type:"select", name:"priority", label: "Stat", showColumn: true, choices:'./assets/js/options.json'}
 // ,							{label: 'Endpoint', name:'endpoint', default: {name: 'External (no auth)', value: 'External', target:''}, type: 'select', choices: '/endpoints/list/'+model.group_id},
-        {"name":"dob","label":"DOB","template":"{{attributes.dob}}"},
+        {"name":"dob","label":"DOB","template":"{{stuff}}s{{attributes.dob}}"},
         // {"name":"age","label":"Age
         {"name":"profile","label":"Medication Profile long title","type":"fieldset","fields":[
             {"label":"Drug name","name":"drug_name"}
@@ -186,21 +189,23 @@
 			], data: data}
 
 			bt = new GrapheneDataGrid(options).on('manage',function(e){
-				debugger;
 				console.log(e.model.attributes);
-
+			}).on('add',function(e){
+				// e.preventDefault();
 				console.log(e.table.models[0].attributes);
 			}).on('sort',function(e){
-				
 				console.log(e.table.models[0].attributes);
-					
 			}).on('added',function(e){
-				e.model.waiting = true;
-				e.model.dispatch('change');
+				e.model.waiting(true);
+				// e.model.owner.draw();
 			}).on('click',function(e){
+				// e.model.waiting = false;
+				e.model.waiting(!e.model.waiting());
+
 				e.model.toggle();
 
 			})
+			
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
 			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))
 			// bt = new GrapheneDataGrid({

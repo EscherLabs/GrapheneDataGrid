@@ -1,6 +1,7 @@
 function GrapheneDataGrid(options) {
 	this.version = '0.0.2';
-	this.eventBus = new gform.eventBus({owner:'table',item:'model'}, this)
+
+	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
 	this.on = this.eventBus.on;
 	this.dispatch = this.eventBus.dispatch;
 
@@ -16,14 +17,10 @@ function GrapheneDataGrid(options) {
 	var loaded = false;
 	if (window.localStorage && options.name) {
 		try{
-		loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
+			loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
 		}catch(e){};
 	}
 	if(typeof options.item_template !== 'string' ){
-		// options.item_template= Hogan.compile(options.item_template)
-		// options.item_template = options.item_template;//gform.renderString(options.item_template)
-
-	// }else{
 		if(window.outerWidth > 767 || window.outerWidth == 0){
 			options.item_template = gform.stencils['table_row'];
 		}else{
@@ -65,7 +62,7 @@ function GrapheneDataGrid(options) {
 		_.each(this.grab(options), function(model) {
 			var row = document.createElement('tr');
 			row.innerHTML =gform.renderString(view,model)
-			row.setAttribute("class", 'filterable grid-row');
+			row.setAttribute("class", 'filterable grid-row'+(model.waiting() ? " warning" : ""));
 			row.setAttribute('data-id', model.id);
 			fragment.appendChild(row);
 		});
@@ -447,10 +444,17 @@ function GrapheneDataGrid(options) {
 
 		if(options.data) {
 			for(var i in options.data) {
-				this.models.push(new tableModel(this, options.data[i]).on('check', function(e){
-						e.model.owner.updateCount();
-					})
+				this.models.push(new tableModel(this, options.data[i],{
+				'*':[function(e){
+				e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
+				}],
+				'check': [function(e){
+					e.model.owner.draw();
+				}]
+				})
 				);
+
+
 			}
 		}
 		if(typeof this.options.defaultSort !== 'undefined'){
@@ -524,11 +528,8 @@ function GrapheneDataGrid(options) {
 		
 
 		this.containerEl.on('click','[data-event="add"]', function(){
-			var event = _.find(this.options.events, {name:'add'});
-
-			if(typeof event !== 'undefined' && typeof event.callback == 'function'){
-				event.callback.call(this);
-			}else{
+			// this.dispatch('add');
+			if(this.dispatch('add').default){
 				new gform(_.extend({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
 					if(e.form.validate()){
 						this.add(e.form.get(),{validate:false})
@@ -591,8 +592,8 @@ function GrapheneDataGrid(options) {
 
 		//Mobile
 		// this.containerEl.on('change', '.sortBy', function(e) {
-		// 	if($(e.currentTarget).val() !== ''){
-		// 		processSort((_.find(this.options.filterFields, {id:$(e.currentTarget).val()}) || {search:true}).search)
+		// 	if(e.currentTarget.value !== ''){
+		// 		processSort((_.find(this.options.filterFields, {id:e.currentTarget.value}) || {search:true}).search)
 		// 	}
 		// }.bind(this));
 		// this.containerEl.on('click', '.filterForm', function(e) {
@@ -625,8 +626,14 @@ function GrapheneDataGrid(options) {
 
 
 	this.add = function(item,config){
-		var newModel = new tableModel(this, item)
-
+		var newModel = new tableModel(this, item,{
+			'*':[function(e){
+			e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
+			}],
+			'check': [function(e){
+				e.model.owner.draw();
+			}]
+			})
 		if(config.validate == false || 	this.validate(item)) {
 			this.models.push(newModel);
 			if(typeof this.options.defaultSort !== 'undefined'){
@@ -645,9 +652,8 @@ function GrapheneDataGrid(options) {
 		}else{
 			return false
 		}
-		return newModel.on('check', function(){
-			this.owner.updateCount();
-		});
+		return newModel;
+		
 		
 	}
 	this.search = function(options) {

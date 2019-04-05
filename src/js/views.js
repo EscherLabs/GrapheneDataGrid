@@ -314,7 +314,7 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 gform.stencils.table_row=`{{#options.hasActions}}
 
 <td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
-  <span class="text-muted fa {{[[}}#waiting{{]]}}fa-spinner fa-spin {{[[}}/waiting{{]]}} {{[[}}^waiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/waiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+  <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
    </td>
 
   {{/options.hasActions}}
