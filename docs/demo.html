@@ -142,15 +142,22 @@
 				// preDraw: function(model){
 				// 	model.stuff = 'yippe';
 				// },
-				events:[
-					{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
-						console.log(model.attributes);
-					}, multiEdit: true, complete: function(){alert('Manage');}},
-					{'name': 'sort', 'label': '<i class="fa fa-sort"></i> Sort', 
-					callback: function(collection){
-						console.log(collection[0].attributes);
-					}, global: true}
+				actions:[
+					{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
+					'|',
+					{type:"primary",name:'edit',min:1,max:false,label:'<i class="fa fa-pencil"></i> edit' },
+					'|',
+					{type:"success",name:'add',min:0,max:false,label:'<i class="fa fa-pencil-square-o"></i> New' },
 				],
+				// actions:[
+				// 	{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
+				// 		console.log(model.attributes);
+				// 	}, multiEdit: true, complete: function(){alert('Manage');}},
+				// 	{'name': 'sort', 'label': '<i class="fa fa-sort"></i> Sort', 
+				// 	callback: function(collection){
+				// 		console.log(collection[0].attributes);
+				// 	}, global: true}
+				// ],
 				events:{'model:set':[function(e){
 					e.model.stuff = 'yippe';
 				}]},
@@ -173,7 +180,7 @@
             "type": "checkbox",
             // "truestate": "true",
             // "falsestate": "false",            
-            "template":'{{#attributes.COMPLETE}}<span class="fa fa-check-square-o"></span>{{/attributes.COMPLETE}}{{^attributes.COMPLETE}}<span class="fa fa-square-o"></span>{{/attributes.COMPLETE}}'
+            "template":'{{#attributes.COMPLETE}}<span class="fa fa-check-square-o"></span>{{/attributes.COMPLETE}}{{^attributes.COMPLETE}}<span data-id="{{id}}" data-event="delete" class="fa fa-square-o"></span>{{/attributes.COMPLETE}}'
         },           				// {type:"select", name:"priority", label: "Stat", showColumn: true, choices:'./assets/js/options.json'}
 // ,							{label: 'Endpoint', name:'endpoint', default: {name: 'External (no auth)', value: 'External', target:''}, type: 'select', choices: '/endpoints/list/'+model.group_id},
         {"name":"dob","label":"DOB","template":"{{stuff}}s{{attributes.dob}}"},
@@ -188,21 +195,30 @@
 
 			], data: data}
 
-			bt = new GrapheneDataGrid(options).on('manage',function(e){
+			bt = new GrapheneDataGrid(options).on('model:manage',function(e){
 				console.log(e.model.attributes);
-			}).on('add',function(e){
+			}).on('model:add',function(e){
 				// e.preventDefault();
 				console.log(e.table.models[0].attributes);
-			}).on('sort',function(e){
-				console.log(e.table.models[0].attributes);
+			}).on('delete',function(e){
+				if(typeof e.model !== 'undefined'){
+					e.preventDefault();
+					e.model.delete();
+					e.table.draw();
+				}else{
+					if(e.table.getSelected().length > 1){
+						e.preventDefault();
+					}
+				}
 			}).on('added',function(e){
 				e.model.waiting(true);
 				// e.model.owner.draw();
 			}).on('click',function(e){
 				// e.model.waiting = false;
+				e.model.toggle();
+
 				e.model.waiting(!e.model.waiting());
 
-				e.model.toggle();
 
 			})
 			

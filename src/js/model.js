@@ -8,9 +8,26 @@ function tableModel (owner, initial, events) {
 	this.attribute_history = [];
 	this.schema = owner.options.schema;
 	this.iswaiting;
+
+	this.row = document.createElement('tr');
+	this.row.setAttribute('data-id', this.id);
+	this.row.setAttribute("class", 'filterable grid-row'+(this.iswaiting ? " warning" : ""));
+
 	this.waiting = function(state){
-		if(typeof state !== 'undefined'){this.iswaiting = state;this.owner.draw();}
+
+		if(typeof state !== 'undefined'){this.iswaiting = state;
+			this.row.setAttribute("class", 'filterable grid-row'+(this.iswaiting ? " warning" : ""));
+			this.draw();
+		}
 		return this.iswaiting;
+	}
+
+	this.draw = function(){
+		var temp = gform.renderString(this.owner.view,this);
+		if(this.row.innerHTML != temp){
+			this.row.innerHTML = temp;
+		}
+		return this.row;
 	}
 	this.eventBus = new gform.eventBus({owner:'model',item:'model',handlers:events||{}}, this)
 	this.on = this.eventBus.on;
@@ -72,6 +89,8 @@ function tableModel (owner, initial, events) {
 			this.attributes = newAtts;
 		}
 		processAtts.call(this);
+		this.draw();
+
 		if(!silent){
 			// debugger;
 			this.dispatch('set');
@@ -80,11 +99,12 @@ function tableModel (owner, initial, events) {
 	this.checked = false;
 	this.deleted = false;
 	this.toggle = function(state, silent) {
-		if(typeof state === 'bool') {
+		if(typeof state === 'boolean') {
 			this.checked = state;
 		}else{
 			this.checked = !this.checked;
 		}
+		this.draw();
 		if(!silent){
 			this.dispatch('check');
 		}

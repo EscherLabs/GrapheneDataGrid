@@ -1,5 +1,5 @@
 
-gform.stencils.events = `<div>
+gform.stencils.actions = `<div>
 <span class="hidden-xs">
 {{#options.hasDelete}}
 <a href="javascript:void(0);" data-event="delete" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
@@ -8,9 +8,9 @@ gform.stencils.events = `<div>
 
     {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
 
-    {{#options.events}}
+    {{#options.actions}}
       {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}">{{{label}}}</a>{{/global}}
-    {{/options.events}}
+    {{/options.actions}}
 
 </div>
 </span>
@@ -21,9 +21,9 @@ gform.stencils.events = `<div>
   <ul class="dropdown-menu">
       {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
 
-      {{#options.events}}
+      {{#options.actions}}
         {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{[[}}id{{]]}}">{{{label}}}</a></li>{{/global}}
-      {{/options.events}}
+      {{/options.actions}}
       {{#options.hasDelete}}
         <li role="separator" class="divider"></li>
         <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
@@ -31,7 +31,34 @@ gform.stencils.events = `<div>
   </ul>
 </div>
 </div>
+
 `;
+gform.stencils.actions = `
+<table style="width:100%">
+<thead>
+<tr>
+<th>
+<div class="btn-group pull-left" role="group" aria-label="...">
+
+{{#options.actions}}
+{{#name}}
+<a href="javascript:void(0);" data-event="{{name}}" class="btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
+{{/name}}
+
+{{^name}}
+</div>
+</th>
+<th>
+<div class="btn-group pull-right" role="group" aria-label="...">
+
+{{/name}}
+{{/options.actions}}
+</div>
+</th>
+</tr>
+</thead>
+</table>`
+
 gform.stencils.count=`{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 0">{{checked_count}} item(s) selected</h5>{{/checked_count}}`;
 gform.stencils.mobile_head=`
 <div style="clear:both;">
@@ -86,7 +113,7 @@ gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">
 </td></tr>`
 gform.stencils.mobile_table=`<div class="well table-well">
 <div style="height:40px;">
-  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
 
   <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 
@@ -94,11 +121,11 @@ gform.stencils.mobile_table=`<div class="well table-well">
   <div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
     {{#showAdd}}
     <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-    {{/showAdd}}	
+    {{/showAdd}}
 
-    {{#options.events}}
+    {{#options.actions}}
       {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
-    {{/options.events}}
+    {{/options.actions}}
     {{#options.download}}
     <div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
     {{/options.download}}
@@ -131,7 +158,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
 
 
 {{#options.hasActions}}
-<div style="padding: 16px 0 0 15px;"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></div>
+<div style="padding: 16px 0 0 15px;"><i name="select_all" class="fa fa-2x fa-square-o"></i></div>
 {{/options.hasActions}}
 
 <div class="table-container" style="width:100%;overflow:auto">
@@ -151,19 +178,20 @@ gform.stencils.mobile_table=`<div class="well table-well">
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
 gform.stencils.table=`<div class="well table-well">
+
 <div style="overflow:hidden">
-  <div name="events" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:100%" ></div>
 
   <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 
   <div class="hiddenForm" style="display:none"></div>
   <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
-    {{#showAdd}}
+    {{#showAdds}}
     <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-    {{/showAdd}}		
-    {{#options.events}}
+    {{/showAdds}}		
+    {{#options.actions}}
       {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
-    {{/options.events}}
+    {{/options.actions}}
 
   </div>
  
@@ -286,7 +314,7 @@ gform.stencils.table_footer=`<div>
 </div>`
 gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
 {{#options.hasActions}}
-<th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i data-event="select_all" class="fa fa-2x fa-square-o"></i></th>
+<th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i name="select_all" class="fa fa-2x fa-square-o"></i></th>
 {{/options.hasActions}}
 
 {{#items}}
