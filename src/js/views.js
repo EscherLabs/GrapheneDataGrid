@@ -42,14 +42,14 @@ gform.stencils.actions = `
 
 {{#options.actions}}
 {{#name}}
-<a href="javascript:void(0);" data-event="{{name}}" class="btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
+<a href="javascript:void(0);" style="display: inline-block;font-size: 14px;float: none;clear: none;" data-event="{{name}}" class="btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
 {{/name}}
 
 {{^name}}
 </div>
 </th>
-<th>
-<div class="btn-group pull-right" role="group" aria-label="...">
+<th style="width:100%">
+<div class="btn-group pull-right" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
 {{/name}}
 {{/options.actions}}
