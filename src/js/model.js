@@ -1,6 +1,6 @@
 
 function tableModel (owner, initial, events) {
-	
+	this.visible = false;
 	this.owner = owner;
 	this.id = gform.getUID();
 	this.attributes = {};
@@ -23,9 +23,11 @@ function tableModel (owner, initial, events) {
 	}
 
 	this.draw = function(){
-		var temp = gform.renderString(this.owner.view,this);
-		if(this.row.innerHTML != temp){
-			this.row.innerHTML = temp;
+		if(this.visible){
+			var temp = gform.renderString(this.owner.view,this);
+			if(this.row.innerHTML != temp){
+				this.row.innerHTML = temp;
+			}
 		}
 		return this.row;
 	}

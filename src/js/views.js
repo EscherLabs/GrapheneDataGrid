@@ -1,38 +1,3 @@
-
-gform.stencils.actions = `<div>
-<span class="hidden-xs">
-{{#options.hasDelete}}
-<a href="javascript:void(0);" data-event="delete" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
-{{/options.hasDelete}}
-<div class="btn-group"role="group" aria-label="...">
-
-    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
-
-    {{#options.actions}}
-      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}">{{{label}}}</a>{{/global}}
-    {{/options.actions}}
-
-</div>
-</span>
-<div class="btn-group visible-xs">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="fa fa-cogs"></i> <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
-
-      {{#options.actions}}
-        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{[[}}id{{]]}}">{{{label}}}</a></li>{{/global}}
-      {{/options.actions}}
-      {{#options.hasDelete}}
-        <li role="separator" class="divider"></li>
-        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
-      {{/options.hasDelete}}
-  </ul>
-</div>
-</div>
-
-`;
 gform.stencils.actions = `
 <table style="width:100%">
 <thead>
@@ -42,7 +7,7 @@ gform.stencils.actions = `
 
 {{#options.actions}}
 {{#name}}
-<a href="javascript:void(0);" style="display: inline-block;font-size: 14px;float: none;clear: none;" data-event="{{name}}" class="btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
+<a href="javascript:void(0);" style="display: inline-block;font-size: 14px;float: none;clear: none;" data-event="{{name}}" class="grid-action disabled btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
 {{/name}}
 
 {{^name}}
@@ -100,11 +65,11 @@ gform.stencils.mobile_head=`
 </div>
 `
 gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">		
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
 <span class="text-muted fa {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
 </div>
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
 <div>
 {{#items}}
 {{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
@@ -157,9 +122,9 @@ gform.stencils.mobile_table=`<div class="well table-well">
     {{>mobile_head}}
 
 
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <div style="padding: 16px 0 0 15px;"><i name="select_all" class="fa fa-2x fa-square-o"></i></div>
-{{/options.hasActions}}
+{{/options.hideCheck}}
 
 <div class="table-container" style="width:100%;overflow:auto">
 
@@ -178,23 +143,11 @@ gform.stencils.mobile_table=`<div class="well table-well">
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
 gform.stencils.table=`<div class="well table-well">
+<input type="file" class="csvFileInput" accept=".csv" style="display:none">
+<div class="hiddenForm" style="display:none"></div>
 
 <div style="overflow:hidden">
   <div name="actions" class=" pull-left" style="margin-bottom:10px;width:100%" ></div>
-
-  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
-
-  <div class="hiddenForm" style="display:none"></div>
-  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
-    {{#showAdds}}
-    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-    {{/showAdds}}		
-    {{#options.actions}}
-      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
-    {{/options.actions}}
-
-  </div>
- 
 </div>	
 <div>
 
@@ -253,9 +206,9 @@ gform.stencils.table=`<div class="well table-well">
 {{#options.autoSize}}
     <thead>
           <tr  class="list-group-row">
-              {{#options.hasActions}}
+              {{^options.hideCheck}}
   <th style="width:60px" class="select-column"></th>
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
         {{#items}}
   {{#visible}}
 <th  style="min-width:85px">
@@ -313,9 +266,9 @@ gform.stencils.table_footer=`<div>
   {{/entries.length}}
 </div>`
 gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i name="select_all" class="fa fa-2x fa-square-o"></i></th>
-{{/options.hasActions}}
+{{/options.hideCheck}}
 
 {{#items}}
 {{#visible}}
@@ -325,12 +278,12 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 </tr>
 {{#options.filter}}
 <tr class="filter">
-{{#options.hasActions}}<td>
+{{^options.hideCheck}}<td>
 <div name="reset-search" style="position:relative" class="btn" data-toggle="tooltip" data-placement="left" title="Clear Filters">
   <i class="fa fa-filter"></i>
   <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
 </div>
-</td>{{/options.hasActions}}
+</td>{{/options.hideCheck}}
 
 {{#items}}
 {{#visible}}
@@ -339,13 +292,13 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 {{/items}}
 </tr>
 {{/options.filter}}`
-gform.stencils.table_row=`{{#options.hasActions}}
+gform.stencils.table_row=`{{^options.hideCheck}}
 
 <td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
   <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
    </td>
 
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
 {{#items}}
 {{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
 {{/items}}`

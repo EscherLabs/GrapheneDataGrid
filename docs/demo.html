@@ -99,7 +99,6 @@
 
 		<script type='text/javascript'>
 		var options = {container: '#first',
-				// inlineEdit:true,
 				// filter: false,
 				// sort: false,
 				// search: false,
@@ -109,17 +108,18 @@
 				autoSize: 10,
 				multiEdit:['gform_id', 'status'],
 				title:'Demo Content',
-				edit:true,
 				// editComplete:function(models){
 
 				// 	console.log(models)
 				// },
-				add: true,
-				click: function(model){
-					model.toggle();
-				},
+				// create:{},
+				edit:{fields:[
+				{type:"text", name:"order2", label:"Order2",type:'select',placeholder:"Select one",options:["asfdasdfnasldfjl;asjdlfka"]}
+			]},
+				// click: function(model){
+				// 	model.toggle();
+				// },
 				name:"bt",
-				delete:true,
 				entries:[2,5,10],
 				count:10000,
 				// defaultSort: 'order',
@@ -145,11 +145,11 @@
 				actions:[
 					{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
 					'|',
-					{type:"primary",name:'edit',min:1,max:false,label:'<i class="fa fa-pencil"></i> edit' },
-					{type:"default",name:'manage',min:1,max:false,label:'<i class="fa fa-gears"></i> Manage' },
+					{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
+					{type:"default",name:'manage',min:1,label:'<i class="fa fa-gears"></i> Manage' },
 					'|',
-					{type:"info",name:'sort',min:0,max:false,label:'<i class="fa fa-pencil-sort"></i> sort' },
-					{type:"success",name:'add',min:0,max:false,label:'<i class="fa fa-pencil-square-o"></i> New' },
+					{type:"info",name:'sort',min:0,max:0,label:'<i class="fa fa-pencil-sort"></i> sort' },
+					{type:"success",name:'add',min:0,label:'<i class="fa fa-pencil-square-o"></i> New' },
 				],
 				// actions:[
 				// 	{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
@@ -185,7 +185,7 @@
             "template":'{{#attributes.COMPLETE}}<span class="fa fa-check-square-o"></span>{{/attributes.COMPLETE}}{{^attributes.COMPLETE}}<span data-id="{{id}}" data-event="delete" class="fa fa-square-o"></span>{{/attributes.COMPLETE}}'
         },           				// {type:"select", name:"priority", label: "Stat", showColumn: true, choices:'./assets/js/options.json'}
 // ,							{label: 'Endpoint', name:'endpoint', default: {name: 'External (no auth)', value: 'External', target:''}, type: 'select', choices: '/endpoints/list/'+model.group_id},
-        {"name":"dob","label":"DOB","template":"{{stuff}}s{{attributes.dob}}"},
+        {"name":"dob","label":"DOB","template":"{{stuff}}s{{attributes.dob}}",edit:[{type:"matches",name:"_method",value:'create'}]},
         // {"name":"age","label":"Age
         {"name":"profile","label":"Medication Profile long title","type":"fieldset","fields":[
             {"label":"Drug name","name":"drug_name"}
@@ -213,13 +213,13 @@
 					}
 				}
 			}).on('added',function(e){
-				e.model.waiting(true);
+				// e.model.waiting(true);
 				// e.model.owner.draw();
 			}).on('click',function(e){
 				// e.model.waiting = false;
 				e.model.toggle();
 
-				e.model.waiting(!e.model.waiting());
+				// e.model.waiting(!e.model.waiting());
 
 
 			})

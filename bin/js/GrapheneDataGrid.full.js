@@ -1,5 +1,5 @@
 function GrapheneDataGrid(options) {
-	this.version = '0.0.2';
+	this.version = '0.0.3';
 	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
 	this.on = this.eventBus.on;
 	// this.dispatch = this.eventBus.dispatch;
@@ -29,16 +29,18 @@ function GrapheneDataGrid(options) {
 
 	this.filterValues = {};
 	this.draw = function() {
+		
 		_.each(this.summary.items, function(item){
 			this.$el.find('.filter #'+item.id+',[data-sort='+item.id+']').toggle(item.isEnabled);
 		}.bind(this))
+
 		// if(this.$el.find('.filter').length){
-			options.search = this.filterValues;
-			_.each(options.search, function(item, index) {
-				if(!item && (item !== 0)) {
-					delete options.search[index];
-				}
-			});
+		options.search = this.filterValues;
+		_.each(options.search, function(item, index) {
+			if(!item && (item !== 0)) {
+				delete options.search[index];
+			}
+		});
 		var pagebuffer = options.pagebuffer || 2;
 
 		if(this.$el.find('[name="search"]').length && this.$el.find('[name="search"]').val().length){
@@ -255,7 +257,7 @@ function GrapheneDataGrid(options) {
 			})
 	}
 
-	var summary = {'[[':'{{', ']]':'}}',checked_count:0,multi_checked:false,multiEdit:!!options.multiEdit ,'items': _.map(options.filterFields, function(val){
+	var summary = {'[[':'{{', ']]':'}}',checked_count:0,'items': _.map(options.filterFields, function(val){
 		var name = (val.search|| val.label.split(' ').join('_').toLowerCase());
 
 		if(val.template){
@@ -290,13 +292,7 @@ function GrapheneDataGrid(options) {
 		// }
 		return {'isEnabled': (typeof val.showColumn =='undefined' || val.showColumn), 'label': val.label, 'name': name, 'cname': (val.name|| val.label.split(' ').join('_').toLowerCase()), 'id': val.id, 'visible':!(val.type == 'hidden')} 
 	})};
-	options.hasActions = !!(options.edit || options.delete || options.events);
-	if(typeof options.hasEdit == 'undefined'){
-		options.hasEdit = !!(options.edit);			
-	}
-	if(typeof options.hasDelete == 'undefined'){
-		options.hasDelete = !!(options.delete);
-	}
+
 	options.entries = options.entries || [25, 50 ,100];
 	summary.options = options;
 	summary.showAdd = !!(options.add) || options.showAdd;
@@ -365,7 +361,7 @@ function GrapheneDataGrid(options) {
 				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
 					this.getSelected()[0].set(e.form.toJSON());
 					this.eventBus.dispatch('edited')
-					this.eventBus.dispatch('model:edited',his.getSelected()[0])
+					this.eventBus.dispatch('model:edited',this.getSelected()[0])
 					this.draw();
 					e.form.pub('close')
 
@@ -455,8 +451,8 @@ function GrapheneDataGrid(options) {
 		    	ref.find('.status').html('<div class="alert alert-success">Successfully processed file, '+itemCount+ ' rows were added!</div>')
 		    	ref.find('.btn').toggleClass('btn-danger btn-success').html('Done');
 		    	ref.find('.progress').hide();
-					if(typeof table.options.defaultSort !== 'undefined'){
-						table.models = _.sortBy(table.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(table)).reverse();
+					if(typeof table.options.sortBy !== 'undefined'){
+						table.models = _.sortBy(table.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(table)).reverse();
 					}
 
 		    	if(typeof table.options.onBulkLoad == 'function'){
@@ -482,7 +478,7 @@ function GrapheneDataGrid(options) {
 		this.$el = $el;
 
 		if($el.find('.filter').length) {
-			this.filter = new gform({name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },'.filter').on('change', function(){
+			this.filter = new gform({name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },'.filter').on('input', function(){
 				this.$el.find('[name="search"]').val('');
 				this.filterValues = this.filter.toJSON();
 				this.draw();
@@ -494,9 +490,18 @@ function GrapheneDataGrid(options) {
 		this.updateCount =function(count) {
 			var count = count || this.getSelected().length;
 			this.summary.checked_count = count;
-			this.summary.multi_checked = count>1;
 
 			this.$el.find('[name="actions"]').html(gform.render('actions',this.summary));
+
+			_.each(this.$el.find('.grid-action'),function(i){
+				var event = _.assign({max:10000,min:0}, _.find(this.options.actions,{name:i.dataset.event}))
+				if(this.summary.checked_count >= event.min && this.summary.checked_count <= event.max){
+					gform.removeClass(i,'disabled')
+				}else{
+					gform.addClass(i,'disabled')
+				}
+			}.bind(this))
+
 			this.$el.find('[name="count"]').html(gform.render('count',this.summary));
 
 			var checkbox = this.$el.find('[name="select_all"].fa');
@@ -526,8 +531,8 @@ function GrapheneDataGrid(options) {
 
 			}
 		}
-		if(typeof this.options.defaultSort !== 'undefined'){
-			this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(this)).reverse();
+		if(typeof this.options.sortBy !== 'undefined'){
+			this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(this)).reverse();
 		}
 
 		this.$el.on('change', '.csvFileInput', _.partial(handleFiles, this));
@@ -675,8 +680,8 @@ function GrapheneDataGrid(options) {
 			})
 		if(config.validate == false || 	this.validate(item)) {
 			this.models.push(newModel);
-			if(typeof this.options.defaultSort !== 'undefined'){
-				this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.defaultSort]; }.bind(this)).reverse();
+			if(typeof this.options.sortBy !== 'undefined'){
+				this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(this)).reverse();
 			}
 			if(config.draw !== false){
 				this.draw();
@@ -815,10 +820,17 @@ function GrapheneDataGrid(options) {
 			}catch(e){}
 		}
 	}
-
+	this.visible = [];
 
 	this.grab = function(options) {
-		return this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		_.each(this.visible,function(item){
+			item.visible = false;
+		})
+		this.visible = temp = this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		_.each(this.visible,function(item){
+			item.visible = true;
+		})
+		return temp;
 	};
 	this.getModels = function(search){
 		var search = search || {deleted: false};
@@ -1026,7 +1038,7 @@ function GrapheneDataGrid(options) {
   }
 });
 function tableModel (owner, initial, events) {
-	
+	this.visible = false;
 	this.owner = owner;
 	this.id = gform.getUID();
 	this.attributes = {};
@@ -1049,9 +1061,11 @@ function tableModel (owner, initial, events) {
 	}
 
 	this.draw = function(){
-		var temp = gform.renderString(this.owner.view,this);
-		if(this.row.innerHTML != temp){
-			this.row.innerHTML = temp;
+		if(this.visible){
+			var temp = gform.renderString(this.owner.view,this);
+			if(this.row.innerHTML != temp){
+				this.row.innerHTML = temp;
+			}
 		}
 		return this.row;
 	}
@@ -1125,7 +1139,7 @@ function tableModel (owner, initial, events) {
 	this.checked = false;
 	this.deleted = false;
 	this.toggle = function(state, silent) {
-		if(typeof state === 'bool') {
+		if(typeof state === 'boolean') {
 			this.checked = state;
 		}else{
 			this.checked = !this.checked;
@@ -1151,40 +1165,32 @@ function tableModel (owner, initial, events) {
 		this.deleted = true;
 		// this.owner.models.splice(_.indexOf(_.map(this.owner.models, 'id'), this.id),1);
 	}
-};
-gform.stencils.actions = `<div>
-<span class="hidden-xs">
-{{#options.hasDelete}}
-<a href="javascript:void(0);" data-event="delete" class="btn btn-danger {{^checked_count}}disabled{{/checked_count}}" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a>
-{{/options.hasDelete}}
-<div class="btn-group"role="group" aria-label="...">
+};gform.stencils.actions = `
+<table style="width:100%">
+<thead>
+<tr>
+<th>
+<div class="btn-group pull-left" role="group" aria-label="...">
 
-    {{#options.hasEdit}}<a href="javascript:void(0);" data-event="edit" class="btn btn-primary {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a>{{/options.hasEdit}}
+{{#options.actions}}
+{{#name}}
+<a href="javascript:void(0);" style="display: inline-block;font-size: 14px;float: none;clear: none;" data-event="{{name}}" class="grid-action disabled btn btn-{{type}}{{^type}}default{{/type}}">{{{label}}}</a>
+{{/name}}
 
-    {{#options.actions}}
-      {{^global}}<a href="javascript:void(0);" data-event="{{name}}" class="custom-event btn btn-default {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}" data-id="{{[[}}id{{]]}}">{{{label}}}</a>{{/global}}
-    {{/options.actions}}
-
+{{^name}}
 </div>
-</span>
-<div class="btn-group visible-xs">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="fa fa-cogs"></i> <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-      {{#options.hasEdit}}<li  class=" {{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="edit" data-id="{{[[}}id{{]]}}"><i class="fa fa-pencil"></i> Edit</a></li> {{/options.hasEdit}}
+</th>
+<th style="width:100%">
+<div class="btn-group pull-right" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
-      {{#options.actions}}
-        {{^global}}<li class="{{^checked_count}}disabled{{/checked_count}}{{^multiEdit}}{{#multi_checked}}disabled{{/multi_checked}}{{/multiEdit}}"><a href="javascript:void(0);" data-event="{{name}}" class="custom-event" data-id="{{[[}}id{{]]}}">{{{label}}}</a></li>{{/global}}
-      {{/options.actions}}
-      {{#options.hasDelete}}
-        <li role="separator" class="divider"></li>
-        <li class=" {{^checked_count}}disabled{{/checked_count}}"><a href="javascript:void(0);" data-event="delete" style="margin-right:15px"><i class="fa fa-times"></i> Delete</a></li>
-      {{/options.hasDelete}}
-  </ul>
+{{/name}}
+{{/options.actions}}
 </div>
-</div>
-`;
+</th>
+</tr>
+</thead>
+</table>`
+
 gform.stencils.count=`{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 0">{{checked_count}} item(s) selected</h5>{{/checked_count}}`;
 gform.stencils.mobile_head=`
 <div style="clear:both;">
@@ -1247,7 +1253,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
   <div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
     {{#showAdd}}
     <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-    {{/showAdd}}	
+    {{/showAdd}}
 
     {{#options.actions}}
       {{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
@@ -1304,22 +1310,11 @@ gform.stencils.mobile_table=`<div class="well table-well">
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
 gform.stencils.table=`<div class="well table-well">
+<input type="file" class="csvFileInput" accept=".csv" style="display:none">
+<div class="hiddenForm" style="display:none"></div>
+
 <div style="overflow:hidden">
-  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
-
-  <input type="file" class="csvFileInput" accept=".csv" style="display:none">
-
-  <div class="hiddenForm" style="display:none"></div>
-  <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
-    {{#showAdd}}
-    <div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-    {{/showAdd}}		
-    {{#options.actions}}
-      {{#global}}<div class="btn btn-default custom-event {{global}}" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
-    {{/options.actions}}
-
-  </div>
- 
+  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:100%" ></div>
 </div>	
 <div>
 
