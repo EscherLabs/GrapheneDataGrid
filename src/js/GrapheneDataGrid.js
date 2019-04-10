@@ -327,8 +327,8 @@ function GrapheneDataGrid(options) {
 					}
 				// }
 			}else{
-				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, options.edit || options.form || {}) ).on('save', function(e) {
-					this.getSelected()[0].set(e.form.toJSON());
+				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
+					this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
 					this.eventBus.dispatch('edited')
 					this.eventBus.dispatch('model:edited',this.getSelected()[0])
 					this.draw();
