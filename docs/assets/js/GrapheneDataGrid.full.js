@@ -1,4 +1,9 @@
 function GrapheneDataGrid(options) {
+	var actions = [{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
+	'|',
+	{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
+	'|',
+	{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> New' }];
 	this.version = '0.0.3';
 	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
 	this.on = this.eventBus.on;
@@ -7,7 +12,12 @@ function GrapheneDataGrid(options) {
 	options = _.extend({filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.actions == 'object' && options.actions.length){
 		options.actions = _.map(options.actions,function(event){
-			return _.extend({global:false},event)
+			// return _.extend({global:false},event)
+			var temp = _.find(actions,{name:event.name})
+			if(typeof temp !== 'undefined'){
+				event = _.defaultsDeep(event,temp);
+			}
+			return event;
 		})
 	}else{
 		options.actions = false;
@@ -160,21 +170,7 @@ function GrapheneDataGrid(options) {
 	}.bind(this)
 
 	var options = _.extend({count: options.count || 25, page: 1, sort: 'createdAt', reverse: false}, options);
-	// self = this;
-	// options.schema = 
-	// 	_.map(options.schema, function(item){
-	// 	return gform.processOpts(item,{update:function(options){
-	// 		this.item.choices = options.choices; 
-	// 		this.item.options = options.choices; 
-	// 		var schema = this.self.options.schema;
-	// 		_.each(this.self.models,function(model){
-	// 			model.schema = schema;
-	// 			model.pat();
-	// 		})
-	// 		this.self.draw();
 
-	// 	}.bind({item:item,self:self}) });
-	// } )
 	
 
 
@@ -192,7 +188,7 @@ function GrapheneDataGrid(options) {
 					valid: true,
 					parsable:true,
 					visible:true,
-					enabled:true,
+					editable:true,
 					array:false,
 					offset: 0,
 			}, this.opts, gform.default,(gform.types[fieldIn.type]||gform.types['text']).defaults, fieldIn)
@@ -201,32 +197,18 @@ function GrapheneDataGrid(options) {
 			return field;
 		})
 	}
-	options.filterFields = _.map(_.extend({}, options.filters || options.schema), function(val){
+	options.filterFields = _.map(_.extend({}, options.filters || options.schema || options.form.fields), function(val){
 		val = gform.normalizeField.call({options:{default:{type:'text'}}},val);
 		name = val.name;
 		val.value = '';
 		switch(val.type){
 			case 'checkbox':
 				val.options = [{label: 'False', value: 'false'}, {label: val.options[0] || 'True', value: val.options[1] || 'true'}];
-				// if(typeof val.falsestate !== 'undefined'){
-				// 	val.options[0].label = val.falsestate;
-				// 	val.options[0].value = val.falsestate;
-				// }
 			case 'radio':
 				val.type = 'select';
 			case 'select':
-				// var temp = val.options;
 				val.placeholder = false;
 				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},{type:'optgroup',options:val.options}]
-				// val.placeholder = false;
-				// val.options = val.options||{}
-				// val.placeholder = {}
-				// newOptions[0][] = 'No Filter';
-				// val.placeholder[val.value_key || 'value'] = '';
-
-				// if(val.value_key == 'index'){
-				// 	delete val.value_key;
-				// }
 				break;
 		case 'hidden':
 				break;
@@ -247,7 +229,7 @@ function GrapheneDataGrid(options) {
 		val.name = val.id;
 		val.show = {};
 		// val.isEnabled = true;
-		val.enabled = true;
+		val.editable = true;
 		val.help = '';
 		return val;
 	});
@@ -295,7 +277,6 @@ function GrapheneDataGrid(options) {
 
 	options.entries = options.entries || [25, 50 ,100];
 	summary.options = options;
-	summary.showAdd = !!(options.add) || options.showAdd;
 
 	this.summary = summary;
 	var template;
@@ -314,13 +295,13 @@ function GrapheneDataGrid(options) {
 		}
 	}
 	var actions = {
-		'add':function(){
-		new gform(_.extend({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.gform || {} )).on('save', function(e) {
-			if(e.form.validate()){
-				this.add(e.form.get(),{validate:false})
-				e.form.pub('close');
-			}
-		}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()},
+		'create':function(){
+			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
+				if(e.form.validate()){
+					this.add(e.form.get(),{validate:false})
+					e.form.pub('close');
+				}
+			}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()},
 		'edit':function(){
 			if(	typeof this.options.multiEdit !== 'undefined' && 
 				this.options.multiEdit.length !== 0 &&
@@ -353,13 +334,11 @@ function GrapheneDataGrid(options) {
 						}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
 					}else{
 						$(gform.render('modal_container',{title: "Common Field Editor ",footer:'<div class="btn btn-danger" style="margin-right:20px" data-dismiss="modal">Done</div>', body:'<div class="alert alert-warning">No eligible fields have been found for editing.</div>'})).modal();
-
 					}
-
 				// }
 			}else{
-				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:this.getSelected()[0].schema}, this.options.gform || {} ) ).on('save', function(e) {
-					this.getSelected()[0].set(e.form.toJSON());
+				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
+					this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
 					this.eventBus.dispatch('edited')
 					this.eventBus.dispatch('model:edited',this.getSelected()[0])
 					this.draw();
@@ -374,7 +353,9 @@ function GrapheneDataGrid(options) {
 				if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
 					_.each(checked_models, function(item){
 							item.delete();
-					})
+							this.eventBus.dispatch('model:deleted',item)
+
+					}.bind(this))
 					this.eventBus.dispatch('deleted')
 					this.draw();
 				}
@@ -518,7 +499,7 @@ function GrapheneDataGrid(options) {
 
 		if(options.data) {
 			for(var i in options.data) {
-				this.models.push(new tableModel(this, options.data[i],{
+				this.models.push(new gridModel(this, options.data[i],{
 				'*':[function(e){
 				e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
 				}],
@@ -670,7 +651,7 @@ function GrapheneDataGrid(options) {
 
 
 	this.add = function(item,config){
-		var newModel = new tableModel(this, item,{
+		var newModel = new gridModel(this, item,{
 			'*':[function(e){
 			e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
 			}],
@@ -688,7 +669,7 @@ function GrapheneDataGrid(options) {
 			}
 			// this.updateCount(this.summary.checked_count);
 			if(config.silent !== true){
-				this.eventBus.dispatch('added',newModel)
+				this.eventBus.dispatch('created',newModel)
 			}
 			// if(typeof this.options.add == 'function'){
 			// 	this.options.add(newModel);
@@ -1037,7 +1018,7 @@ function GrapheneDataGrid(options) {
     return(true);
   }
 });
-function tableModel (owner, initial, events) {
+function gridModel (owner, initial, events) {
 	this.visible = false;
 	this.owner = owner;
 	this.id = gform.getUID();
@@ -1232,11 +1213,11 @@ gform.stencils.mobile_head=`
 </div>
 `
 gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">		
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
 <span class="text-muted fa {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
 </div>
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
 <div>
 {{#items}}
 {{#visible}}{{#isEnabled}}<div class="row" style="min-width:85px"><span class="col-sm-3"><b>{{label}}</b></span><span class="col-sm-9 col-xs-12">{{{name}}}</span></div>{{/isEnabled}}{{/visible}}
@@ -1289,9 +1270,9 @@ gform.stencils.mobile_table=`<div class="well table-well">
     {{>mobile_head}}
 
 
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <div style="padding: 16px 0 0 15px;"><i name="select_all" class="fa fa-2x fa-square-o"></i></div>
-{{/options.hasActions}}
+{{/options.hideCheck}}
 
 <div class="table-container" style="width:100%;overflow:auto">
 
@@ -1373,9 +1354,9 @@ gform.stencils.table=`<div class="well table-well">
 {{#options.autoSize}}
     <thead>
           <tr  class="list-group-row">
-              {{#options.hasActions}}
+              {{^options.hideCheck}}
   <th style="width:60px" class="select-column"></th>
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
         {{#items}}
   {{#visible}}
 <th  style="min-width:85px">
@@ -1433,9 +1414,9 @@ gform.stencils.table_footer=`<div>
   {{/entries.length}}
 </div>`
 gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
-{{#options.hasActions}}
+{{^options.hideCheck}}
 <th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i name="select_all" class="fa fa-2x fa-square-o"></i></th>
-{{/options.hasActions}}
+{{/options.hideCheck}}
 
 {{#items}}
 {{#visible}}
@@ -1445,12 +1426,12 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 </tr>
 {{#options.filter}}
 <tr class="filter">
-{{#options.hasActions}}<td>
+{{^options.hideCheck}}<td>
 <div name="reset-search" style="position:relative" class="btn" data-toggle="tooltip" data-placement="left" title="Clear Filters">
   <i class="fa fa-filter"></i>
   <i class="fa fa-times text-danger" style="position: absolute;right: 5px;"></i>
 </div>
-</td>{{/options.hasActions}}
+</td>{{/options.hideCheck}}
 
 {{#items}}
 {{#visible}}
@@ -1459,13 +1440,13 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 {{/items}}
 </tr>
 {{/options.filter}}`
-gform.stencils.table_row=`{{#options.hasActions}}
+gform.stencils.table_row=`{{^options.hideCheck}}
 
 <td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
   <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
    </td>
 
-  {{/options.hasActions}}
+  {{/options.hideCheck}}
 {{#items}}
 {{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
 {{/items}}`

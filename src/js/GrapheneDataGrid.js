@@ -1,4 +1,9 @@
 function GrapheneDataGrid(options) {
+	var actions = [{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
+	'|',
+	{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
+	'|',
+	{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> New' }];
 	this.version = '0.0.3';
 	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
 	this.on = this.eventBus.on;
@@ -7,7 +12,12 @@ function GrapheneDataGrid(options) {
 	options = _.extend({filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.actions == 'object' && options.actions.length){
 		options.actions = _.map(options.actions,function(event){
-			return _.extend({global:false},event)
+			// return _.extend({global:false},event)
+			var temp = _.find(actions,{name:event.name})
+			if(typeof temp !== 'undefined'){
+				event = _.defaultsDeep(event,temp);
+			}
+			return event;
 		})
 	}else{
 		options.actions = false;
@@ -285,7 +295,7 @@ function GrapheneDataGrid(options) {
 		}
 	}
 	var actions = {
-		'add':function(){
+		'create':function(){
 			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
 				if(e.form.validate()){
 					this.add(e.form.get(),{validate:false})
@@ -343,7 +353,9 @@ function GrapheneDataGrid(options) {
 				if(confirm("Are you sure you want to delete "+checked_models.length+" records? \nThis operation can not be undone.\n\n" )){
 					_.each(checked_models, function(item){
 							item.delete();
-					})
+							this.eventBus.dispatch('model:deleted',item)
+
+					}.bind(this))
 					this.eventBus.dispatch('deleted')
 					this.draw();
 				}
@@ -487,7 +499,7 @@ function GrapheneDataGrid(options) {
 
 		if(options.data) {
 			for(var i in options.data) {
-				this.models.push(new tableModel(this, options.data[i],{
+				this.models.push(new gridModel(this, options.data[i],{
 				'*':[function(e){
 				e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
 				}],
@@ -639,7 +651,7 @@ function GrapheneDataGrid(options) {
 
 
 	this.add = function(item,config){
-		var newModel = new tableModel(this, item,{
+		var newModel = new gridModel(this, item,{
 			'*':[function(e){
 			e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
 			}],
@@ -657,7 +669,7 @@ function GrapheneDataGrid(options) {
 			}
 			// this.updateCount(this.summary.checked_count);
 			if(config.silent !== true){
-				this.eventBus.dispatch('added',newModel)
+				this.eventBus.dispatch('created',newModel)
 			}
 			// if(typeof this.options.add == 'function'){
 			// 	this.options.add(newModel);

@@ -1,5 +1,5 @@
 
-function tableModel (owner, initial, events) {
+function gridModel (owner, initial, events) {
 	this.visible = false;
 	this.owner = owner;
 	this.id = gform.getUID();
