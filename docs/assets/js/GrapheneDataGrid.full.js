@@ -1,15 +1,15 @@
 function GrapheneDataGrid(options) {
-	var actions = [{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
+	var actions = [{type:"danger",name:'delete',min:1,label:'<i class="fa fa-times"></i> Delete' },
 	'|',
 	{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
 	'|',
 	{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> New' }];
 	this.version = '0.0.3';
-	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
+	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{} }, this)
 	this.on = this.eventBus.on;
 	// this.dispatch = this.eventBus.dispatch;
 
-	options = _.extend({filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
+	options = _.extend({filter: true,actions:[{'name':'create'},'|',{'name':'edit'},'|',{'name':'delete'}], sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.actions == 'object' && options.actions.length){
 		options.actions = _.map(options.actions,function(event){
 			// return _.extend({global:false},event)
@@ -203,12 +203,15 @@ function GrapheneDataGrid(options) {
 		val.value = '';
 		switch(val.type){
 			case 'checkbox':
-				val.options = [{label: 'False', value: 'false'}, {label: val.options[0] || 'True', value: val.options[1] || 'true'}];
+				val.options = [{label: 'False', value: 'false'}, {label: val.options[1] || 'True', value: val.options[1] || 'true'}];
+				val.format = {label:"{{label}}"}
 			case 'radio':
 				val.type = 'select';
 			case 'select':
 				val.placeholder = false;
-				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},{type:'optgroup',options:val.options}]
+				var temp = _.pick(val,['options','max','min','path','format'])
+				temp.type = 'optgroup';
+				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},temp]
 				break;
 		case 'hidden':
 				break;
@@ -296,7 +299,7 @@ function GrapheneDataGrid(options) {
 	}
 	var actions = {
 		'create':function(){
-			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
+			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
 				if(e.form.validate()){
 					this.add(e.form.get(),{validate:false})
 					e.form.pub('close');
@@ -320,7 +323,7 @@ function GrapheneDataGrid(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel'},{type:'save'}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 							var newValues = e.form.get();
 							_.map(selectedModels,function(model){
 								model.set(_.extend({}, model.attributes, newValues));
@@ -337,7 +340,7 @@ function GrapheneDataGrid(options) {
 					}
 				// }
 			}else{
-				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
+				new gform(_.extend({},{name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
 					this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
 					this.eventBus.dispatch('edited')
 					this.eventBus.dispatch('model:edited',this.getSelected()[0])
@@ -466,6 +469,8 @@ function GrapheneDataGrid(options) {
 			}.bind(this));
 
 			this.filter.set()
+			debugger;
+			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema })
 		}
 
 		this.updateCount =function(count) {
@@ -807,7 +812,8 @@ function GrapheneDataGrid(options) {
 		_.each(this.visible,function(item){
 			item.visible = false;
 		})
-		this.visible = temp = this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		var temp = this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		this.visible = temp
 		_.each(this.visible,function(item){
 			item.visible = true;
 		})
@@ -1043,6 +1049,7 @@ function gridModel (owner, initial, events) {
 
 	this.draw = function(){
 		if(this.visible){
+			this.dispatch('draw')
 			var temp = gform.renderString(this.owner.view,this);
 			if(this.row.innerHTML != temp){
 				this.row.innerHTML = temp;
@@ -1055,44 +1062,54 @@ function gridModel (owner, initial, events) {
 	this.dispatch = this.eventBus.dispatch;
 	var processAtts = function() {
 		_.each(this.schema, function(item){
+
 			if(typeof item.options !== 'undefined'){
-				var option;
-				if(typeof item.value_key !== 'undefined'){
-					if(item.value_key == 'index'){
-						option = item.options[this.attributes[item.name]]
-					}else{
-						var search = {};
-						search[item.value_key] = this.attributes[item.name];
-						option = _.find(item.options, search);
-						if(_.isFinite(this.attributes[item.name])){
-							search[item.value_key] = parseInt(this.attributes[item.name]);
-							if(typeof option === 'undefined'){
-								option = _.find(item.options, search);
-							}
-							if(typeof option === 'undefined'){
-								option = _.find(item.options, search);
-							}
-						}
-					}
-				}else{
-					option =  _.find(item.options, {value:this.attributes[item.name]});
-					if(typeof option === 'undefined'){
-						option = _.find(item.options, {id:this.attributes[item.name]});
-					}
-          if(_.isFinite(this.attributes[item.name])){
-            if(typeof option === 'undefined'){
-              option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
-            }
-            if(typeof option === 'undefined'){
-              option = _.find(item.options, {id:parseInt(this.attributes[item.name], 10)});
-            }
-          }
+				// var option;
+
+
+				// if(typeof item.value_key !== 'undefined'){
+				// 	if(item.value_key == 'index'){
+				// 		option = item.options[this.attributes[item.name]]
+				// 	}else{
+				// 		var search = {};
+				// 		search[item.value_key] = this.attributes[item.name];
+				// 		option = _.find(item.options, search);
+				// 		if(_.isFinite(this.attributes[item.name])){
+				// 			search[item.value_key] = parseInt(this.attributes[item.name]);
+				// 			if(typeof option === 'undefined'){
+				// 				option = _.find(item.options, search);
+				// 			}
+				// 			if(typeof option === 'undefined'){
+				// 				option = _.find(item.options, search);
+				// 			}
+				// 		}
+				// 	}
+				// }else{
+				// 	option =  _.find(item.options, {value:this.attributes[item.name]});
+				// 	if(typeof option === 'undefined'){
+				// 		option = _.find(item.options, {id:this.attributes[item.name]});
+				// 	}
+        //   if(_.isFinite(this.attributes[item.name])){
+        //     if(typeof option === 'undefined'){
+        //       option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
+        //     }
+        //     if(typeof option === 'undefined'){
+        //       option = _.find(item.options, {id:parseInt(this.attributes[item.name], 10)});
+        //     }
+        //   }
+				// }
+
+				// if(typeof option === 'object') {
+				// 	this.display[item.name] = option[item.label_key] || option.label || option.name;
+				// }else{
+				// 	this.display[item.name] = this.attributes[item.name];
+				// }
+				var temp = _.find(this.owner.checkForm.fields,{name:item.name})
+				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]});
+				if(typeof options !== 'undefined'){
+					this.display[item.name] = _.find(temp.getoptions(),{value:this.attributes[item.name]}).label
 				}
-				if(typeof option === 'object') {
-					this.display[item.name] = option[item.label_key] || option.label || option.name;
-				}else{
-					this.display[item.name] = this.attributes[item.name];
-				}
+
 			}else{
 				if(item.template){
 					// this.display[item.name] = Hogan.compile(item.template).render(this);	
@@ -1102,6 +1119,9 @@ function gridModel (owner, initial, events) {
 					this.display[item.name] = this.attributes[item.name];
 				}
 			}
+
+
+
 		}.bind(this))
 	}
 	this.set = function(newAtts, silent){
@@ -1116,6 +1136,9 @@ function gridModel (owner, initial, events) {
 			// debugger;
 			this.dispatch('set');
 		}
+	}
+	this.update = function(newAtts, silent){
+		this.set(_.assign(this.attributes,newAtts),silent)
 	}
 	this.checked = false;
 	this.deleted = false;
@@ -1151,7 +1174,7 @@ function gridModel (owner, initial, events) {
 <thead>
 <tr>
 <th>
-<div class="btn-group pull-left" role="group" aria-label="...">
+<div class="btn-group pull-left" style="white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
 {{#options.actions}}
 {{#name}}
@@ -1162,7 +1185,7 @@ function gridModel (owner, initial, events) {
 </div>
 </th>
 <th style="width:100%">
-<div class="btn-group pull-right" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
+<div class="btn-group pull-{{^align}}left{{/align}}{{align}}" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
 {{/name}}
 {{/options.actions}}
@@ -1295,7 +1318,7 @@ gform.stencils.table=`<div class="well table-well">
 <div class="hiddenForm" style="display:none"></div>
 
 <div style="overflow:hidden">
-  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:100%" ></div>
+  <div name="actions" class=" pull-left" style="margin-bottom:10px;" ></div>
 </div>	
 <div>
 

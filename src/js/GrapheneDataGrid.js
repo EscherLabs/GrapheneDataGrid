@@ -1,15 +1,15 @@
 function GrapheneDataGrid(options) {
-	var actions = [{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
+	var actions = [{type:"danger",name:'delete',min:1,label:'<i class="fa fa-times"></i> Delete' },
 	'|',
 	{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
 	'|',
 	{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> New' }];
 	this.version = '0.0.3';
-	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{}}, this)
+	this.eventBus = new gform.eventBus({owner:'table',item:'model',handlers:options.events||{} }, this)
 	this.on = this.eventBus.on;
 	// this.dispatch = this.eventBus.dispatch;
 
-	options = _.extend({filter: true, sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
+	options = _.extend({filter: true,actions:[{'name':'create'},'|',{'name':'edit'},'|',{'name':'delete'}], sort: true, search: true, download: true, upload: true, columns: true, id:gform.getUID()}, options);
 	if(typeof options.actions == 'object' && options.actions.length){
 		options.actions = _.map(options.actions,function(event){
 			// return _.extend({global:false},event)
@@ -203,12 +203,15 @@ function GrapheneDataGrid(options) {
 		val.value = '';
 		switch(val.type){
 			case 'checkbox':
-				val.options = [{label: 'False', value: 'false'}, {label: val.options[0] || 'True', value: val.options[1] || 'true'}];
+				val.options = [{label: 'False', value: 'false'}, {label: val.options[1] || 'True', value: val.options[1] || 'true'}];
+				val.format = {label:"{{label}}"}
 			case 'radio':
 				val.type = 'select';
 			case 'select':
 				val.placeholder = false;
-				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},{type:'optgroup',options:val.options}]
+				var temp = _.pick(val,['options','max','min','path','format'])
+				temp.type = 'optgroup';
+				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},temp]
 				break;
 		case 'hidden':
 				break;
@@ -296,7 +299,7 @@ function GrapheneDataGrid(options) {
 	}
 	var actions = {
 		'create':function(){
-			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
+			new gform(_.assign({},{name:'modal',table:this, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields: options.schema}, options.create || options.form || {} )).on('save', function(e) {
 				if(e.form.validate()){
 					this.add(e.form.get(),{validate:false})
 					e.form.pub('close');
@@ -320,7 +323,7 @@ function GrapheneDataGrid(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel'},{type:'save'}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 							var newValues = e.form.get();
 							_.map(selectedModels,function(model){
 								model.set(_.extend({}, model.attributes, newValues));
@@ -337,7 +340,7 @@ function GrapheneDataGrid(options) {
 					}
 				// }
 			}else{
-				new gform(_.extend({},{name:'modal',actions:[{type:'cancel'},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
+				new gform(_.extend({},{name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:options.schema}, options.edit || options.form || {}) ).on('save', function(e) {
 					this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
 					this.eventBus.dispatch('edited')
 					this.eventBus.dispatch('model:edited',this.getSelected()[0])
@@ -466,6 +469,8 @@ function GrapheneDataGrid(options) {
 			}.bind(this));
 
 			this.filter.set()
+			debugger;
+			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema })
 		}
 
 		this.updateCount =function(count) {
@@ -807,7 +812,8 @@ function GrapheneDataGrid(options) {
 		_.each(this.visible,function(item){
 			item.visible = false;
 		})
-		this.visible = temp = this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		var temp = this.filtered.slice((options.count * (options.page-1) ), (options.count * (options.page-1) ) + options.count)
+		this.visible = temp
 		_.each(this.visible,function(item){
 			item.visible = true;
 		})

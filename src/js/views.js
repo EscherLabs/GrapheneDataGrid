@@ -3,7 +3,7 @@ gform.stencils.actions = `
 <thead>
 <tr>
 <th>
-<div class="btn-group pull-left" role="group" aria-label="...">
+<div class="btn-group pull-left" style="white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
 {{#options.actions}}
 {{#name}}
@@ -14,7 +14,7 @@ gform.stencils.actions = `
 </div>
 </th>
 <th style="width:100%">
-<div class="btn-group pull-right" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
+<div class="btn-group pull-{{^align}}left{{/align}}{{align}}" style="margin-left:15px;white-space: nowrap; font-size: 0;" role="group" aria-label="...">
 
 {{/name}}
 {{/options.actions}}
@@ -147,7 +147,7 @@ gform.stencils.table=`<div class="well table-well">
 <div class="hiddenForm" style="display:none"></div>
 
 <div style="overflow:hidden">
-  <div name="actions" class=" pull-left" style="margin-bottom:10px;width:100%" ></div>
+  <div name="actions" class=" pull-left" style="margin-bottom:10px;" ></div>
 </div>	
 <div>
 

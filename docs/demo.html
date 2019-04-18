@@ -143,13 +143,13 @@
 				// 	model.stuff = 'yippe';
 				// },
 				actions:[
-					{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
-					'|',
+					{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> Newest' },
+					{type:"info",name:'sort',min:0,max:0,label:'<i class="fa fa-pencil-sort"></i> sort' },
+					{align:"right"},
 					{type:"primary",name:'edit',min:1,label:'<i class="fa fa-pencil"></i> edit' },
 					{type:"default",name:'manage',min:1,label:'<i class="fa fa-gears"></i> Manage' },
 					'|',
-					{type:"info",name:'sort',min:0,max:0,label:'<i class="fa fa-pencil-sort"></i> sort' },
-					{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> Newest' },
+					{type:"danger",name:'delete',min:1,max:1,label:'<i class="fa fa-times"></i> Delete' },
 				],
 				// actions:[
 				// 	{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
@@ -222,6 +222,8 @@
 				// e.model.waiting(!e.model.waiting());
 
 
+			}).on('draw',function(){
+				debugger;
 			})
 			
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
