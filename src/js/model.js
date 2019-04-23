@@ -80,9 +80,10 @@ function gridModel (owner, initial, events) {
 				// 	this.display[item.name] = this.attributes[item.name];
 				// }
 				var temp = _.find(this.owner.checkForm.fields,{name:item.name})
-				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]});
+				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+''});
 				if(typeof options !== 'undefined'){
-					this.display[item.name] = _.find(temp.getoptions(),{value:this.attributes[item.name]}).label
+					
+					this.display[item.name] = options.label
 				}
 
 			}else{
@@ -100,7 +101,7 @@ function gridModel (owner, initial, events) {
 		}.bind(this))
 	}
 	this.set = function(newAtts, silent){
-		if(typeof newAtts !== 'undefined'){
+		if(typeof newAtts !== 'undefined' && newAtts !== null){
 			this.attribute_history.push(_.extend( {}, this.attributes));
 			this.attributes = newAtts;
 		}

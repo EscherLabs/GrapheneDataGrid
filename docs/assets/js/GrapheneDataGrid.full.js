@@ -36,7 +36,9 @@ function GrapheneDataGrid(options) {
 			options.item_template = gform.stencils['mobile_row'];
 		}
 	}
-
+	this.toJSON =function(){
+		return _.pluck(this.getModels(),'attributes')
+	}
 	this.filterValues = {};
 	this.draw = function() {
 		
@@ -246,10 +248,11 @@ function GrapheneDataGrid(options) {
 		var name = (val.search|| val.label.split(' ').join('_').toLowerCase());
 
 		if(val.template){
-			name = val.template.replace(/{{value}}/gi, '{{attributes.'+ name + '}}');
+			name = val.template;//.replace(/{{value}}/gi, '{{attributes.'+ name + '}}');
 
 		}else{
-			name = '{{attributes.'+ name + '}}'
+			// name = '{{attributes.'+ name + '}}'
+			name = '{{display.'+ name + '}}';
 		}
 		// else{
 		// 	switch(val.type){
@@ -306,10 +309,7 @@ function GrapheneDataGrid(options) {
 				}
 			}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()},
 		'edit':function(){
-			if(	typeof this.options.multiEdit !== 'undefined' && 
-				this.options.multiEdit.length !== 0 &&
-				this.getSelected().length >1) {
-
+			if(this.getSelected().length >1) {
 				if(typeof this.options.multiEdit == 'undefined' || this.options.multiEdit.length == 0){return;}
 				var selectedModels = this.getSelected();
 				if(selectedModels.length == 0){ return; }
@@ -469,8 +469,11 @@ function GrapheneDataGrid(options) {
 			}.bind(this));
 
 			this.filter.set()
-			debugger;
-			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema })
+			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema }).on('change',function(){
+				_.each(this.models,function(item){
+					item.update(null,true)
+				})
+			}.bind(this))
 		}
 
 		this.updateCount =function(count) {
@@ -1105,9 +1108,10 @@ function gridModel (owner, initial, events) {
 				// 	this.display[item.name] = this.attributes[item.name];
 				// }
 				var temp = _.find(this.owner.checkForm.fields,{name:item.name})
-				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]});
+				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+''});
 				if(typeof options !== 'undefined'){
-					this.display[item.name] = _.find(temp.getoptions(),{value:this.attributes[item.name]}).label
+					
+					this.display[item.name] = options.label
 				}
 
 			}else{
@@ -1125,7 +1129,7 @@ function gridModel (owner, initial, events) {
 		}.bind(this))
 	}
 	this.set = function(newAtts, silent){
-		if(typeof newAtts !== 'undefined'){
+		if(typeof newAtts !== 'undefined' && newAtts !== null){
 			this.attribute_history.push(_.extend( {}, this.attributes));
 			this.attributes = newAtts;
 		}
