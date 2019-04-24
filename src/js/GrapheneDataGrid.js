@@ -253,6 +253,7 @@ function GrapheneDataGrid(options) {
 		}else{
 			// name = '{{attributes.'+ name + '}}'
 			name = '{{display.'+ name + '}}';
+
 		}
 		// else{
 		// 	switch(val.type){
@@ -379,14 +380,15 @@ function GrapheneDataGrid(options) {
 	      reader.readAsText(fileToRead);
 	      reader.onload = function (event) {
 		      var csv = event.target.result;
-		      var temp = CSVToArray(csv);
+		      var temp = _.csvToArray(csv);
+			//   CSVParser
 		      var valid = true;
 
-					$('#myModal').remove();
-					var ref = $(gform.stencils['modal'].render({title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
+					// $('#myModal').remove();
+					var ref = $(gform.render('modal_container',{title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
 					ref.modal();
 					ref.on('hidden.bs.modal', function () {
-		      	this.importing = false;
+		      			this.importing = false;
 					}.bind(this));
 
 					var itemCount = temp.length-1;
@@ -470,8 +472,8 @@ function GrapheneDataGrid(options) {
 
 			this.filter.set()
 			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema }).on('change',function(){
-				_.each(this.models,function(item){
-					item.update(null,true)
+				_.each(this.models,function(model){
+					model.update(null,true)
 				})
 			}.bind(this))
 		}

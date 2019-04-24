@@ -197,34 +197,45 @@
 
 			], data: data}
 
-			bt = new GrapheneDataGrid(options).on('model:manage',function(e){
-				console.log(e.model.attributes);
-			}).on('model:add',function(e){
-				// e.preventDefault();
-				console.log(e.table.models[0].attributes);
-			}).on('delete',function(e){
-				if(typeof e.model !== 'undefined'){
-					e.preventDefault();
-					e.model.delete();
-					e.table.draw();
-				}else{
-					if(e.table.getSelected().length > 1){
-						e.preventDefault();
-					}
-				}
-			}).on('added',function(e){
-				// e.model.waiting(true);
-				// e.model.owner.draw();
-			}).on('click',function(e){
-				// e.model.waiting = false;
-				e.model.toggle();
+			// bt = new GrapheneDataGrid(options).on('model:manage',function(e){
+			// 	console.log(e.model.attributes);
+			// }).on('model:add',function(e){
+			// 	// e.preventDefault();
+			// 	console.log(e.table.models[0].attributes);
+			// }).on('delete',function(e){
+			// 	if(typeof e.model !== 'undefined'){
+			// 		e.preventDefault();
+			// 		e.model.delete();
+			// 		e.table.draw();
+			// 	}else{
+			// 		if(e.table.getSelected().length > 1){
+			// 			e.preventDefault();
+			// 		}
+			// 	}
+			// }).on('added',function(e){
+			// 	// e.model.waiting(true);
+			// 	// e.model.owner.draw();
+			// }).on('click',function(e){
+			// 	// e.model.waiting = false;
+			// 	e.model.toggle();
 
-				// e.model.waiting(!e.model.waiting());
+			// 	// e.model.waiting(!e.model.waiting());
 
 
-			}).on('draw',function(){
-				debugger;
-			})
+			// }).on('draw',function(){
+			// 	debugger;
+			// })
+
+			options.schema = [
+				{name:"Favorite Food",label:"Favorite Food"},
+				{name:"Birthday",label:"Birthday"},
+				{name:"Full Name (last,first)",label:"Full Name (last,first)"},
+				{name:"Favorite Color",label:"Favorite Color"},
+
+			]
+			options.data = []
+
+			grid = new GrapheneDataGrid(options);
 			
 			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
 			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))
