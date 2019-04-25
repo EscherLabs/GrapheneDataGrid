@@ -253,6 +253,7 @@ function GrapheneDataGrid(options) {
 		}else{
 			// name = '{{attributes.'+ name + '}}'
 			name = '{{display.'+ name + '}}';
+
 		}
 		// else{
 		// 	switch(val.type){
@@ -326,7 +327,7 @@ function GrapheneDataGrid(options) {
 						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 							var newValues = e.form.get();
 							_.map(selectedModels,function(model){
-								model.set(_.extend({}, model.attributes, newValues));
+								model.update(newValues);
 								this.eventBus.dispatch('model:edited',model)
 							}.bind(this))
 			
@@ -379,14 +380,15 @@ function GrapheneDataGrid(options) {
 	      reader.readAsText(fileToRead);
 	      reader.onload = function (event) {
 		      var csv = event.target.result;
-		      var temp = CSVToArray(csv);
+		      var temp = _.csvToArray(csv);
+			//   CSVParser
 		      var valid = true;
 
-					$('#myModal').remove();
-					var ref = $(gform.stencils['modal'].render({title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
+					// $('#myModal').remove();
+					var ref = $(gform.render('modal_container',{title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
 					ref.modal();
 					ref.on('hidden.bs.modal', function () {
-		      	this.importing = false;
+		      			this.importing = false;
 					}.bind(this));
 
 					var itemCount = temp.length-1;
@@ -470,8 +472,8 @@ function GrapheneDataGrid(options) {
 
 			this.filter.set()
 			this.checkForm = new gform({name:'internal'+this.options.id, fields: options.schema }).on('change',function(){
-				_.each(this.models,function(item){
-					item.update(null,true)
+				_.each(this.models,function(model){
+					model.update(null,true)
 				})
 			}.bind(this))
 		}
@@ -991,16 +993,20 @@ function GrapheneDataGrid(options) {
   csvToArray: function(csvString) {
     var trimQuotes = function (stringArray) {
       for (var i = 0; i < stringArray.length; i++) {
-          stringArray[i] = _.trim(stringArray[i], '"');
+          // stringArray[i] = _.trim(stringArray[i], '"');
+          if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
+            stringArray[i] = stringArray[i].substr(1,stringArray[i].length-2)
+          }
+          stringArray[i] = stringArray[i].split('""').join('"')
       }
       return stringArray;
     }
     var csvRowArray    = csvString.split(/\n/);
-    var headerCellArray = trimQuotes(csvRowArray.shift().split(','));
+    var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
     var objectArray     = [];
     
     while (csvRowArray.length) {
-        var rowCellArray = trimQuotes(csvRowArray.shift().split(','));
+        var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
         var rowObject    = _.zipObject(headerCellArray, rowCellArray);
         objectArray.push(rowObject);
     }
@@ -1012,11 +1018,12 @@ function GrapheneDataGrid(options) {
     labels = _.map(columns,'name')
     var empty = _.zipObject(labels, _.map(labels, function() { return '';}))
     csv += _.map(data,function(d){
-        return JSON.stringify(_.values(_.extend(empty,_.pick(d,labels))))
+        return JSON.stringify(_.map(_.values(_.extend(empty,_.pick(d,labels))),function(item){return item.split('"').join('""');}))
+        //return JSON.stringify(_.values(_.extend(empty,_.pick(d,labels))))
     },this)
     .join('\n') 
     .replace(/(^\[)|(\]$)/mg, '')
-    .split('\"').join("")
+    // .split('\"').join("")
   
     var link = document.createElement("a");
     link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
@@ -1027,6 +1034,71 @@ function GrapheneDataGrid(options) {
     return(true);
   }
 });
+
+
+var CSVParser = (function(){
+    "use strict";
+    function captureFields(fields) {
+        /* jshint -W040 */
+        if (this.options.ignoreEmpty === false || fields.some(function(field){ return field.length !== 0; })) {
+            this.rows.push(fields);
+        }
+        /* jshint +W040 */
+    }
+
+    function Parser(data, options){
+        var defaultOptions = { "fieldSeparator": ",", "strict": true, "ignoreEmpty": true};
+        if (options === undefined) options = {};
+        this.options = {};
+        Object.keys(defaultOptions).forEach(function(key) {
+            this.options[key] = options[key] === undefined ? defaultOptions[key] : options[key];
+        }, this);
+        this.rows = [];
+        this.data = data;
+    }
+    Parser.prototype.toString = function toString() { return "[object CSVParser]"; };
+    Parser.prototype.numberOfRows = function numberOfRows() { return this.rows.length; };
+    Parser.prototype.parse = function parse(){
+        // Regular expression for parsing CSV from [Kirtan](http://stackoverflow.com/users/83664/kirtan) on Stack Overflow
+        // http://stackoverflow.com/a/1293163/34386
+        var regexString = (
+            // Delimiters.
+            "(\\" + this.options.fieldSeparator + "|\\r?\\n|\\r|^)" +
+
+            // Quoted fields.
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+            // Standard fields.
+            "([^\"\\" + this.options.fieldSeparator + "\\r\\n]*))");
+            var objPattern = new RegExp(regexString, "gi");
+            var doubleQuotePattern = new RegExp( "\"\"", "g" );
+
+        var fields = [];
+        var arrMatches = null;
+        var strMatchedDelimiter, strMatchedValue;
+        /* jshint -W084 */
+        while (arrMatches = objPattern.exec( this.data )){
+        /* jshint +W084 */
+            strMatchedDelimiter = arrMatches[ 1 ];
+            if (strMatchedDelimiter.length && (strMatchedDelimiter != this.options.fieldSeparator)){
+                captureFields.apply(this, [fields]);
+                fields = [];
+            }
+
+            if (arrMatches[ 2 ]){
+                strMatchedValue = arrMatches[ 2 ].replace(doubleQuotePattern, "\"");
+            } else {
+                strMatchedValue = arrMatches[ 3 ];
+            }
+            fields.push( strMatchedValue );
+        }
+        captureFields.apply(this, [fields]);
+        if (this.options.strict === true && !this.rows.every(function(row){ return (row.length === this.length); }, this.rows[0])) {
+            throw new Error("Invalid CSV data. Strict mode requires all rows to have the same number of fields. You can override this by passing `strict: false` in the CSVParser options");
+        }
+    };
+    return Parser;
+})();
 function gridModel (owner, initial, events) {
 	this.visible = false;
 	this.owner = owner;
@@ -1108,10 +1180,19 @@ function gridModel (owner, initial, events) {
 				// 	this.display[item.name] = this.attributes[item.name];
 				// }
 				var temp = _.find(this.owner.checkForm.fields,{name:item.name})
-				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+''});
+
+				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+""});
 				if(typeof options !== 'undefined'){
-					
 					this.display[item.name] = options.label
+				}else{
+					if(_.isFinite(this.attributes[item.name])){
+						options = _.find(temp.mapOptions.getoptions(),{value:parseInt(this.attributes[item.name])});
+					}if(typeof options !== 'undefined'){
+					this.display[item.name] = options.label
+				}else{
+					this.display[item.name] = this.attributes[item.name];
+				}
+					
 				}
 
 			}else{
@@ -1130,6 +1211,7 @@ function gridModel (owner, initial, events) {
 	}
 	this.set = function(newAtts, silent){
 		if(typeof newAtts !== 'undefined' && newAtts !== null){
+
 			this.attribute_history.push(_.extend( {}, this.attributes));
 			this.attributes = newAtts;
 		}
@@ -1306,7 +1388,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
 <div style="min-height:100px">
   <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
     <tbody class="list-group">
-      <tr><td>
+      <tr><td colspan="100">
         <div class="alert alert-info" role="alert">You have no items.</div>
       </td></tr>
     </tbody>
@@ -1393,7 +1475,7 @@ gform.stencils.table=`<div class="well table-well">
   </thead>
 {{/options.autoSize}}
     <tbody class="list-group">
-      <tr><td>
+      <tr><td colspan="100">
         <div class="alert alert-info" role="alert">You have no items.</div>
       </td></tr>
     </tbody>

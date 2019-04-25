@@ -131,7 +131,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
 <div style="min-height:100px">
   <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
     <tbody class="list-group">
-      <tr><td>
+      <tr><td colspan="100">
         <div class="alert alert-info" role="alert">You have no items.</div>
       </td></tr>
     </tbody>
@@ -218,7 +218,7 @@ gform.stencils.table=`<div class="well table-well">
   </thead>
 {{/options.autoSize}}
     <tbody class="list-group">
-      <tr><td>
+      <tr><td colspan="100">
         <div class="alert alert-info" role="alert">You have no items.</div>
       </td></tr>
     </tbody>

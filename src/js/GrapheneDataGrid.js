@@ -327,7 +327,7 @@ function GrapheneDataGrid(options) {
 						new gform({legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 							var newValues = e.form.get();
 							_.map(selectedModels,function(model){
-								model.set(_.extend({}, model.attributes, newValues));
+								model.update(newValues);
 								this.eventBus.dispatch('model:edited',model)
 							}.bind(this))
 			
