@@ -685,7 +685,8 @@ function GrapheneDataGrid(options) {
 			}
 			// this.updateCount(this.summary.checked_count);
 			if(config.silent !== true){
-				this.eventBus.dispatch('created',newModel)
+        this.eventBus.dispatch('created',newModel)
+				this.eventBus.dispatch('model:created',newModel)
 			}
 			// if(typeof this.options.add == 'function'){
 			// 	this.options.add(newModel);
