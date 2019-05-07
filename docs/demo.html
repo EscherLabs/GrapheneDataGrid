@@ -187,11 +187,11 @@
 // ,							{label: 'Endpoint', name:'endpoint', default: {name: 'External (no auth)', value: 'External', target:''}, type: 'select', choices: '/endpoints/list/'+model.group_id},
         {"name":"dob","label":"DOB","template":"{{stuff}}s{{attributes.dob}}",edit:[{type:"matches",name:"_method",value:'create'}]},
         // {"name":"age","label":"Age
-        {"name":"profile","label":"Medication Profile long title","type":"fieldset","fields":[
-            {"label":"Drug name","name":"drug_name"}
-            ],
-            "template":"adf:{{attributes.profile.drug_name}}"
-        },
+        // {"name":"profile","label":"Medication Profile long title","type":"fieldset","fields":[
+        //     {"label":"Drug name","name":"drug_name"}
+        //     ],
+        //     "template":"adf:{{attributes.profile.drug_name}}"
+        // },
 				// {type:"contenteditable", name:"test", label:"Test", required:false, template:"{{{value}}}"},
 				{type:"select", name:"status", label: "Status", default: {name: 'External (no auth)', value: 'External', target:''}, showColumn: true,format:{label:'{{label}}'}, options:'./assets/js/options.json'}
 

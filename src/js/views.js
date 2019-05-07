@@ -25,6 +25,11 @@ gform.stencils.actions = `
 </table>`
 
 gform.stencils.count=`{{#checked_count}}<h5 class="range label label-info checked_count" style="margin:7px 0">{{checked_count}} item(s) selected</h5>{{/checked_count}}`;
+
+
+
+
+
 gform.stencils.mobile_head=`
 <div style="clear:both;">
 
@@ -66,8 +71,9 @@ gform.stencils.mobile_head=`
 `
 gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">		
 {{^options.hideCheck}}
-<div data-event="mark" style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
-<span class="text-muted fa {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
+
+<div data-event="mark" data-id="{{[[}}id{{]]}}"  style="text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+<span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}}" style="margin:6px; cursor:pointer;font-size:24px"></span>
 </div>
   {{/options.hideCheck}}
 <div>
@@ -142,6 +148,11 @@ gform.stencils.mobile_table=`<div class="well table-well">
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
+
+
+
+
+
 gform.stencils.table=`<div class="well table-well">
 <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 <div class="hiddenForm" style="display:none"></div>

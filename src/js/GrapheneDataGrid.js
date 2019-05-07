@@ -41,6 +41,7 @@ function GrapheneDataGrid(options) {
 		if(window.outerWidth > 767 || window.outerWidth == 0){
 			options.item_template = gform.stencils['table_row'];
 		}else{
+			this.mobile = true;
 			options.item_template = gform.stencils['mobile_row'];
 		}
 	}
@@ -302,7 +303,7 @@ function GrapheneDataGrid(options) {
 		template= template = gform.renderString(options.template,summary)
 
 	}else{
-		if(window.outerWidth > 767 || window.outerWidth == 0){
+		if(!this.mobile){
 			// template = Hogan.compile(templates['table'].render(summary, templates));
 			template = gform.render('table',summary)
 		}else{
@@ -489,19 +490,19 @@ function GrapheneDataGrid(options) {
 			}.bind(this));
 
 			this.filter.set()
-			this.checkForm = new gform(_.assign({},{collections:this.collections,name:'internal'+this.options.id, fields: options.schema }, options.form || {} )).on('change',function(){
-				_.each(this.models,function(model){
-					model.update(null,true)
-				})
-			}.bind(this))
-		}
 
+		}
+		this.checkForm = new gform(_.assign({},{collections:this.collections,name:'internal'+this.options.id, fields: options.schema }, options.form || {} )).on('change',function(){
+			_.each(this.models,function(model){
+				model.update(null,true)
+			})
+		}.bind(this))
 		this.updateCount =function(count) {
 			var count = count || this.getSelected().length;
 			this.summary.checked_count = count;
-
-			this.$el.find('[name="actions"]').html(gform.render('actions',this.summary));
-
+			if(!this.mobile){
+				this.$el.find('[name="actions"]').html(gform.render('actions',this.summary));
+			}
 			_.each(this.$el.find('.grid-action'),function(i){
 				var event = _.assign({max:10000,min:0}, _.find(this.options.actions,{name:i.dataset.event}))
 				if(this.summary.checked_count >= event.min && this.summary.checked_count <= event.max){
@@ -667,24 +668,34 @@ function GrapheneDataGrid(options) {
 
 
 		//Mobile
-		// this.$el.on('change', '.sortBy', function(e) {
-		// 	if(e.currentTarget.value !== ''){
-		// 		processSort((_.find(this.options.filterFields, {id:e.currentTarget.value}) || {search:true}).search)
-		// 	}
-		// }.bind(this));
-		// this.$el.on('click', '.filterForm', function(e) {
-		// 	this.$el.find('[name="search"]').val('');
+		this.$el.on('change', '.sortBy', function(e) {
+			if(e.currentTarget.value !== ''){
+				processSort((_.find(this.options.filterFields, {id:e.currentTarget.value}) || {search:true}).search)
+			}
+		}.bind(this));
+		this.$el.on('click', '.filterForm', function(e) {
+			this.$el.find('[name="search"]').val('');
+			new gform({collections:this.collections,legend:"Filter By" ,name:'modal_filter'+this.options.id,data:this.filterValues, fields: options.filterFields }).on('save', function(){
+				this.filterValues = gform.instances['modal_filter'+this.options.id].toJSON();
+				this.draw();					
+				gform.instances['modal_filter'+this.options.id].trigger('close');
 
-		// 	new gform({legend:"Filter By" ,name:'modal_filter'+this.options.id,attributes:this.filterValues, disableMath: true, suppress: true, fields: options.filterFields }).on('save', function(){
-		// 		this.filterValues = gform.instances['modal_filter'+this.options.id].toJSON();
-		// 		this.draw();					
-		// 		gform.instances['modal_filter'+this.options.id].trigger('close');
+			}.bind(this)).modal();
 
-		// 	}.bind(this)).modal();
-		// }.bind(this));	
-		// this.$el.on('click', '.reverse', function(e) {
-		// 	processSort(this.options.sort)
-		// }.bind(this));
+			// this.filter = new gform({collections:this.collections,name:'filter'+this.options.id,clear:false, fields: this.options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },$el.find('.filter')[0]).on('input', function(){
+			// 	this.$el.find('[name="search"]').val('');
+			// 	this.filterValues = this.filter.toJSON();
+			// 	this.draw();
+			// }.bind(this)).modal();
+
+			// this.filter.set()
+
+
+		}.bind(this));	
+		this.$el.on('click', '.reverse', function(e) {
+			debugger;
+			processSort(this.options.sort)
+		}.bind(this));
 
 		this.load(options.data);
 	}

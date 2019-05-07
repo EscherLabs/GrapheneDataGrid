@@ -27,7 +27,7 @@ output: `
 		{{>_label}}
 		
 	<div class="col-xs-12">
-    <output name="{{name}}" id="{{id}}">{{{value}}}</output>
+    <output name="{{name}}" id="{{id}}">{{{display}}}</output>
     {{>_error}}
 		{{>_addons}}
 		{{>_actions}} 
@@ -179,8 +179,8 @@ hidden: `<input type="hidden" name="{{name}}" value="{{value}}" />{{>_addons}}`,
 </div>`,
     _fieldset: `<div class="row"><fieldset data-type="fieldset" name="{{name}}" id="{{id}}" class="{{modifiers}} col-md-12" >
 {{#array}}
-<div class="btn-group actions">
-	<div data-id="{{id}}" class="gform-add btn btn-white"><i class="fa fa-plus text-success"></i></div><div data-id="{{id}}" class="btn btn-white gform-minus"><i class="fa fa-minus text-danger"></i></div>
+<div data-name="{{name}}" class="btn-group actions">
+	<div data-id="{{id}}" class="gform-add btn btn-white"><i data-id="{{id}}"  class="gform-add fa fa-plus text-success"></i></div><div data-id="{{id}}" class="btn btn-white gform-minus"><i data-id="{{id}}"  class="fa gform-minus fa-minus text-danger"></i></div>
 </div>
 {{/array}}
 {{^hideLabel}}
@@ -189,7 +189,7 @@ hidden: `<input type="hidden" name="{{name}}" value="{{value}}" />{{>_addons}}`,
 <div style="position:relative;top:-20px">{{>_addons}}</div>
 </fieldset></div>`,
 	_actions: `{{#array}}
-	<div class="btn-group actions pull-right">
+	<div data-name="{{name}}" class="btn-group actions pull-right">
 	<div data-id="{{id}}" class="gform-add btn btn-white"><i data-id="{{id}}" class="gform-add fa fa-plus text-success"></i></div>
 	<div data-id="{{id}}" class="btn btn-white gform-minus"><i data-id="{{id}}" class="gform-minus fa fa-minus text-danger"></i></div>
 	</div>
@@ -359,7 +359,7 @@ gform.types['combo']    = _.extend({}, gform.types['input'], gform.types['collec
          
          this.onchangeEvent = function(){
             this.value = this.get();
-            this.owner.pub(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
+            this.owner.trigger(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
         }.bind(this)
       $(this.el).find('select').on('change',this.onchangeEvent)
     },
@@ -380,8 +380,8 @@ gform.types['combo']    = _.extend({}, gform.types['input'], gform.types['collec
 		  gform.types[this.type].initialize.call(this);
 
 		  if(!silent) {
-			  this.owner.pub(['change:'+this.name,'change'], this);
-			  // this.owner.pub('change', this);
+			  this.owner.trigger(['change:'+this.name,'change'], this);
+			  // this.owner.trigger('change', this);
 		  }
 		  
 	},
@@ -407,7 +407,7 @@ gform.types['color'] = _.extend({}, gform.types['input'], {
   initialize: function(){
 	this.onchangeEvent = function(){
 		this.value = this.get();
-		this.owner.pub(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
+		this.owner.trigger(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
 	}.bind(this)
 	this.el.addEventListener('input', this.onchangeEvent.bind(null,true));
 
@@ -416,7 +416,7 @@ gform.types['color'] = _.extend({}, gform.types['input'], {
 
 	$(this.el.querySelector('input[name="' + this.name + '"]')).colorpicker({format: 'hex'}).on('changeColor', function(ev){
 		this.el.querySelector('i').style.backgroundColor = this.get()
-		this.owner.pub('change',this);
+		this.owner.trigger('change',this);
 	}.bind(this));
 
   }
@@ -449,7 +449,7 @@ gform.types['datetime'] = _.extend({}, gform.types['input'], {
   initialize: function(){
 	this.onchangeEvent = function(){
 		this.value = this.get();
-		this.owner.pub(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
+		this.owner.trigger(['change:'+this.name,'change','input:'+this.name,'input'], this,{input:this.value});
 	}.bind(this)
 	
 	// this.el.addEventListener('input', this.onchangeEvent.bind(null,true));
