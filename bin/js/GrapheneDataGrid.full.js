@@ -87,9 +87,12 @@ function GrapheneDataGrid(options) {
 			// row.setAttribute('data-id', model.id);
 			fragment.appendChild(model.draw());
 		});
-		
-		this.$el[0].querySelector('.list-group').innerHTML = '';
-		this.$el[0].querySelector('.list-group').appendChild(fragment)
+		var target =this.$el[0].querySelector('.list-group');
+		if(target !== null){
+			target.innerHTML = '';
+			target.appendChild(fragment)
+		}
+
 
 		var startpage = options.page - pagebuffer;
 		if(startpage < 1){startpage = 1;}
@@ -321,9 +324,9 @@ function GrapheneDataGrid(options) {
 			new gform({name:'modal',table:this,collections:this.collections, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
 				if(e.form.validate()){
 					this.add(e.form.get(),{validate:false})
-					e.form.pub('close');
+					e.form.trigger('close');
 				}
-			}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()},
+			}.bind(this)).on('cancel',function(e){e.form.trigger('close')}).modal()},
 		'edit':function(){
 			if(this.getSelected().length >1) {
 				if(typeof this.options.multiEdit == 'undefined' || this.options.multiEdit.length == 0){return;}
@@ -346,11 +349,11 @@ function GrapheneDataGrid(options) {
 								this.eventBus.dispatch('model:edited',model)
 							}.bind(this))
 			
-							e.form.pub('close');
+							e.form.trigger('close');
 						}).on('close', function(){
 							this.draw();
 							this.eventBus.dispatch('edited')
-						}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
+						}.bind(this)).on('cancel',function(e){e.form.trigger('close')}).modal()
 					}else{
 						$(gform.render('modal_container',{title: "Common Field Editor ",footer:'<div class="btn btn-danger" style="margin-right:20px" data-dismiss="modal">Done</div>', body:'<div class="alert alert-warning">No eligible fields have been found for editing.</div>'})).modal();
 					}
@@ -365,9 +368,9 @@ function GrapheneDataGrid(options) {
 					this.eventBus.dispatch('edited')
 					this.eventBus.dispatch('model:edited',this.getSelected()[0])
 					this.draw();
-					e.form.pub('close')
+					e.form.trigger('close')
 
-				}.bind(this)).on('cancel',function(e){e.form.pub('close')}).modal()
+				}.bind(this)).on('cancel',function(e){e.form.trigger('close')}).modal()
 			}
 		},
 		'delete':function(){
