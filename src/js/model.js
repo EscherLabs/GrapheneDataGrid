@@ -29,6 +29,8 @@ function gridModel (owner, initial, events) {
 			if(this.row.innerHTML != temp){
 				this.row.innerHTML = temp;
 			}
+			this.dispatch('drawn')
+
 		}
 		return this.row;
 	}
@@ -88,17 +90,21 @@ function gridModel (owner, initial, events) {
 					if(_.isFinite(this.attributes[item.name])){
 						options = _.find(temp.mapOptions.getoptions(),{value:parseInt(this.attributes[item.name])});
 					}if(typeof options !== 'undefined'){
-					this.display[item.name] = options.label
-				}else{
-					this.display[item.name] = this.attributes[item.name];
-				}
-					
+						this.display[item.name] = options.label
+					}else{
+						// this.display[item.name] = this.attributes[item.name];
+						if(item.template){
+							this.display[item.name] = gform.renderString(item.template,this)
+							
+						}else{
+							this.display[item.name] = this.attributes[item.name];
+						}
+					}
 				}
 
 			}else{
 				if(item.template){
-					// this.display[item.name] = Hogan.compile(item.template).render(this);	
-					this.display[item.name] = gform.renderString(item.template)
+					this.display[item.name] = gform.renderString(item.template,this)
 					
 				}else{
 					this.display[item.name] = this.attributes[item.name];
