@@ -8,7 +8,7 @@ Just define your form using standard [GrapheneForms syntax](https://docs.escherl
 
 [Click Here for Examples and Documentation](https://docs.escherlabs.com/GrapheneDataGrid/)
 
-<div><a href="https://docs.escherlabs.com/GrapheneDataGrid/"><img width="600px" src="https://docs.escherlabs.com/GrapheneDataGrid/images/table_example.png"></a></div>
+<div><a href="https://docs.escherlabs.com/GrapheneDataGrid/"><img width="600px" src="https://docs.escherlabs.com/GrapheneDataGrid/assets/images/table_example.png"></a></div>
 
 ## Features
 * Full CRUD (Create, Read, Update, Delete) functionality
