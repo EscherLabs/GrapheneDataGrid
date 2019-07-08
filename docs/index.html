@@ -98,20 +98,16 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
 
 		</div><!--/.container-->
 
+		<script type='text/javascript' src='assets/js/jquery.min.js'></script>
+		<script type='text/javascript' src='assets/js/lodash.min.js'></script>
+		<script type="text/javascript" src="assets/js/sortable.js"></script>
+		<script src="assets/js/bin/gform.js"></script>
+		<script src="assets/js/bin/bootstrap.js"></script>  
+		 <script src='assets/js/GrapheneDataGrid.full.js'></script>
 
-		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
-		<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js'></script>
-
-		<!-- // <script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3//jquery-ui.min.js'></script> -->
-		<script type='text/javascript' src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
-  <script src='https://rawgit.com/Cloverstone/gform/master/bin/full.gform.min.js'></script>
-   <script src='https://rawgit.com/Cloverstone/gform/master/bin/bootstrap.full.gform.js'></script> 
-		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-        		<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js'></script>		
-
- <script src='https://rawgit.com/Cloverstone/GrapheneDataGrid/master/bin/js/GrapheneDataGrid.min.js'></script> 
 		<script>
-            bt = new GrapheneDataGrid({container:'#myGrapheneDataGrid',
+			debugger;
+            bt = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
 						name:'index',
             search: false,columns: false,upload:false,download:false,title:'Demo Content',
             edit:true,
@@ -128,7 +124,7 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
                 {name:'third'},
                 {name:'second'},
                 {name:'first'},
-            ]})
+			]})
         </script>
 	</body>
 </html>
