@@ -92,17 +92,35 @@
 
 				</div><!--/span-->
 				<div class="col-xs-12 col-sm-9">
-					<!--Introduction -->
 					<a name="intro" style="display:block;position:relative;top:-40px"></a>
-					<h2>Graphene Data Grid</h2>
-
+					<h2>Graphene Data Grid Intro</h2>
+					<p> #########Introduction Here #############</p>
+					<p> #########Introduction Here #############</p>
+					<p> #########Introduction Here #############</p>
+					<p> MOVE EXAMPLE FROM HOME PAGE TO HERE </p>
+					<p> What does demo do? Allow you to play with settings? </p>
+					<p>#######################################################</p>
 
 					<!--Getting Started -->
 					<a name="getting_started" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>Getting Started</h4>
-					<p><b>Dependencies</b> - GrapheneDataGrid is built on top of <a href="https://cloverstone.github.io/gform/">gform.js</a> and you will need to include that and any of its dependencies, aditionally underscore.js or lodash.js are required</p>
-	
+					<p><b>Dependencies</b> - GrapheneDataGrid has a few dependencies you will need to get started:</p>
+					<ul>
+						<li>GrapheneDataGrid is built on top of
+						 <a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
+							gform.js</a>, otherwise known as GrapheneForms. You will need to include a dependency for GrapheneForms called Lodash 
+							(<a href="https://lodash.com/" target="_blank">lodash.js</a>).  <br>You can click the link to see the documentation for GrapheneForms or Lodash.</li>
+						<li>For the next dependency you need to pick one:
+							<ul>
+								<li>You can use <a href="https://underscorejs.org/" target="_blank">underscore.js</a> </li>
+								Or
+								<li><a href="https://lodash.com/" target="_blank">lodash.js</a></li>
+							</ul>
+						</li>
+
+					</ul>
+					
 					<p>A minimum setup might look something like this</p>
 					<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -334,11 +352,13 @@
 		</div><!--/.container-->
 
 
-		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
+		<script type='text/javascript' src='assets/js/jquery.min.js'></script>
+		<script type='text/javascript' src='assets/js/lodash.min.js'></script>
+		<script type="text/javascript" src="assets/js/sortable.js"></script>
+		<script src="assets/js/bin/gform.js"></script>
+		<script src="assets/js/bin/bootstrap.js"></script>  
+		 <script src='assets/js/GrapheneDataGrid.full.js'></script>
 
-		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3//jquery-ui.min.js'></script>
-		<script type='text/javascript' src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
-
-		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+		<!-- <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script> -->
 	</body>
 </html>
