@@ -1,4 +1,4 @@
-<div><img height="100px" src="https://docs.escherlabs.com/assets/images/products/gtables.png"></div>
+<div><img height="100px" src="https://docs.escherlabs.com/GrapheneDataGrid/assets/images/graphene_datagrid_logo.png"></div>
 
 # GrapheneDataGrid Overview
 
