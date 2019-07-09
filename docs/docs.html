@@ -58,7 +58,10 @@
 					<h4>What is GrapheneDataGrid.js?</h4>
 					<ul class>
 						<li class="list-unstyled" ><a href="#intro"><i class="fa fa-chevron-right"></i> Introduction</a></li>
-						<li class="list-unstyled" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a></li>
+						<li class="list-unstyled list-parent" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a>
+							<li class="list-unstyled sublist hidden">Default Method</li>
+							<li class="list-unstyled sublist hidden">Bootstrap Method</li>
+						</li>
 						<li class="list-unstyled" ><a href="#api"><i class="fa fa-chevron-right"></i> Api</a></li>
 					</ul>
 					<a href="#options"><h4>Options</h4></a>
@@ -113,6 +116,22 @@
 					<a name="getting_started" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>Getting Started</h4>
+					<p>There are two methods you may use to set up GrapheneDataGrid</p>
+					<p> 1: Default Method:<br>
+						- The default method only depends on GrapheneForms and Lodash.
+						<br>- This method uses GrapheneForms' default code to
+								provide styling and functionality.</p>
+					<p> 2: Bootstrap Method:<br>
+					- This method requires the defaults methods dependencies as well as Bootstrap and its codependency, jquery.
+					- Uses Bootstrap CSS and Bootstrap JS + jquery for styling and functionality<br>
+					- This method also uses includes a templated version of GrapheneForms</p>
+
+					<h4>(1) Default Method</h4>
+					<p>################################TODO</p>
+
+					<hr>
+
+					<h4>(2) BootStrap Method</h4>
 					<p><b>Dependencies</b> - GrapheneDataGrid has a few dependencies you will need to get started:</p>
 					<ul>
 						<li>
@@ -154,9 +173,9 @@
     &lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;&lt;/style&gt;
 	
 	&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
-	&lt;script type='text/javascript' src='#############lodash'&gt;&lt;/script&gt;
-    &lt;script type='text/javascript' src='gform.min.js'&gt;&lt;/script&gt;
-    &lt;script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='gform.bootstrap.min.js'&gt;&lt;/script&gt;
     &lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
   &lt;/head&gt;
   &lt;body&gt;
@@ -381,9 +400,20 @@
 		<script type='text/javascript' src='assets/js/jquery.min.js'></script>
 		<script type='text/javascript' src='assets/js/lodash.min.js'></script>
 		<script type="text/javascript" src="assets/js/sortable.js"></script>
-		<script src="assets/js/bin/gform.js"></script>
-		<script src="assets/js/bin/bootstrap.js"></script>  
+		<script src="assets/js/gform_bootstrap.js"></script>
+		<script src="assets/js/bootstrap.min.js"></script>  
 		 <script src='assets/js/GrapheneDataGrid.full.js'></script>
+
+		 <script>
+			 
+			 
+			 $('.list-parent')[0].onclick = function(){myFunction()};
+
+			 function myFunction(){
+				 console.log("Clicked!!!");
+			 }
+
+		 </script>
 
 		<!-- <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script> -->
 	</body>
