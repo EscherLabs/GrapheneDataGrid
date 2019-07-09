@@ -91,46 +91,72 @@
 					<br>
 
 				</div><!--/span-->
-				<div class="col-xs-12 col-sm-9">
-					<a name="intro" style="display:block;position:relative;top:-40px"></a>
-					<h2>Graphene Data Grid Intro</h2>
-					<p> #########Introduction Here #############</p>
-					<p> #########Introduction Here #############</p>
-					<p> #########Introduction Here #############</p>
-					<p> MOVE EXAMPLE FROM HOME PAGE TO HERE </p>
-					<p> What does demo do? Allow you to play with settings? </p>
-					<p>#######################################################</p>
 
+				
+				<div class="col-xs-12 col-sm-9">
+						<div class="row">
+							<div class="col-md-6">
+								<a class="btn btn-default pull-right" href="https://github.com/EscherLabs/GrapheneDataGrid"><i class="fa fa-github-alt"></i> View on github</a>
+							</div><!--/span-->
+		
+							<div class="col-md-6">
+								<a class="btn btn-default" href="https://github.com/EscherLabs/GrapheneDataGrid/archive/master.zip"><i class="fa fa-download"></i> Get Code</a>
+							</div><!--/span-->
+						</div><!--/row-->
+						
+						<a name="intro" style="display:block;position:relative;top:-40px"></a>
+						<h2>About GrapheneDataGrid:</h2>
+					
+					
+					
 					<!--Getting Started -->
 					<a name="getting_started" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>Getting Started</h4>
 					<p><b>Dependencies</b> - GrapheneDataGrid has a few dependencies you will need to get started:</p>
 					<ul>
+						<li>
+							<p>The first dependency we incorporate is Bootstrap 3.4.1 for the purpose of styling and functionality.<br>
+								 Make sure to include both: </p>
+							<ul>
+								<li>Bootstrap Css 3.4.1</li>
+								<strong>and</strong>
+								<li>Bootstrap JS 3.4.1 * ***</li>
+								<li>You can either use the provided CDN's below or find out how to setup Bootstrap at: <a  target="_blank" href="https://getbootstrap.com/docs/3.4/getting-started/">(Getting Started with Bootstrap)</a> </li>
+							</ul>
+							<p>* Note that Bootstrap has one dependency attached to it, <a href="https://jquery.com/">jQuery</a>.
+							So <strong>make sure jquery is the first script included on your page</strong>
+							<i> - Bootstrap's get started page helps you setup jquery -</i><br>
+<pre><code class="prettyprint">
+	&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'&gt;&lt;/style&gt;
+
+	&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+
+</code></pre>
+							*** We <u>do not</u> require the optional Bootstrap dependency of <u>popper.js</u> </p>
+						</li>
 						<li>GrapheneDataGrid is built on top of
 						 <a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
-							gform.js</a>, otherwise known as GrapheneForms. You will need to include a dependency for GrapheneForms called Lodash 
-							(<a href="https://lodash.com/" target="_blank">lodash.js</a>).  <br>You can click the link to see the documentation for GrapheneForms or Lodash.</li>
-						<li>For the next dependency you need to pick one:
-							<ul>
-								<li>You can use <a href="https://underscorejs.org/" target="_blank">underscore.js</a> </li>
-								Or
-								<li><a href="https://lodash.com/" target="_blank">lodash.js</a></li>
-							</ul>
-						</li>
+							gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
+							(<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms **.  <br>
+							 - <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
+							**<i>Note the include for GrapheneForms will appear as 'gform_bootstrap.js' or 'gform_bootstrap.min.js'</i> </li>
+						
 
 					</ul>
 					
-					<p>A minimum setup might look something like this</p>
+					<p>A minimum setup might look something like this:</p>
 					<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
+
     &lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'&gt;&lt;/style&gt;
-    &lt;script src='http://twitter.github.com/hogan.js/builds/3.0.1/hogan-3.0.1.js'&gt;&lt;/script&gt;
-    &lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+    &lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;&lt;/style&gt;
+	
+	&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='#############lodash'&gt;&lt;/script&gt;
     &lt;script type='text/javascript' src='gform.min.js'&gt;&lt;/script&gt;
-    &lt;script type='text/javascript' src='bootstrap.gform.js'&gt;&lt;/script&gt;
-    &lt;script type='text/javascript' src='underscore.min.js'&gt;&lt;/script&gt;
+    &lt;script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'&gt;&lt;/script&gt;
     &lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
   &lt;/head&gt;
   &lt;body&gt;

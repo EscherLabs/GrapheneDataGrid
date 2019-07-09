@@ -100,25 +100,23 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
 
 		<!-- Include External Dependencies (JQuery, Lodash, Sortable, Bootstrap -->
 		<script type='text/javascript' src='assets/js/jquery.min.js'></script>
-		<script type='text/javascript' src='assets/js/lodash.min.js'></script>
-		<!-- <script type="text/javascript" src="assets/js/sortable.js"></script> -->
 		<script type='text/javascript' src="assets/js/bootstrap.min.js"></script> 
+		<script type='text/javascript' src='assets/js/lodash.min.js'></script>
+		
 		<!-- Include Graphene Forms (with Bootstrap Template) -->
-		<!-- <script type='text/javascript' src="assets/js/gform.js"></script>  -->
 		<script type='text/javascript' src="assets/js/gform_bootstrap.js"></script> 
+
 		<!-- Include Graphene Data Grid --> 
 		<script type='text/javascript' src='assets/js/GrapheneDataGrid.full.js'></script>
 
+		<!-- Optional -->
+		<!-- <script type="text/javascript" src="assets/js/sortable.js"></script> -->
+
 		<script>
             bt = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
-						name:'index',
-            search: false,columns: false,upload:false,download:false,title:'Demo Content',
-            edit:true,
-            add: true,
-            click: function(model){model.toggle();},
-            delete:true,
-            entries:[],
-            count:4,
+			search: false,columns: false,upload:false,download:true,title:'Demo Content',
+			entries: [3, 4, 5,7],
+			count: 4,
             schema:[
                 {type:"text", name:"name", label:"Name", required:true},
             ], data: [
@@ -127,7 +125,47 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
                 {name:'third'},
                 {name:'second'},
                 {name:'first'},
-			]})
+			],
+		})
         </script>
 	</body>
 </html>
+
+<!-- actions: (5) [{…}, "|", {…}, "|", {…}]
+columns: false
+count: 10000
+data: (5) [{…}, {…}, {…}, {…}, {…}]
+download: false
+el: "#myGrapheneDataGrid"
+entries: (3) [25, 50, 100]
+filter: true
+filterFields: [{…}]
+id: "f0"
+item_template: "{{^options.hideCheck}}↵↵<td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">↵  <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>↵   </td>↵↵  {{/options.hideCheck}}↵{{#items}}↵{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}↵{{/items}}"
+name: "index"
+page: 1
+pagecount: 1
+reverse: false
+schema: [{…}]
+search: {}
+sort: true
+title: "Demo Content" -->
+
+<!-- app.grid('Data',{
+	sort:'DATE_LABELS_PRINTED',
+	el:'#Data_table',
+	form:'SOOT_Info',
+	search: false,
+	columns: false,
+	download: false,
+	upload: false,
+	//Sample Data to be used
+	resource: "get_null_dates",
+	actions:[
+		{name: "edit", label:'<i class="fa fa-times"></i> Print Labels For Classes'},'|',
+		
+		 //#######################TODO REMOVE FOR DEV######################################################
+		{type:"info",name:'undo',label:'<i class="fa fa-times"></i> Undo Button'}
+		 //#######################TODO REMOVE FOR DEV######################################################
+	]
+	 -->
