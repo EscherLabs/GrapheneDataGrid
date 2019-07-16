@@ -58,9 +58,11 @@
 					<h4>What is GrapheneDataGrid.js?</h4>
 					<ul class>
 						<li class="list-unstyled" ><a href="#intro"><i class="fa fa-chevron-right"></i> Introduction</a></li>
-						<li class="list-unstyled list-parent" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a>
-							<li class="list-unstyled sublist hidden">Default Method</li>
-							<li class="list-unstyled sublist hidden">Bootstrap Method</li>
+						<li class="list-unstyled" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a>
+							<ul class="sublist-nav">
+								<li class="list-unstyled">Default Method</li>
+								<li class="list-unstyled">Bootstrap Method</li>
+							</ul>
 						</li>
 						<li class="list-unstyled" ><a href="#api"><i class="fa fa-chevron-right"></i> Api</a></li>
 					</ul>
@@ -127,12 +129,22 @@
 					- This method also uses includes a templated version of GrapheneForms</p>
 
 					<h4>(1) Default Method</h4>
-					<p>################################TODO</p>
+					<p><b>Dependencies</b> - GrapheneForms and Lodash</p>
+
+					<ul>
+						<li>GrapheneDataGrid is built on top of
+							<a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
+							   gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
+							   (<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms 
+							   (<b>For the Default Method we want to include the default gform option</b>: gform.js or gform.min.js).  <br>
+								- <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
+							   </li>
+							</ul>
 
 					<hr>
 
 					<h4>(2) BootStrap Method</h4>
-					<p><b>Dependencies</b> - GrapheneDataGrid has a few dependencies you will need to get started:</p>
+					<p><b>Dependencies</b> - jQuery, Bootstrap 3.4.1 (Both JS and CSS),</p>
 					<ul>
 						<li>
 							<p>The first dependency we incorporate is Bootstrap 3.4.1 for the purpose of styling and functionality.<br>
@@ -404,10 +416,13 @@
 		<script src="assets/js/bootstrap.min.js"></script>  
 		 <script src='assets/js/GrapheneDataGrid.full.js'></script>
 
+		 <!-- Only used for Docs Page not needed for DataGrid -->
+		 <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+
 		 <script>
 			 
 			 
-			 $('.list-parent')[0].onclick = function(){myFunction()};
+			 $('.sublist').onclick = function(){myFunction()};
 
 			 function myFunction(){
 				 console.log("Clicked!!!");
