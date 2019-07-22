@@ -60,27 +60,31 @@
 						<li class="list-unstyled" ><a href="#intro"><i class="fa fa-chevron-right"></i> Introduction</a></li>
 						<li class="list-unstyled" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a>
 							<ul class="sublist-nav">
-								<li class="list-unstyled"><a href="#default_method">Default Method</a></li>
-								<li class="list-unstyled"><a href="#bootstrap_method">Bootstrap Method</a></li>
+								<li class="list-unstyled fa fa-square-o"><a href="#default_method"> Default Method</a></li>
+								<li class="list-unstyled fa fa-square-o"><a href="#bootstrap_method"> Bootstrap Method</a></li>
 							</ul>
 						</li>
 						<li class="list-unstyled" ><a href="#api"><i class="fa fa-chevron-right"></i> Api</a></li>
 					</ul>
-					<a href="#options"><h4>Options</h4></a>
+					<a href="#first_grid"><h4>Making a Grid</h4></a>
 					<ul class>
-						<li class="list-unstyled" ><a href="#title"><i class="fa fa-chevron-right"></i> title</a></li>
-						<li class="list-unstyled" ><a href="#schema"><i class="fa fa-chevron-right"></i> schema</a></li>
-						<li class="list-unstyled" ><a href="#filters"><i class="fa fa-chevron-right"></i> filters</a></li>
-						<li class="list-unstyled" ><a href="#data"><i class="fa fa-chevron-right"></i> data</a></li>
-						<li class="list-unstyled" ><a href="#events"><i class="fa fa-chevron-right"></i> events</a></li>
-						<li class="list-unstyled" ><a href="#multiEdit"><i class="fa fa-chevron-right"></i> multiEdit</a></li>
-						<li class="list-unstyled" ><a href="#inlineEdit"><i class="fa fa-chevron-right"></i> inlineEdit</a></li>
-						<li class="list-unstyled" ><a href="#autoSize"><i class="fa fa-chevron-right"></i> autoSize</a></li>
-						<li class="list-unstyled" ><a href="#pagination"><i class="fa fa-chevron-right"></i> pagination</a></li>
-						<li class="list-unstyled" ><a href="#callbacks"><i class="fa fa-chevron-right"></i> callbacks</a></li>
-						<!-- <li class="list-unstyled" ><a href="#event_bus"><i class="fa fa-chevron-right"></i> Event Bus</a></li> -->
-						<li class="list-unstyled" ><a href="#flags"><i class="fa fa-chevron-right"></i> Display flags</a></li>
-	
+						
+							<li class="list-unstyled"><a href="#options"><h4 class="text-primary"><u>Options</u></h4></a></li>
+						<ul>
+							<li class="list-unstyled" ><a href="#el"><i class="fa fa-chevron-right"></i> el</a></li>
+							<li class="list-unstyled" ><a href="#data"><i class="fa fa-chevron-right"></i> data</a></li>
+							<li class="list-unstyled" ><a href="#schema"><i class="fa fa-chevron-right"></i> schema</a></li>
+							<li class="list-unstyled" ><a href="#title"><i class="fa fa-chevron-right"></i> title</a></li>							
+							<li class="list-unstyled" ><a href="#filters"><i class="fa fa-chevron-right"></i> filters</a></li>
+							<li class="list-unstyled" ><a href="#events"><i class="fa fa-chevron-right"></i> events</a></li>
+							<li class="list-unstyled" ><a href="#multiEdit"><i class="fa fa-chevron-right"></i> multiEdit</a></li>
+							<li class="list-unstyled" ><a href="#inlineEdit"><i class="fa fa-chevron-right"></i> inlineEdit</a></li>
+							<li class="list-unstyled" ><a href="#autoSize"><i class="fa fa-chevron-right"></i> autoSize</a></li>
+							<li class="list-unstyled" ><a href="#pagination"><i class="fa fa-chevron-right"></i> pagination</a></li>
+							<li class="list-unstyled" ><a href="#callbacks"><i class="fa fa-chevron-right"></i> callbacks</a></li>
+							<!-- <li class="list-unstyled" ><a href="#event_bus"><i class="fa fa-chevron-right"></i> Event Bus</a></li> -->
+							<li class="list-unstyled" ><a href="#flags"><i class="fa fa-chevron-right"></i> Display flags</a></li>
+						</ul>
 					</ul>				
 					<a href="#model"><h4>Model</h4></a>
 					<ul class>
@@ -111,6 +115,50 @@
 						
 						<a name="intro" style="display:block;position:relative;top:-40px"></a>
 						<h2>About GrapheneDataGrid:</h2>
+						<div class="container mx-auto text-justify">
+							<p class="text-center">
+									!!! <u>If you are looking to use GrapheneDataGrid while inside of the Graphene environment,<br>
+										we have a seperate documentation page you should use.
+									</u>
+									<a href="#" class="">Click Here to Navigate to it.</a> !!!<br>
+									If you have never heard of Graphene before, continue reading below.<hr>
+							GrapheneDataGrid provides a full tabular interface for managing, manipulating, and displaying data. The DataGrid offers:
+								<ul>
+									<li>Sorting,</li>
+									<li>Searching,</li>
+									<li>Paginating,</li>
+									<li>Editing,</li>
+									<li>Updating,</li>
+									<li>Adding,</li>
+									<li>and Deletion of Data</li>
+								</ul>
+							</p>
+						</div>
+						<hr>
+						<h3>Heres a Basic Example of a Grid,</h3>
+						<h4>Result:</h4>
+						<div id="myGrapheneDataGrid"></div>
+						<hr>
+						<h4>Code:</h4>
+				<pre><code class="prettyprint">
+	gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+		search: false,columns: false,upload:false,download:false,title:'Demo Content',
+		entries:[],
+		count:4,
+		schema:[
+			{type:"text", name:"name", label:"Name", required:true},
+			{type:"text", name:"number",label:"Age"}
+		], data: [
+			{name:'Bob'},
+			{name:'Adam', number: 30},
+			{name:'Tim', number: 30.5},
+			{name:'Lauri', number: 21},
+			{name:'Scott'},
+		]
+	})
+					</code></pre>
+					
+						<hr>
 					
 					
 					
@@ -118,16 +166,15 @@
 					<a name="getting_started" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>Getting Started</h4>
-					<p>There are two methods you may use to set up GrapheneDataGrid</p>
+					<p>There are two methods you may use to set up GrapheneDataGrid...</p>
 					
 					<p> 1: Default Method:<br>
-						- The default method only depends on GrapheneForms and Lodash.
+						- This method only depends on GrapheneForms and Lodash.
 						<br>- This method uses GrapheneForms' default code to
 								provide styling and functionality.</p>
 					<p> 2: Bootstrap Method:<br>
-					- This method requires the defaults methods dependencies as well as Bootstrap and its codependency, jquery.
+					- This method requires the same dependencies as the Default Method as well as Bootstrap and jquery.
 					- Uses Bootstrap CSS and Bootstrap JS + jquery for styling and functionality<br>
-					- This method also uses includes a templated version of GrapheneForms</p>
 
 					<hr>
 					<!-- Default Method  -> Start -->
@@ -238,52 +285,126 @@
 &lt;/html&gt;</code></pre>
 
 <!-- Code Example of Bootstrap Method ->End -->
-					<br>
-					<p>To get started we just need to initialize our table with some options</p>
-					<pre><code class="prettyprint">var options = {"container":".myTable"};<br>var myForm = GrapheneDataGrid(options);</code></pre>
+					<hr>
+					
 	<!-- Bootstrap Method  -> End -->
 
-					<!--Api -->
-					<a name="api" style="display:block;position:relative;top:-40px"></a>
+						<!-- Making Grids Start -->
+					<a name="first_grid" style="display:block;position:relative;top:-40px"></a>
 					<br>
-					<h4>API</h4>
-					<h5>find <code>myTable.find([search]);</code></h5>
-					<p>
-						search: pass an object with an exact match of any fields you want to match on
+					<h2>Making a Grid</h4>
+						<p>Here is what the construction of a GrapheneDataGrid looks like,</p>
 
-						an array of models is returened wich can be manipulated with the model api
-					</p>
-					<br>
-					<h5>draw <code>myTable.draw();</code></h5>
-					<p>
-						this will cause the table to be redrawn with any updated options or values that have changed since the last draw
-					</p>
-					<hr>
+<pre><code class="prettyprint">var options = {
+	//Make Desired options
+	el : 'myContainer',
+	data : [
+		{data : "myData"},
+		{data : "This is an array"}
+	],
+	schema : [
+		{type:'text', name:'data', label:'data', required: 'true'}
+	]
+};
+	//Pass into Grid
+var first_grid = new GrapheneDataGrid(options);
+</code></pre>
 
-					<h5>models <code>myTable.models;</code></h5>
-					<p>
-						the models can be accessed directly via the <code>models</code> variable. Any attributes that are modified or checked state will be updated visuially the next time draw is called.
-					</p>
-					<hr>
+<p>The example above displays the only options <strong>required</strong> to make a grid.<br>
+The required options are:
+<ul>
+	<li>el : The html element where the grid will be located</li>
+	<li>data : The data to populate the grid with</li>
+	<li>schema : How the data will be displayed in the grid</li>
+</ul><br></p>
+<h5>We will go over every available option in detail below.</h5><hr>
 
-
+					
 					<!--options -->
 					<a name="options" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h3>Options</h3>
-					<pre><code class="prettyprint">var options = {
-  name: "My Form"
-  schema: gformFields,
-  data: "myForm"
-};</code></pre>
-					<!--legend -->
-					<a name="title" style="display:block;position:relative;top:-40px"></a>
+					<p>- Object options : This is the only parameter passed into GrapheneDataGrid:<br></p>
+						<pre><code>&emsp;new GrapheneDataGrid(options)</code></pre>
+					<p>Some Key Notes about options:
+						<ul>
+							<li>Options is an Object, meaning it has multiple key value pairs</li>
+							<li>You only have to pass in three of the total options,<ul>
+								<li>1. el (Where the Data is displayed)</li>
+								<li>2. data (The data to be displayed)</li>
+								<li>3. schema (How the data is displayed)</li>
+							</ul></li>
+							<li>Many of the options below have default values (which will be noted in the documentation below) which is why they are not required to create a grid</li>
+						</ul>
+					</p>
+					<hr>
+					<!-- Options: el -->
+					<a name="el" style="display:block;position:relative;top:-40px"></a>
 					<br>
-					<h4>title</h4>					
+					<h4>el:</h4>
 					<p>
-						This is the title of the table, used for downloads and labeling.
-						<pre><code class="prettyprint">options.title = "Table title";</code></pre>
-					</p>					
+						This is the HTML Element where the grid will be displayed. Both HTML Classes and ID's are valid containers 
+<pre><code>&lt;body&gt;
+	&lt;div id="myIDContainer"&gt;&lt;/div&gt;
+	&lt;div class="myClassContainer"&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;script&gt;
+	//ID example
+	options = {  el : document.getElementByID('myIDContainer')  }
+	//Class Example
+	options = {  el : document.getElementsByClassName('myClassContainer')[0]  }
+&lt;/script&gt;
+</code></pre>
+					</p>
+					<hr>
+					<!-- Options: data -->
+					<a name="data" style="display:block;position:relative;top:-40px"></a>
+					<br>
+					<h4>data</h4>
+					<p>
+						Array data;<br>
+						This is an array of Objects where each object represents one row in the table.</p>
+<pre><code>&lt;script&gt;
+	var options = {
+		data : [ 
+			//First Column of Data
+			{name : "value", number : 1},
+			//Second Column of Data
+			{name : "value", number : 2}
+		]
+	}
+&lt;/script&gt;
+</code></pre><br>
+
+<p>Note all objects are independent of each other, so they could all contain the same data values.<br>
+The name of int the name:value pairs of the object are extremely important. For the data's values to be displayed the name value
+must match one of the name values of the schema (See Below)</p>
+<h4>Code:</h4>
+<pre><code>&lt;script&gt;
+var options = {
+	data : [ 
+		//First Column of Data
+		{number : 1, string : "value"},
+		//Second Column of Data
+		{number : 2, string : "value"}
+	],
+	schema : [
+//The first row of data will be labeled 'Numbers', and will read the key-value 'number' from the data Objects.
+		{type:'text', name:'number', label:'Numbers'},
+//the second row of data will be labeled 'Strings', and will read the key-value 'string' from the data Objects
+		{type:'text', name:'string', label:'Strings'}
+	]
+}
+var Grid = new GrapheneDataGrid(options);
+
+&lt;/script&gt;
+	</code></pre><br>
+	<h4>Result:</h4>
+	<div id="options_data_example"></div>
+	<hr>
+	
+					
+					<!-- Options: schema -->
 					<a name="schema" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>schema</h4>					
@@ -292,7 +413,16 @@
 						<pre><code class="prettyprint">options.schema = [{"label": "Field 1" , "name": "field_1"}];</code></pre>
 
 						The fields defined here will be used fore creating new entries into the table, editing entries in the table and will derive the filter fields for the table if filters are enabled. Filters use a more limited set of field types and some may be translated into simpler types.
-					</p>					
+					</p>	
+										
+					<!--legend -->
+					<a name="title" style="display:block;position:relative;top:-40px"></a>
+					<br>
+					<h4>title</h4>					
+					<p>
+						This is the title of the table, used for downloads and labeling.
+						<pre><code class="prettyprint">options.title = "Table title";</code></pre>
+					</p>									
 					<a name="filters" style="display:block;position:relative;top:-40px"></a>
 					<br>
 					<h4>filters</h4>
@@ -301,12 +431,6 @@
 
 						<pre><code class="prettyprint">options.filters = [{"label": "Field 1" , "name": "field_1"}];</code></pre>
 
-					</p>
-					<a name="data" style="display:block;position:relative;top:-40px"></a>
-					<br>
-					<h4>data</h4>
-					<p>
-						This should be an array of objects where each object should be represened by one row in the table.
 					</p>
 					<a name="events" style="display:block;position:relative;top:-40px"></a>
 					<br>
@@ -439,7 +563,30 @@
 					<h4>delete</h4>
 					<p>
 						A model can be deleted by calling <code>myModel.delete()</code> this will not trigger the delete callback, it will just remove it from the collection of models maintained in the GrapheneDataGrid instance.
-					</p>			
+					</p>
+					
+					<!--Api -->
+					<a name="api" style="display:block;position:relative;top:-40px"></a>
+					<br>
+					<h4>API</h4>
+					<h5>find <code>myTable.find([search]);</code></h5>
+					<p>
+						search: pass an object with an exact match of any fields you want to match on
+
+						an array of models is returened wich can be manipulated with the model api
+					</p>
+					<br>
+					<h5>draw <code>myTable.draw();</code></h5>
+					<p>
+						this will cause the table to be redrawn with any updated options or values that have changed since the last draw
+					</p>
+					<hr>
+
+					<h5>models <code>myTable.models;</code></h5>
+					<p>
+						the models can be accessed directly via the <code>models</code> variable. Any attributes that are modified or checked state will be updated visuially the next time draw is called.
+					</p>
+					<hr>
 
 					<hr>
 					<footer>
@@ -465,7 +612,41 @@
 
 		 <script>
 			 
+			 gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+			search: false,columns: false,upload:false,download:false,title:'Demo Content',
+			entries: [],
+			count: 4,
+            schema:[
+				{type:"text", name:"name", label:"Name", required:true},
+				{type:"text", name:"number",label:"Age"}
+            ], data: [
+			{name:'Bob'},
+			{name:'Adam', number: 30},
+			{name:'Tim', number: 30.5},
+			{name:'Lauri', number: 21},
+			{name:'Scott'},
+			],
+		})
 			 
+
+
+		var options = {
+		el: '#options_data_example',
+			data : [
+				//First Column of Data
+				{number : 1, string : "value"},
+				//Second Column of Data
+				{number : 2, string : "value"}
+			],
+			actions : [], upload: false, download:false, columns:false, entries:[], search:false,
+			schema : [
+				//The first Row of data will be labeled 'Numbers' and be in text form, and will read from the data objects the 'number' values
+				{type:'text', name:'number', label:'Numbers'},
+				//the second Row of data will be labed 'Strings' and be in text form, and will read from the data objects the 'string' values
+				{type:'text', name:'string', label:'Strings'}
+			]
+		}
+		var Grid = new GrapheneDataGrid(options);</script>
 			 $('.sublist').onclick = function(){myFunction()};
 
 			 function myFunction(){
