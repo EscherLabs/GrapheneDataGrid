@@ -60,8 +60,8 @@
 						<li class="list-unstyled" ><a href="#intro"><i class="fa fa-chevron-right"></i> Introduction</a></li>
 						<li class="list-unstyled" ><a href="#getting_started"><i class="fa fa-chevron-right"></i> Getting Started</a>
 							<ul class="sublist-nav">
-								<li class="list-unstyled">Default Method</li>
-								<li class="list-unstyled">Bootstrap Method</li>
+								<li class="list-unstyled"><a href="#default_method">Default Method</a></li>
+								<li class="list-unstyled"><a href="#bootstrap_method">Bootstrap Method</a></li>
 							</ul>
 						</li>
 						<li class="list-unstyled" ><a href="#api"><i class="fa fa-chevron-right"></i> Api</a></li>
@@ -119,6 +119,7 @@
 					<br>
 					<h4>Getting Started</h4>
 					<p>There are two methods you may use to set up GrapheneDataGrid</p>
+					
 					<p> 1: Default Method:<br>
 						- The default method only depends on GrapheneForms and Lodash.
 						<br>- This method uses GrapheneForms' default code to
@@ -128,35 +129,73 @@
 					- Uses Bootstrap CSS and Bootstrap JS + jquery for styling and functionality<br>
 					- This method also uses includes a templated version of GrapheneForms</p>
 
+					<hr>
+					<!-- Default Method  -> Start -->
+					<a name="default_method" style="display:block;position:relative;top:-40px"></a>
+					<br>
 					<h4>(1) Default Method</h4>
 					<p><b>Dependencies</b> - GrapheneForms and Lodash</p>
 
 					<ul>
 						<li>GrapheneDataGrid is built on top of
 							<a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
-							   gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
-							   (<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms 
-							   (<b>For the Default Method we want to include the default gform option</b>: gform.js or gform.min.js).  <br>
-								- <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
+							   gform.js</a>, otherwise known as GrapheneForms. You will need to include GrapheneForms as well as one dependency for GrapheneForms called Lodash 
+							   (<a href="https://lodash.com/" target="_blank">lodash.js</a>). Make sure to include lodash <u>before</u> the include of GrapheneForms.
+							   <br> <p class="fa"> -- View <a href="#setting_up_gform">Setting up GrapheneForms.</a> --</p> <br>
+								- <i>You can click the above links to see the documentation for GrapheneForms and Lodash</i> -<br>
 							   </li>
 							</ul>
+							<br>
+							<p>A basic setup of the default method would look like this:</p>
 
-					<hr>
+<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
 
+	&lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;
+
+	&lt;script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='gform.js'&gt;&lt;/script&gt;
+	&lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<hr>
+					<!-- Default Method  -> End -->
+
+					<!-- Setting Up Graphene Forms  -> Start -->
+					<a name="setting_up_gform" style="display:block;position:relative;top:-40px"></a>
+					<br>
+					<h4>Setting Up GrapheneForms</h4>
+					<h5>Default Setup:</h5>
+					<ul>
+						<li><p>Info</p></li>
+					</ul>
+
+					<h5>Bootstrap Setup:</h5>
+					<ul>
+						<li><p>Info</p></li>
+					</ul>
+					<!-- Setting Up Graphene Forms  -> End -->
+
+					<!-- Bootstrap Method  -> Start -->
+					<a name="bootstrap_method" style="display:block;position:relative;top:-40px"></a>
+					<br>
 					<h4>(2) BootStrap Method</h4>
-					<p><b>Dependencies</b> - jQuery, Bootstrap 3.4.1 (Both JS and CSS),</p>
+					<p><b>Dependencies</b> - jQuery, Bootstrap 3.4.1 (Both JS and CSS), Lodash, GrapheneForms (BootStrap)</p>
 					<ul>
 						<li>
-							<p>The first dependency we incorporate is Bootstrap 3.4.1 for the purpose of styling and functionality.<br>
-								 Make sure to include both: </p>
+							<p>The first two dependencies we incorporate are jQuery and Bootstrap 3.4.1 for the purpose of styling and functionality.<br>
+								 For Bootstrap make sure to include both: </p>
 							<ul>
 								<li>Bootstrap Css 3.4.1</li>
 								<strong>and</strong>
 								<li>Bootstrap JS 3.4.1 * ***</li>
 								<li>You can either use the provided CDN's below or find out how to setup Bootstrap at: <a  target="_blank" href="https://getbootstrap.com/docs/3.4/getting-started/">(Getting Started with Bootstrap)</a> </li>
 							</ul>
-							<p>* Note that Bootstrap has one dependency attached to it, <a href="https://jquery.com/">jQuery</a>.
-							So <strong>make sure jquery is the first script included on your page</strong>
+							<p>* <a href="https://jquery.com/">jQuery</a> is a dependency of Bootstrap,
+							so <strong>make sure jquery is the first script included on your page</strong><br>
 							<i> - Bootstrap's get started page helps you setup jquery -</i><br>
 <pre><code class="prettyprint">
 	&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'&gt;&lt;/style&gt;
@@ -164,18 +203,20 @@
 	&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
 
 </code></pre>
-							*** We <u>do not</u> require the optional Bootstrap dependency of <u>popper.js</u> </p>
+							*** We <u>do not</u> require the optional Bootstrap dependency of <u>popper.js</u> ***</p>
 						</li>
 						<li>GrapheneDataGrid is built on top of
 						 <a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
 							gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
 							(<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms **.  <br>
 							 - <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
+							 <p class="fa"> -- View <a href="#setting_up_gform">Setting up GrapheneForms.</a> --</p>
 							**<i>Note the include for GrapheneForms will appear as 'gform_bootstrap.js' or 'gform_bootstrap.min.js'</i> </li>
 						
 
 					</ul>
 					
+					<!-- Code Example of Bootstrap Setup -> Start -->
 					<p>A minimum setup might look something like this:</p>
 					<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -195,9 +236,12 @@
   &lt;/div&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
+
+<!-- Code Example of Bootstrap Method ->End -->
 					<br>
 					<p>To get started we just need to initialize our table with some options</p>
 					<pre><code class="prettyprint">var options = {"container":".myTable"};<br>var myForm = GrapheneDataGrid(options);</code></pre>
+	<!-- Bootstrap Method  -> End -->
 
 					<!--Api -->
 					<a name="api" style="display:block;position:relative;top:-40px"></a>

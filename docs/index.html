@@ -65,13 +65,13 @@
 				<p>
 					<h2>GrapheneDataGrid</h2> GrapheneDataGrid provides a full tabular interface for managing, manipulating, and displaying data. The DataGrid offers:
 					<ul>
-						<li class="list-unstyled"> <i class="">Sorting, </i> </li>
+						<li>Sorting,</li>
 						<li>Searching,</li>
 						<li>Paginating,</li>
 						<li>Editing,</li>
 						<li>Updating,</li>
 						<li>Adding,</li>
-						<li>and Deleting Data</li>
+						<li>and Deletion of Data</li>
 					</ul>
 				</p>
 			</div>
@@ -137,42 +137,3 @@
         </script>
 	</body>
 </html>
-
-<!-- actions: (5) [{…}, "|", {…}, "|", {…}]
-columns: false
-count: 10000
-data: (5) [{…}, {…}, {…}, {…}, {…}]
-download: false
-el: "#myGrapheneDataGrid"
-entries: (3) [25, 50, 100]
-filter: true
-filterFields: [{…}]
-id: "f0"
-item_template: "{{^options.hideCheck}}↵↵<td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">↵  <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>↵   </td>↵↵  {{/options.hideCheck}}↵{{#items}}↵{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}↵{{/items}}"
-name: "index"
-page: 1
-pagecount: 1
-reverse: false
-schema: [{…}]
-search: {}
-sort: true
-title: "Demo Content" -->
-
-<!-- app.grid('Data',{
-	sort:'DATE_LABELS_PRINTED',
-	el:'#Data_table',
-	form:'SOOT_Info',
-	search: false,
-	columns: false,
-	download: false,
-	upload: false,
-	//Sample Data to be used
-	resource: "get_null_dates",
-	actions:[
-		{name: "edit", label:'<i class="fa fa-times"></i> Print Labels For Classes'},'|',
-		
-		 //#######################TODO REMOVE FOR DEV######################################################
-		{type:"info",name:'undo',label:'<i class="fa fa-times"></i> Undo Button'}
-		 //#######################TODO REMOVE FOR DEV######################################################
-	]
-	 -->
