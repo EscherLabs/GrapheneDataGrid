@@ -61,20 +61,26 @@
 			</div><!--/row-->
             			<hr>
 
-            <p>
-                Graphene Data Grid takes gform to the next level, providing a full tabular interface for sorting, searching, paginating, editing, updating, adding, and deleting data.
-</p><p>
-Just define your gform form, map your CRUD functions, and your'e ready to go!
-            </p>
+			<div class="container mx-auto text-justify">
+				<p>
+					<h2>GrapheneDataGrid</h2> GrapheneDataGrid provides a full tabular interface for managing, manipulating, and displaying data. The DataGrid offers:
+					<ul>
+						<li class="list-unstyled"> <i class="">Sorting, </i> </li>
+						<li>Searching,</li>
+						<li>Paginating,</li>
+						<li>Editing,</li>
+						<li>Updating,</li>
+						<li>Adding,</li>
+						<li>and Deleting Data</li>
+					</ul>
+				</p>
+			</div>
 			<hr>
-			<h4>Basic Usage</h4>
+			<h3>Basic Example</h3>
+			<h4>Code:</h4>
 	<pre><code class="prettyprint">
-          bt = new GrapheneDataGrid({container:'#myGrapheneDataGrid',
+          bt = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
             search: false,columns: false,upload:false,download:false,title:'Demo Content',
-            edit:true,
-            add: true,
-            click: function(model){model.toggle();},
-            delete:true,
             entries:[],
             count:4,
             schema:[
@@ -90,6 +96,7 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
         </code></pre>
         
 			<hr>
+			<h4>Result:</h4>
 			<div id="myGrapheneDataGrid"></div>
 			<hr>
 			<footer>
@@ -114,8 +121,8 @@ Just define your gform form, map your CRUD functions, and your'e ready to go!
 
 		<script>
             bt = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
-			search: false,columns: false,upload:false,download:true,title:'Demo Content',
-			entries: [3, 4, 5,7],
+			search: false,columns: false,upload:false,download:false,title:'Demo Content',
+			entries: [],
 			count: 4,
             schema:[
                 {type:"text", name:"name", label:"Name", required:true},
