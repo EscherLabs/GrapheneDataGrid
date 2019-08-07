@@ -7,7 +7,7 @@ topNavBar:
 
 sideNavBar:
   - page: What is GrapheneDataGrid.js?
-    view: /docpages/WhatIs.html
+    view: ./WhatIs.html
     subLinks:
       - value: Introduction
         id: intro
@@ -16,7 +16,7 @@ sideNavBar:
         id: getting_started
   
   - page: Making a Grid
-    view: /docpages/MakingAGrid.html
+    view: ./MakingAGrid.html
     subLinks:
         - value: Options
           id: options
