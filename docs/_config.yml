@@ -1,0 +1,7 @@
+name: GrapheneDataGrid Docs
+markdrown: kramdown
+collections:
+  docpages:
+    output: true
+plugins:
+  - jekyll-redirect-from

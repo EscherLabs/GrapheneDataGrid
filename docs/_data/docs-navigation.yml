@@ -1,0 +1,30 @@
+topNavBar: 
+
+- name: Docs
+  link: ./WhatIs.html
+- name: Demo
+  link: ./demo.html
+
+sideNavBar:
+  - page: What is GrapheneDataGrid.js?
+    view: /docpages/WhatIs.html
+    subLinks:
+      - value: Introduction
+        id: intro
+
+      - value: Getting Started
+        id: getting_started
+  
+  - page: Making a Grid
+    view: /docpages/MakingAGrid.html
+    subLinks:
+        - value: Options
+          id: options
+          subLinks:
+            - value: Thing1
+              id: Thing1
+            - value: Thing2
+              id: Thing2 Thing2
+
+
+

@@ -1,0 +1,72 @@
+---
+layout: default
+title: GrapheneDataGrid Docs
+---
+
+<div class="container-fluid">
+
+        <div class="">
+    
+            <div class="col-sm-3" >
+            <div class="hidden-xs" style="position:fixed;overflow:auto;top:100px;bottom:0;width:250px; border-right: #ba1073 1px solid;" id="sidebar" role="navigation">
+                {% for item in site.data.docs-navigation.sideNavBar%}
+                <!-- For Every Docs Page -->
+                {% if item.view == page.url %}
+                    {% assign current = true %}
+                {% else %}
+                    {% assign current = false %}
+                {% endif %}
+
+                
+                <a href="{{ item.view }}"><h4>{{ item.page }}</h4></a>    
+                        <ul>
+                            <!-- For Every item that is a child of the page -->
+                            {% for subItem in item.subLinks %}
+                            <li class="list-unstyled" ><a href=
+                                {% if !current %}
+                                "#{{ subItem.id }}"
+                                {% else %}
+                                "{{ item.view }}#{{ subItem.id }}"
+                                {% endif %}
+                            ><i class="fa fa-chevron-right"></i> {{ subItem.value }}</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                {% if subItem.subLinks[0] %}
+                                    {% for SSitem in subItem.subLinks %}
+                                    <ul>
+                                <li class="list-unstyled" ><a href="#{{ SSitem.id }}"><i class="fa fa-chevron-right"></i> {{ SSitem.value }}</a></li>
+                                    </ul>
+                                {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                {% endfor %}
+    
+            </div><!-- /col-sm-->
+    
+            </div><!--/span-->
+<div class="col-xs-12 col-sm-9">
+        <div class="row">
+            <div class="col-md-6">
+                <a class="btn btn-default pull-right" href="https://github.com/EscherLabs/GrapheneDataGrid"><i class="fa fa-github-alt"></i> View on github</a>
+            </div><!--/col-md-6-->
+
+            <div class="col-md-6">
+                <a class="btn btn-default" href="https://github.com/EscherLabs/GrapheneDataGrid/archive/master.zip"><i class="fa fa-download"></i> Get Code</a>
+            </div><!--/col-md-6-->
+        </div><!--/row-->
+
+    <!-- Insert Page Content Here -->
+    {{ content }}
+    <hr>
+    <footer>
+        <p>&copy; Escher Labs 2019</p>
+    </footer>
+
+</div><!--/span-->
+
+</div><!--/row-->
+
+</div><!--/.container-->
+
+<!-- Only used for Docs Page not needed for DataGrid -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
