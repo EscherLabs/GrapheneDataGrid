@@ -1,0 +1,146 @@
+---
+layout: docs
+name: Making a Grid
+title: Making a Grid
+---   
+        <!-- Making Grids Start -->
+    <a name="first_grid" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h2>Making a Grid</h4>
+        <p>Here is what the construction of a GrapheneDataGrid looks like,</p>
+
+<pre><code class="prettyprint">var options = {
+//Make Desired options
+el : 'myContainer',
+data : [
+{data : "myData"},
+{data : "This is an array"}
+],
+schema : [
+{type:'text', name:'data', label:'data', required: 'true'}
+]
+};
+//Pass into Grid
+var first_grid = new GrapheneDataGrid(options);
+</code></pre>
+
+<p>The example above displays the only options <strong>required</strong> to make a grid.<br>
+The required options are:
+<ul>
+<li>el : The html element where the grid will be located</li>
+<li>data : The data to populate the grid with</li>
+<li>schema : How the data will be displayed in the grid</li>
+</ul><br></p>
+<h5>We will go over every available option in detail below.</h5><hr>
+
+    
+    <!--options -->
+    <a name="options" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h3>Options</h3>
+    <p>- Object options : This is the only parameter passed into GrapheneDataGrid:<br></p>
+        <pre><code>&emsp;new GrapheneDataGrid(options)</code></pre>
+    <p>Some Key Notes about options:
+        <ul>
+            <li>Options is an Object, meaning it has multiple key value pairs</li>
+            <li>You only have to pass in three of the total options,<ul>
+                <li>1. el (Where the Data is displayed)</li>
+                <li>2. data (The data to be displayed)</li>
+                <li>3. schema (How the data is displayed)</li>
+            </ul></li>
+            <li>Many of the options below have default values (which will be noted in the documentation below) which is why they are not required to create a grid</li>
+        </ul>
+    </p>
+    <hr>
+    <!-- Options: el -->
+    <a name="el" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>el:</h4>
+    <p>
+        This is the HTML Element where the grid will be displayed. Both HTML Classes and ID's are valid containers 
+<pre><code>&lt;body&gt;
+&lt;div id="myIDContainer"&gt;&lt;/div&gt;
+&lt;div class="myClassContainer"&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;script&gt;
+//ID example
+options = {  el : document.getElementByID('myIDContainer')  }
+//Class Example
+options = {  el : document.getElementsByClassName('myClassContainer')[0]  }
+&lt;/script&gt;
+</code></pre>
+    </p>
+    <hr>
+    <!-- Options: data -->
+    <a name="data" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>data</h4>
+    <p>
+        Array data;<br>
+        This is an array of Objects where each object represents one row in the table.</p>
+<pre><code>&lt;script&gt;
+var options = {
+data : [ 
+//First Column of Data
+{name : "value", number : 1},
+//Second Column of Data
+{name : "value", number : 2}
+]
+}
+&lt;/script&gt;
+</code></pre><br>
+
+<p>Note all objects are independent of each other, so they could all contain the same data values.<br>
+The name of int the name:value pairs of the object are extremely important. For the data's values to be displayed the name value
+must match one of the name values of the schema (See Below)</p>
+<h4>Code:</h4>
+<pre><code>&lt;script&gt;
+var options = {
+data : [ 
+//First Column of Data
+{number : 1, string : "value"},
+//Second Column of Data
+{number : 2, string : "value"}
+],
+schema : [
+//The first row of data will be labeled 'Numbers', and will read the key-v 	alue 'number' from the data Objects.
+{type:'text', name:'number', label:'Numbers'},
+//the second row of data will be labeled 'Strings', and will read the key-value 'string' from the data Objects
+{type:'text', name:'string', label:'Strings'}
+],
+filter: false
+}
+var Grid = new GrapheneDataGrid(options);
+
+&lt;/script&gt;
+</code></pre><br>
+<h4>Result:</h4>
+<div id="options_data_example"></div>
+<hr>
+
+<script type='text/javascript' src='assets/js/jquery.min.js'></script>
+<script type='text/javascript' src='assets/js/lodash.min.js'></script>
+<script type="text/javascript" src="assets/js/sortable.js"></script>
+<script src="assets/js/gform_bootstrap.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>  
+<script src='assets/js/GrapheneDataGrid.full.js'></script>
+<script>
+
+var options = {
+el: '#options_data_example',
+data : [
+//First Column of Data
+{number : 1, string : "value"},
+//Second Column of Data
+{number : 2, string : "value"}
+],
+filter: false,
+actions : [], upload: false, download:false, columns:false, entries:[], search:false,
+schema : [
+//The first Row of data will be labeled 'Numbers' and be in text form, and will read from the data objects the 'number' values
+{type:'text', name:'number', label:'Numbers'},
+//the second Row of data will be labed 'Strings' and be in text form, and will read from the data objects the 'string' values
+{type:'text', name:'string', label:'Strings'}
+]
+}
+var Grid = new GrapheneDataGrid(options);</script>
