@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="Adam Smallcomb">
+
+        <title> GrapheneDataGrid Docs</title>
+
+		<!-- Bootstrap core CSS -->
+		<link rel='stylesheet' type='text/css' href='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'>
+		<link rel='stylesheet' type='text/css' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
+
+		<!-- Custom styles for this template -->
+		<link rel='stylesheet' type='text/css' href='assets/css/demo.css'>
+
+	</head>
+
+	<body>
+        <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="./WhatIs.html" style="line-height: 40px;font-size:10px;">
+					<span style="line-height: 40px;font-size: 20px;font-weight: 200;color: #cccccf;">GrapheneDataGrid.js</span>
+			</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+                
+                <li >
+                    <a href="./WhatIs.html"><i 
+                        class="fa fa-life-ring"
+                    >Docs</i></a>
+                </li>
+                
+                <li >
+                    <a href="./demo.html"><i 
+                        class="fa fa-flask"
+                    >Demo</i></a>
+                </li>
+                
+			</ul>
+		</div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</div><!-- /.navbar -->
+		<div class="container-fluid">
+
+        <div class="">
+    
+            <div class="col-sm-3" >
+            <div class="hidden-xs" style="position:fixed;overflow:auto;top:100px;bottom:0;width:250px; border-right: #ba1073 1px solid;" id="sidebar" role="navigation">
+                
+                <!-- For Every Docs Page -->
+                
+
+                
+                <a href="./WhatIs.html"><h4>What is GrapheneDataGrid.js?</h4></a>    
+                        <ul>
+                            <!-- For Every item that is a child of the page -->
+                            
+                            <li class="list-unstyled" ><a href=
+                                
+                                "./WhatIs.html#intro"
+                                
+                            ><i class="fa fa-chevron-right"></i> Introduction</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                
+                            
+                            <li class="list-unstyled" ><a href=
+                                
+                                "./WhatIs.html#getting_started"
+                                
+                            ><i class="fa fa-chevron-right"></i> Getting Started</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                
+                            
+                        </ul>
+                
+                <!-- For Every Docs Page -->
+                
+
+                
+                <a href="./MakingAGrid.html"><h4>Making a Grid</h4></a>    
+                        <ul>
+                            <!-- For Every item that is a child of the page -->
+                            
+                            <li class="list-unstyled" ><a href=
+                                
+                                "./MakingAGrid.html#options"
+                                
+                            ><i class="fa fa-chevron-right"></i> Options</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                
+                                    
+                                    <ul>
+                                <li class="list-unstyled" ><a href="#Thing1"><i class="fa fa-chevron-right"></i> Thing1</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href="#Thing2 Thing2"><i class="fa fa-chevron-right"></i> Thing2</a></li>
+                                    </ul>
+                                
+                                
+                            
+                        </ul>
+                
+    
+            </div><!-- /col-sm-->
+    
+            </div><!--/span-->
+<div class="col-xs-12 col-sm-9">
+        <div class="row">
+            <div class="col-md-6">
+                <a class="btn btn-default pull-right" href="https://github.com/EscherLabs/GrapheneDataGrid"><i class="fa fa-github-alt"></i> View on github</a>
+            </div><!--/col-md-6-->
+
+            <div class="col-md-6">
+                <a class="btn btn-default" href="https://github.com/EscherLabs/GrapheneDataGrid/archive/master.zip"><i class="fa fa-download"></i> Get Code</a>
+            </div><!--/col-md-6-->
+        </div><!--/row-->
+
+    <!-- Insert Page Content Here -->
+    				<a name="intro" style="display:block;position:relative;top:-40px"></a>
+				<h2>About GrapheneDataGrid:</h2>
+				<div class="container mx-auto text-justify">
+					<p>
+							GrapheneDataGrid provides a full tabular interface for managing, manipulating, and displaying data. The DataGrid offers:
+						<ul>
+							<li>Sorting,</li>
+							<li>Searching,</li>
+							<li>Paginating,</li>
+							<li>Editing,</li>
+							<li>Updating,</li>
+							<li>Adding,</li>
+							<li>and Deletion of Data</li>
+						</ul>
+					</p>
+				</div>
+				<hr>
+				<h3>Heres a Basic Example of a Grid,</h3>
+				<h4>Result:</h4>
+				<div id="myGrapheneDataGrid"></div>
+				<hr>
+				<h4>Code:</h4>
+		<pre><code class="prettyprint">
+gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+search: false,columns: false,upload:false,download:false,title:'Demo Content',
+entries:[],
+count:4,
+schema:[
+	{type:"text", name:"name", label:"Name", required:true},
+	{type:"text", name:"number",label:"Age"}
+], data: [
+	{name:'Bob'},
+	{name:'Adam', number: 30},
+	{name:'Tim', number: 30.5},
+	{name:'Lauri', number: 21},
+	{name:'Scott'},
+]
+})
+			</code></pre>
+			
+				<hr>
+			
+			
+			
+			<!--Getting Started -->
+			<a name="getting_started" style="display:block;position:relative;top:-40px"></a>
+			<br>
+			<h4>Getting Started</h4>
+			<p>There are two methods you may use to set up GrapheneDataGrid...</p>
+			
+			<p> 1: Default Method:<br>
+				- This method only depends on GrapheneForms and Lodash.
+				<br>- This method uses GrapheneForms' default code to
+						provide styling and functionality.</p>
+			<p> 2: Bootstrap Method:<br>
+			- This method requires the same dependencies as the Default Method as well as Bootstrap and jquery.
+			- Uses Bootstrap CSS and Bootstrap JS + jquery for styling and functionality<br>
+
+			<hr>
+			<!-- Default Method  -> Start -->
+			<a name="default_method" style="display:block;position:relative;top:-40px"></a>
+			<br>
+			<h4>(1) Default Method</h4>
+			<p><b>Dependencies</b> - GrapheneForms and Lodash</p>
+
+			<ul>
+				<li>GrapheneDataGrid is built on top of
+					<a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
+					   gform.js</a>, otherwise known as GrapheneForms. You will need to include GrapheneForms as well as one dependency for GrapheneForms called Lodash 
+					   (<a href="https://lodash.com/" target="_blank">lodash.js</a>). Make sure to include lodash <u>before</u> the include of GrapheneForms.
+					   <br> <p class="fa"> -- View <a href="#setting_up_gform">Setting up GrapheneForms.</a> --</p> <br>
+						- <i>You can click the above links to see the documentation for GrapheneForms and Lodash</i> -<br>
+					   </li>
+					</ul>
+					<br>
+					<p>A basic setup of the default method would look like this:</p>
+
+<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+
+&lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;
+
+&lt;script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='gform.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<hr>
+			<!-- Default Method  -> End -->
+
+			<!-- Setting Up Graphene Forms  -> Start -->
+			<a name="setting_up_gform" style="display:block;position:relative;top:-40px"></a>
+			<br>
+			<h4>Setting Up GrapheneForms</h4>
+			<h5>Default Setup:</h5>
+			<ul>
+				<li><p>Info</p></li>
+			</ul>
+
+			<h5>Bootstrap Setup:</h5>
+			<ul>
+				<li><p>Info</p></li>
+			</ul>
+			<!-- Setting Up Graphene Forms  -> End -->
+
+			<!-- Bootstrap Method  -> Start -->
+			<a name="bootstrap_method" style="display:block;position:relative;top:-40px"></a>
+			<br>
+			<h4>(2) BootStrap Method</h4>
+			<p><b>Dependencies</b> - jQuery, Bootstrap 3.4.1 (Both JS and CSS), Lodash, GrapheneForms (BootStrap)</p>
+			<ul>
+				<li>
+					<p>The first two dependencies we incorporate are jQuery and Bootstrap 3.4.1 for the purpose of styling and functionality.<br>
+						 For Bootstrap make sure to include both: </p>
+					<ul>
+						<li>Bootstrap Css 3.4.1</li>
+						<strong>and</strong>
+						<li>Bootstrap JS 3.4.1 * ***</li>
+						<li>You can either use the provided CDN's below or find out how to setup Bootstrap at: <a  target="_blank" href="https://getbootstrap.com/docs/3.4/getting-started/">(Getting Started with Bootstrap)</a> </li>
+					</ul>
+					<p>* <a href="https://jquery.com/">jQuery</a> is a dependency of Bootstrap,
+					so <strong>make sure jquery is the first script included on your page</strong><br>
+					<i> - Bootstrap's get started page helps you setup jquery -</i><br>
+<pre><code class="prettyprint">
+&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'&gt;&lt;/style&gt;
+
+&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+
+</code></pre>
+					*** We <u>do not</u> require the optional Bootstrap dependency of <u>popper.js</u> ***</p>
+				</li>
+				<li>GrapheneDataGrid is built on top of
+				 <a href="https://docs.escherlabs.com/GrapheneForms/" target="_blank">
+					gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
+					(<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms **.  <br>
+					 - <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
+					 <p class="fa"> -- View <a href="#setting_up_gform">Setting up GrapheneForms.</a> --</p>
+					**<i>Note the include for GrapheneForms will appear as 'gform_bootstrap.js' or 'gform_bootstrap.min.js'</i> </li>
+				
+
+			</ul>
+			
+			<!-- Code Example of Bootstrap Setup -> Start -->
+			<p>A minimum setup might look something like this:</p>
+			<pre><code class="prettyprint">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+
+&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'&gt;&lt;/style&gt;
+&lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;&lt;/style&gt;
+
+&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='gform.bootstrap.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="myTable"&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<!-- Code Example of Bootstrap Method ->End -->
+<!-- Bootstrap Method  -> End -->
+
+<script type='text/javascript' src='assets/js/jquery.min.js'></script>
+<script type='text/javascript' src='assets/js/lodash.min.js'></script>
+<script type="text/javascript" src="assets/js/sortable.js"></script>
+<script src="assets/js/gform_bootstrap.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>  
+<script src='assets/js/GrapheneDataGrid.full.js'></script>
+ <script>
+	 
+	 gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+	search: false,columns: false,upload:false,download:false,title:'Demo Content',
+	entries: [],
+	count: 4,
+	schema:[
+		{type:"text", name:"name", label:"Name", required:true},
+		{type:"text", name:"number",label:"Age"}
+	], data: [
+	{name:'Bob'},
+	{name:'Adam', number: 30},
+	{name:'Tim', number: 30.5},
+	{name:'Lauri', number: 21},
+	{name:'Scott'},
+	],
+})
+</script>
+    <hr>
+    <footer>
+        <p>&copy; Escher Labs 2019</p>
+    </footer>
+
+</div><!--/span-->
+
+</div><!--/row-->
+
+</div><!--/.container-->
+
+<!-- Only used for Docs Page not needed for DataGrid -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+	</body>
+</html>
