@@ -95,16 +95,98 @@
                                 
                                 "./MakingAGrid.html#options"
                                 
-                            ><i class="fa fa-chevron-right"></i> Options</a></li>
+                            ><i class="fa fa-chevron-right"></i> Options (Customizing the Grid)</a></li>
                                 <!-- If the subItem has children, display those under the subItem -->
                                 
                                     
                                     <ul>
-                                <li class="list-unstyled" ><a href="#Thing1"><i class="fa fa-chevron-right"></i> Thing1</a></li>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#el"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> el (Element)</a></li>
                                     </ul>
                                 
                                     <ul>
-                                <li class="list-unstyled" ><a href="#Thing2 Thing2"><i class="fa fa-chevron-right"></i> Thing2</a></li>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#data"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> data</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#schema"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> schema</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#sort"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> sort</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#multiEdit"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> multiEdit</a></li>
+                                    </ul>
+                                
+                                
+                            
+                            <li class="list-unstyled" ><a href=
+                                
+                                "./MakingAGrid.html#events"
+                                
+                            ><i class="fa fa-chevron-right"></i> Adding Functionality using Events</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                
+                                    
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#create"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> Create</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#edit"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> Edit</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#delete"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> Delete</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#upload"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> Upload</a></li>
+                                    </ul>
+                                
+                                    <ul>
+                                <li class="list-unstyled" ><a href=
+                                    
+                                        "./MakingAGrid.html#download"
+                                    
+                                    ><i class="fa fa-chevron-right"></i> Download</a></li>
                                     </ul>
                                 
                                 
@@ -131,9 +213,9 @@
     <a name="first_grid" style="display:block;position:relative;top:-40px"></a>
     <br>
     <h2>Making a Grid</h4>
-        <p>Here is what the construction of a GrapheneDataGrid looks like,</p>
-
-<pre><code class="prettyprint">var options = {
+    <ul>
+        <li>Here is what the construction of a GrapheneDataGrid looks like,</li>
+<li><pre><code class="prettyprint">var options = {
 //Make Desired options
 el : 'myContainer',
 data : [
@@ -146,25 +228,28 @@ schema : [
 };
 //Pass into Grid
 var first_grid = new GrapheneDataGrid(options);
-</code></pre>
+</code></pre></li>
 
-<p>The example above displays the only options <strong>required</strong> to make a grid.<br>
+<li>The example above displays the only options <strong>required</strong> to make a grid.<br>
 The required options are:
 <ul>
 <li>el : The html element where the grid will be located</li>
 <li>data : The data to populate the grid with</li>
 <li>schema : How the data will be displayed in the grid</li>
-</ul><br></p>
-<h5>We will go over every available option in detail below.</h5><hr>
+</ul><br></li>
+<li><h5>We will go over every available option in detail below.</h5><hr></li>
+
+</ul>
 
     
     <!--options -->
     <a name="options" style="display:block;position:relative;top:-40px"></a>
     <br>
-    <h3>Options</h3>
-    <p>- Object options : This is the only parameter passed into GrapheneDataGrid:<br></p>
-        <pre><code>&emsp;new GrapheneDataGrid(options)</code></pre>
-    <p>Some Key Notes about options:
+    <h3>(Object) Options</h3>
+    <ul>
+    <li>(Object) options : This is the only parameter passed into GrapheneDataGrid:<br></li>
+        <pre><code>&emsp;var grid_constructor = new GrapheneDataGrid(options)</code></pre>
+    <li>Some Key Notes about options:
         <ul>
             <li>Options is an Object, meaning it has multiple key value pairs</li>
             <li>You only have to pass in three of the total options,<ul>
@@ -174,13 +259,15 @@ The required options are:
             </ul></li>
             <li>Many of the options below have default values (which will be noted in the documentation below) which is why they are not required to create a grid</li>
         </ul>
-    </p>
+    </li>
+    </ul>
     <hr>
     <!-- Options: el -->
     <a name="el" style="display:block;position:relative;top:-40px"></a>
     <br>
-    <h4>el:</h4>
-    <p>
+    <h4>(HTML Element) el:</h4>
+    <ul>
+    <li>
         This is the HTML Element where the grid will be displayed. Both HTML Classes and ID's are valid containers 
 <pre><code>&lt;body&gt;
 &lt;div id="myIDContainer"&gt;&lt;/div&gt;
@@ -193,15 +280,19 @@ options = {  el : document.getElementByID('myIDContainer')  }
 options = {  el : document.getElementsByClassName('myClassContainer')[0]  }
 &lt;/script&gt;
 </code></pre>
-    </p>
+    </li>
+    </ul>
     <hr>
     <!-- Options: data -->
     <a name="data" style="display:block;position:relative;top:-40px"></a>
     <br>
-    <h4>data</h4>
-    <p>
-        Array data;<br>
-        This is an array of Objects where each object represents one row in the table.</p>
+    <h4>(Array) data:</h4>
+    <ul>
+    <li>
+        (Array) data = [ {Data Object 1}, {Data Object 2}];<br>
+        This is an array of Objects where each object represents one row in the table.<br>
+        Note all objects are independent of each other, so they could all contain the same data values.<br>
+    </li>
 <pre><code>&lt;script&gt;
 var options = {
 data : [ 
@@ -213,10 +304,23 @@ data : [
 }
 &lt;/script&gt;
 </code></pre><br>
+<br>
+<li>* <u>See the section "schema" below for an example of the 'data' field</u> *</li>
+</ul>
+<hr>
+<!-- End Options : data -->
 
-<p>Note all objects are independent of each other, so they could all contain the same data values.<br>
-The name of int the name:value pairs of the object are extremely important. For the data's values to be displayed the name value
-must match one of the name values of the schema (See Below)</p>
+<!-- Options: schema -->
+<a name="schema" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Array) schema:</h4>
+<ul>
+    <li> (Array) schema = [ { //Column #1 display format }, { //Column #2 display format } ]</li>
+    <li> Schema determines how each data object will be read in and displayed visually.</li>
+    <li> Schema is based on gforms, all possible values of schema can be found here: <a target="_blank" href="https://docs.escherlabs.com/GrapheneForms/docs.html#field_options">gforms Fields Doc</a><br>
+    Try out the demo section of gforms to get a grasp of how different forms will display: <a target="_blank" href="https://docs.escherlabs.com/GrapheneForms/demo.html">gforms Demo Page</a></li>
+<li>The name:value pairs of the objects are extremely important. For the data's values to be displayed the name value
+must match one of the name values of the schema (See Below)</li>
 <h4>Code:</h4>
 <pre><code>&lt;script&gt;
 var options = {
@@ -224,14 +328,16 @@ data : [
 //First Column of Data
 {number : 1, string : "value"},
 //Second Column of Data
-{number : 2, string : "value"}
+{number : 2, string : "value"},
+//Third Column of Data
+{number : 3, string : "value"}
 ],
 schema : [
-//The first row of data will be labeled 'Numbers', and will read the key-v 	alue 'number' from the data Objects.
-{type:'text', name:'number', label:'Numbers'},
-//the second row of data will be labeled 'Strings', and will read the key-value 'string' from the data Objects
-{type:'text', name:'string', label:'Strings'}
+    {type:'text', name:'number', label:'Numbers'},
+    {type:'text', name:'string', label:'Strings'}
 ],
+//The first row of data will be labeled 'Numbers', and will read the key-value 'number' from the data Objects.
+//the second row of data will be labeled 'Strings', and will read the key-value 'string' from the data Objects.
 filter: false
 }
 var Grid = new GrapheneDataGrid(options);
@@ -240,7 +346,22 @@ var Grid = new GrapheneDataGrid(options);
 </code></pre><br>
 <h4>Result:</h4>
 <div id="options_data_example"></div>
-<hr>
+</ul>
+
+<a name="sort" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Name) sort:</h4>
+<ul>
+    <li>(Name) sort = //Name of column taken from schema</li>
+    <li>If you pass a value into sort, then the column will be automatically sorted from greatest to least value on the table loading.</li>
+    <li>See Example Below:</li>
+</ul>
+<div id="options_sort_example"></div>
+
+<a name="multiEdit" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) multiEdit:</h4>
+
 
 <script type='text/javascript' src='assets/js/jquery.min.js'></script>
 <script type='text/javascript' src='assets/js/lodash.min.js'></script>
@@ -250,13 +371,15 @@ var Grid = new GrapheneDataGrid(options);
 <script src='assets/js/GrapheneDataGrid.full.js'></script>
 <script>
 
-var options = {
+var options_data = {
 el: '#options_data_example',
 data : [
 //First Column of Data
-{number : 1, string : "value"},
+{number : 3, string : "value"},
 //Second Column of Data
-{number : 2, string : "value"}
+{number : 2, string : "value"},
+//Third Column of Data
+{number : 1, string : "value"}
 ],
 filter: false,
 actions : [], upload: false, download:false, columns:false, entries:[], search:false,
@@ -267,7 +390,28 @@ schema : [
 {type:'text', name:'string', label:'Strings'}
 ]
 }
-var Grid = new GrapheneDataGrid(options);</script>
+var Grid1 = new GrapheneDataGrid(options_data);
+
+var options_sort = {
+el: '#options_sort_example',
+data : [
+//First Column of Data
+{number : 432, string : "value"},
+//Second Column of Data
+{number : 10000, string : "value"},
+//Third Column of Data
+{number : 3, string : "value"}
+],
+filter: false,
+actions : [], upload: false, download:false, columns:false, entries:[], search:false, sort: 'number',
+schema : [
+//The first Row of data will be labeled 'Numbers' and be in text form, and will read from the data objects the 'number' values
+{type:'text', name:'number', label:'Numbers'},
+//the second Row of data will be labed 'Strings' and be in text form, and will read from the data objects the 'string' values
+{type:'text', name:'string', label:'Strings'}
+]
+}
+var Grid2 = new GrapheneDataGrid(options_sort);</script>
     <hr>
     <footer>
         <p>&copy; Escher Labs 2019</p>
