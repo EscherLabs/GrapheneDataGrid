@@ -18,13 +18,32 @@ sideNavBar:
   - page: Making a Grid
     view: ./MakingAGrid.html
     subLinks:
-        - value: Options
+        - value: Options (Customizing the Grid)
           id: options
           subLinks:
-            - value: Thing1
-              id: Thing1
-            - value: Thing2
-              id: Thing2 Thing2
+            - value: el (Element)
+              id: el
+            - value: data
+              id: data
+            - value: schema
+              id: schema
+            - value: sort
+              id: sort
+            - value: multiEdit
+              id: multiEdit
+        - value: Adding Functionality using Events
+          id: events
+          subLinks:
+            - value: Create
+              id: create
+            - value: Edit
+              id: edit
+            - value: Delete
+              id: delete
+            - value: Upload
+              id: upload
+            - value: Download
+              id: download
 
 
 
