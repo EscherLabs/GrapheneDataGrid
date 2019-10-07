@@ -85,12 +85,12 @@ function gridModel (owner, initial, events) {
 
 				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+""});
 				if(typeof options !== 'undefined'){
-					this.display[item.name] = options.label
+					this.display[item.name] = options.label;
 				}else{
 					if(_.isFinite(this.attributes[item.name])){
 						options = _.find(temp.mapOptions.getoptions(),{value:parseInt(this.attributes[item.name])});
 					}if(typeof options !== 'undefined'){
-						this.display[item.name] = options.label
+						this.display[item.name] = options.label;
 					}else{
 						// this.display[item.name] = this.attributes[item.name];
 						if(item.template){

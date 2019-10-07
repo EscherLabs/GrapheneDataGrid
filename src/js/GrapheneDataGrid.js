@@ -214,14 +214,16 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = gform.normalizeField.call({options:{default:{type:'text'}}},val);
+		val = _.omit(gform.normalizeField.call({options:{default:{type:'text'}}},val),'parent');
 		name = val.name;
 		val.value = '';
 		switch(val.type){
 			case 'checkbox':
-				//Causing problems when array defined
-				val.options = [{label: 'False', value: 'false'}, {label: val.options[1] || 'True', value: val.options[1] || 'true'}];
 				val.format = {label:"{{label}}"}
+
+                var temp = new gform.mapOptions(val)
+                val.options = temp.getoptions();
+                val.options = _.defaults(val.options,[{label: 'False', value: 'false'},{label: 'True', value: 'true'}])
 			case 'radio':
 				val.type = 'select';
 			case 'select':
@@ -493,7 +495,9 @@ GrapheneDataGrid = function(options) {
 		this.$el = $el;
 
 		if($el.find('.filter').length) {
-			this.filter = new gform({collections:this.collections,name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },$el.find('.filter')[0]).on('input', function(){
+			this.filter = new gform({actions:[],collections:this.collections,name:'filter'+this.options.id,clear:false, fields: options.filterFields,default:{target:function(){
+                return '[name="'+this.name+'"],[data-inline="'+this.name+'"]'
+            },hideLabel:true,type:'text',format:{label: '{{label}}', value: '{{value}}'}} },$el.find('.filter')[0]).on('input', function(){
 				this.$el.find('[name="search"]').val('');
 				this.filterValues = this.filter.toJSON();
 				this.draw();
