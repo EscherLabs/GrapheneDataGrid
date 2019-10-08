@@ -229,8 +229,9 @@ GrapheneDataGrid = function(options) {
 			case 'select':
 				val.placeholder = false;
 				var temp = _.pick(val,['options','max','min','path','format'])
+				val = _.omit(val,['options','max','min','path','format'])
 				temp.type = 'optgroup';
-				val.options = [{type:'optgroup',options:[{label:'No Filter',value:null}],format:{label:"{{label}}"}},temp]
+				val.options = [{type:'optgroup',options:[{label:'No Filter',value:''}],format:{label:"{{label}}"}},temp]
 				break;
 
 		case 'smallcombo':
