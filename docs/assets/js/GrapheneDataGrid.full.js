@@ -1062,8 +1062,8 @@ GrapheneDataGrid.version = '0.0.4.1';
         return(score);
       }
     }
-    return(0.0);
-      // return( result );
+    // return(0.0);
+      return( result );
   },
 
   csvToArray: function(csvString) {

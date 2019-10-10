@@ -45,8 +45,8 @@
         return(score);
       }
     }
-    return(0.0);
-      // return( result );
+    // return(0.0);
+      return( result );
   },
 
   csvToArray: function(csvString) {
