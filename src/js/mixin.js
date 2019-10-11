@@ -46,7 +46,7 @@
       }
     }
     // return(0.0);
-      return( result );
+      return( false );
   },
 
   csvToArray: function(csvString) {

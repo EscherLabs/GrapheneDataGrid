@@ -234,10 +234,23 @@ GrapheneDataGrid = function(options) {
 				val.options = [{type:'optgroup',options:[{label:'No Filter',value:''}],format:{label:"{{label}}"}},temp]
 				break;
 
+		case 'fieldset':
+				val.type = 'text';
+
+				if(!val.template){
+					val.template = _.map(val.fields,function(field){
+						return '{{attributes.'+ val.name +'.'+field.name+'}}';
+					})
+					val.template = val.template.join('<br>');
+
+				}
+				val = _.omit(val,['fields'])
+				break;
+
 		case 'smallcombo':
 		case 'hidden':
 				break;
-			default:
+		default:
 				val.type = 'text';
 		}
 
@@ -1063,7 +1076,7 @@ GrapheneDataGrid.version = '0.0.4.1';
       }
     }
     // return(0.0);
-      return( result );
+      return( false );
   },
 
   csvToArray: function(csvString) {
