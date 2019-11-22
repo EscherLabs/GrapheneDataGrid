@@ -214,7 +214,7 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call({options:{default:{type:'text'}}},val),'parent');
+		val = _.omit(gform.normalizeField.call({options:{default:{type:'text'}}},val),'parent','columns');
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -340,7 +340,7 @@ GrapheneDataGrid = function(options) {
 			if(typeof options.create == 'object'){
 				fields = options.create.fields;
 			}
-			new gform({name:'modal',data:options.defaultData,table:this,collections:this.collections,methods:this.methods, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
+			new gform({name:'modal',data:options.defaultData,table:this,collections:this.collections,methods:this.methods,events:(options.create||options.form||{}).events, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
 				if(e.form.validate(true)){
 					this.add(e.form.get(),{validate:false})
 					e.form.trigger('close');
@@ -361,7 +361,7 @@ GrapheneDataGrid = function(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						new gform({collections:this.collections,methods:this.methods,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
 							if(e.form.validate(true)){
 								var newValues = e.form.get();
 								_.map(selectedModels,function(model){
@@ -384,7 +384,7 @@ GrapheneDataGrid = function(options) {
         if(typeof options.edit == 'object'){
           fields = options.edit.fields;
         }
-				new gform({collections:this.collections,methods:this.methods,name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:fields} ).on('save', function(e) {
+				new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:fields} ).on('save', function(e) {
 					if(e.form.validate(true)){
 						this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
 						this.eventBus.dispatch('edited')
@@ -689,12 +689,7 @@ GrapheneDataGrid = function(options) {
 				processSort(sortField);
 			}
 		}.bind(this))
-
-
 		
-
-
-
 		//Mobile
 		this.$el.on('change', '.sortBy', function(e) {
 			if(e.currentTarget.value !== ''){
