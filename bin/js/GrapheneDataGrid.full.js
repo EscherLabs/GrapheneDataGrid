@@ -269,6 +269,7 @@ GrapheneDataGrid = function(options) {
 		// val.isEnabled = true;
 		val.edit = true;
 		val.help = '';
+		val.array = false;
 		return val;
 	});
 	if(typeof options.columns == 'object'){
