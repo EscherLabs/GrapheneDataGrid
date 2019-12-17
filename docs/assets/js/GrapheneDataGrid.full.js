@@ -228,6 +228,7 @@ GrapheneDataGrid = function(options) {
 				val.type = 'select';
 			case 'select':
 				val.placeholder = false;
+				val.multiple = false;
 				var temp = _.pick(val,['options','max','min','path','format'])
 				val = _.omit(val,['options','max','min','path','format'])
 				temp.type = 'optgroup';
@@ -266,6 +267,8 @@ GrapheneDataGrid = function(options) {
 		val.search = val.name;
 		val.name = val.id;
 		val.show = {};
+
+		delete val.size;
 		// val.isEnabled = true;
 		val.edit = true;
 		val.help = '';
