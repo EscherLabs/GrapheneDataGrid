@@ -266,8 +266,10 @@ GrapheneDataGrid = function(options) {
 		val.id = val.id || gform.getUID();
 		val.search = val.name;
 		val.name = val.id;
-		val.show = {};
-
+		val.show = [];
+		val.edit = [];
+		val.show = [];
+		delete val.delete;
 		delete val.size;
 		// val.isEnabled = true;
 		val.edit = true;
