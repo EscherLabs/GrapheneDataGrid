@@ -45,8 +45,8 @@
         return(score);
       }
     }
-    return(0.0);
-      // return( result );
+    // return(0.0);
+      return( false );
   },
 
   csvToArray: function(csvString) {
@@ -77,7 +77,11 @@
     labels = _.map(columns,'name')
     var empty = _.zipObject(labels, _.map(labels, function() { return '';}))
     csv += _.map(data,function(d){
-        return JSON.stringify(_.map(_.values(_.extend(empty,_.pick(d,labels))),function(item){return item.split('"').join('""');}))
+        return JSON.stringify(_.map(_.values(_.extend(empty,_.pick(d,labels))),function(item){
+          if(typeof item == 'string'){
+            return item.split('"').join('""');
+          }else{return item}
+        }))
         //return JSON.stringify(_.values(_.extend(empty,_.pick(d,labels))))
     },this)
     .join('\n') 

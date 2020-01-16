@@ -13,11 +13,11 @@ title: Making a Grid
 //Make Desired options
 el : 'myContainer',
 data : [
-{data : "myData"},
-{data : "This is an array"}
+{column1 : "myData"},
+{column1 : "This is an array"}
 ],
 schema : [
-{type:'text', name:'data', label:'data', required: 'true'}
+{type:'text', name:'column1', label:'This is Column1', required: 'true'}
 ]
 };
 //Pass into Grid
@@ -83,7 +83,7 @@ options = {  el : document.getElementsByClassName('myClassContainer')[0]  }
     <h4>(Array) data:</h4>
     <ul>
     <li>
-        (Array) data = [ {Data Object 1}, {Data Object 2}];<br>
+        (Array) data = [ {Data Object 1}, {Data Object 2}, ... ];<br>
         This is an array of Objects where each object represents one row in the table.<br>
         Note all objects are independent of each other, so they could all contain the same data values.<br>
     </li>
@@ -109,7 +109,7 @@ data : [
 <br>
 <h4>(Array) schema:</h4>
 <ul>
-    <li> (Array) schema = [ { //Column #1 display format }, { //Column #2 display format } ]</li>
+    <li> (Array) schema = [ { //Column #1 display format }, { //Column #2 display format }, ... ]</li>
     <li> Schema determines how each data object will be read in and displayed visually.</li>
     <li> Schema is based on gforms, all possible values of schema can be found here: <a target="_blank" href="https://docs.escherlabs.com/GrapheneForms/docs.html#field_options">gforms Fields Doc</a><br>
     Try out the demo section of gforms to get a grasp of how different forms will display: <a target="_blank" href="https://docs.escherlabs.com/GrapheneForms/demo.html">gforms Demo Page</a></li>
@@ -144,10 +144,10 @@ var Grid = new GrapheneDataGrid(options);
 
 <a name="sort" style="display:block;position:relative;top:-40px"></a>
 <br>
-<h4>(Name) sort:</h4>
+<h4>(ColumnName) sort:</h4>
 <ul>
     <li>(Name) sort = //Name of column taken from schema</li>
-    <li>If you pass a value into sort, then the column will be automatically sorted from greatest to least value on the table loading.</li>
+    <li>If you pass a value into sort, then the column will be automatically sorted in decreasing order when the table loads.</li>
     <li>See Example Below:</li>
 </ul>
 <div id="options_sort_example"></div>
@@ -155,6 +155,217 @@ var Grid = new GrapheneDataGrid(options);
 <a name="multiEdit" style="display:block;position:relative;top:-40px"></a>
 <br>
 <h4>(Boolean) multiEdit:</h4>
+<ul>
+    <li>(Boolean) multiEdit = True //or False</li>
+    <li>######TODO###########</li>
+</ul>
+
+<a name="entries" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Array[Integers]) entries:</h4>
+<ul>
+    <li>(Array of Integers) entries = [ 25,50,75]</li>
+    <li>Allows user to select the maximum number of elements displayed. The default number of elements displayed is set by <b>'count'</b>. Read more on <b>'count'</b> below</li>
+    <li><b>Default:</b> [25,50,100]</li>
+</ul>
+
+<a name="count" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Integer) count:</h4>
+<ul>
+    <li>(Integer) count = 25</li>
+    <li>Defines the number of elements that will be displayed when the grid first loads.</li>
+    <li><b>Default:</b> 25</li>
+</ul>
+
+<a name="search" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) search:</h4>
+<ul>
+    <li>(Boolean) search = True //or False</li>
+    <li>Defines if a search bar is present or not. Search bar is located at the top right of the datagrid if enabled.</li>
+    <li><b>Default:</b> True</li>
+</ul>
+
+<a name="filter" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) filter:</h4>
+<ul>
+    <li>(Boolean) filter = True //or False</li>
+    <li>Defines columns may be filtered by the user or not. Filter bars are located at the top of every column if enabled.</li>
+    <li><b>Default:</b> True</li>
+</ul>
+
+<a name="columns" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) columns:</h4>
+<ul>
+    <li>(Boolean) columns = True //or False</li>
+    <li>Enables or disables the ability to select which columns are currently displayed.</li>
+    <li><b>Default:</b> True</li>
+</ul>
+
+<a name="upload" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) upload:</h4>
+<ul>
+    <li>(Boolean) upload = True //or False</li>
+    <li>Enables or disables the ability to upload .csv files into the datagrid.</li>
+    <li><b>Default:</b> True</li>
+</ul>
+
+<a name="download" style="display:block;position:relative;top:-40px"></a>
+<br>
+<h4>(Boolean) download:</h4>
+<ul>
+    <li>(Boolean) download = True //or False</li>
+    <li>Enables or disables the ability to download the current data populating the datagrid into a .csv file.</li>
+    <li><b>Default:</b> True</li>
+</ul>
+
+<hr>
+<hr>
+
+<a name="events" style="display:block;position:relative;top:-40px"></a>
+<a name = 'actions' style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h3>Functionality and Events</h3>
+    
+    <br>
+    <ul>
+        <li><b>Summary:</b> GrapheneDataGrid allows for custom create, edit, and delete functionality along with the ability to create custom
+        actions.</li>
+
+        <li><b>Actions</b> is another <a href="#options">Option</a> that can be passed into the GrapheneDataGrid.
+        Actions can remove or replace any default datagrid action: Create, Edit, or Delete. <br>
+        Custom actions can be defined using actions as well.</li>
+        <li><b>Default value of actions is below:</b></li>
+    </ul>
+
+    <pre><code>
+    actions: [
+        {name: "create", type: "success", min: 0, label: '<i "class=fa fa-pencil-square-o"></i> New'}, "|",
+        {name: "edit", type: "primary", min: 1, max: 1, label: '<i class="fa fa-pencil hidden"></i> Edit'}, "|",
+        {name: "delete", type: "danger", min: 1, max: 1, label: '<i class="fa fa-times"></i> Delete'}
+        ],
+    </code></pre>
+    <ul>
+        <li><b>(String) name :</b> the defined name of the event</li>
+        <li><b>(String) type:</b> the defined type of the event.</li>
+        <li><b>(Integer) min:</b> the defined type of the event.</li>
+
+    </ul>
+<br>
+    <ul>
+        <li><b>Events</b> are what gives actions their functionality.</li>
+        <li>When an event is triggered on the datagrid, such as the <u>'create'</u> event, a defined function associated with that event is triggered.</li>
+        <li>To map a grid event to a function, append the following to any datagrid creation:<br> .on( Eventname, function(e) )<br>
+        <b>Eventname</b> is the name of the triggered event and <b>function(e)</b> is a function to be executed. 
+        The <b>e parameter</b> is an object containing the event and information associated with the event, such as the datagrid that the event was triggered on. Any defined function can also be put in place of function(e).
+        <li><b>NOTE</b> that if you define a function the first parameter will always be the event object.</li>
+        <li>See the Example below on how to add functionality to a datagrid:</li>
+    </ul>
+<br>
+
+    <h2>Code:</h2>
+    <br>
+    <pre><code>
+        var custom = function(e){
+            var a = document.getElementById('toggleclass');
+            a.innerText = "Custom Commands Rock!";
+            }
+        var events_grid = new GrapheneDataGrid({
+            el : '#eventsgrid',
+            data : [
+                { middlename: "Scott"},
+                { middlename: "Tim"}
+            ],
+            schema : [{type: 'text', name : 'middlename', label : 'Someones Middle Name'}],
+            actions: [
+                {name: "create", type: "success", min: 0, label: '<i "class=fa fa-pencil-square-o"></i> New'}, "|",
+                {name: "customevent", type: "primary", min: 0, label: '<i "class=fa fa-pencil-square-o"></i> Custom'}, "|",
+                {name: "delete", type: "danger", min: 1, max: 1, label: '<i class="fa fa-times"></i> Delete'}
+                ],
+        }).on('customevent', custom)
+            .on('create', function(e){
+                e.preventDefault();
+                //Create Some Stuff!
+            });
+    </code></pre>
+    <p>-    In this code the <b>'delete'</b> event has the default functionality because no function is explicitly mapped to it. Try it out by selecting an element! <br>
+    -   The <b>'new'</b> event has custom functionality mapped to it. Note the 'preventDefault()' function. This will stop any default behaviors from occuring while you map your custom functions. Try it out!<br>
+    -   Finally we have our <b>'custom'</b> event that we created. We made the function custom(e) which will ad some text to an HTML element. Try it out!</p>
+    <p><b>NOTE: We removed the 'edit' event.</b></p>
+    <p><b>NOTE: Adding the "|" after any event item in 'actions' helps with the spacing of the grid buttons but is not required.</b></p>
+
+    <h2>Grid:</h2>
+
+    <div id="toggleclass"></div>
+    <div id="eventsgrid"></div>
+
+
+    <a name="create" style="display:block;position:relative;top:-40px"></a>
+    <br>
+
+    <h4>(Event) create</h4>
+    <p>Info</p>
+
+    <a name="created" style="display:block;position:relative;top:-40px"></a>
+    <br>
+
+    <h4>(Event) created</h4>
+    <p>Info</p>
+
+    <a name="model:create" style="display:block;position:relative;top:-40px"></a>
+    <br>
+
+    <h4>(Event) model:create</h4>
+    <p>Info</p>
+
+    <a name="model:created" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) model:created</h4>
+    <p>Info</p>
+
+    <a name="edit" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) edit</h4>
+    <p>Info</p>
+
+    <a name="edited" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) edited</h4>
+    <p>Info</p>
+
+    <a name="model:edit" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) model:edit</h4>
+    <p>Info</p>
+
+    <a name="model:edited" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) model:edited</h4>
+    <p>Info</p>
+
+    <a name="delete" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) delete</h4>
+    <p>Info</p>
+
+    <a name="deleted" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) deleted</h4>
+    <p>Info</p>
+
+    <a name="model:delete" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) model:delete</h4>
+    <p>Info</p>
+
+    <a name="model:deleted" style="display:block;position:relative;top:-40px"></a>
+    <br>
+    <h4>(Event) model:deleted</h4>
+    <p>Info</p>
 
 
 <script type='text/javascript' src='assets/js/jquery.min.js'></script>
@@ -205,4 +416,28 @@ schema : [
 {type:'text', name:'string', label:'Strings'}
 ]
 }
-var Grid2 = new GrapheneDataGrid(options_sort);</script>
+var Grid2 = new GrapheneDataGrid(options_sort);
+
+var custom = function(e){
+    var e = document.getElementById('toggleclass');
+    e.innerText = "Custom Commands Rock!";
+    }
+var events_grid = new GrapheneDataGrid({
+    el : '#eventsgrid',
+    data : [
+        { middlename: "Scott"},
+        { middlename: "Tim"}
+    ],
+    schema : [{type: 'text', name : 'middlename', label : 'Someones Middle Name'}],
+    actions: [
+        {name: "create", type: "success", min: 0, label: '<i "class=fa fa-pencil-square-o"></i> New'}, "|",
+        {name: "customevent", type: "primary", min: 0, label: '<i "class=fa fa-pencil-square-o"></i> Custom'}, "|",
+        {name: "delete", type: "danger", min: 1, max: 1, label: '<i class="fa fa-times"></i> Delete'}
+        ],
+}).on('customevent', custom)
+    .on('create', function(e){
+        e.preventDefault();
+        //Create Some Stuff!
+    });
+
+</script>

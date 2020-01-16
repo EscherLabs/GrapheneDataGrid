@@ -31,19 +31,49 @@ sideNavBar:
               id: sort
             - value: multiEdit
               id: multiEdit
-        - value: Adding Functionality using Events
-          id: events
-          subLinks:
-            - value: Create
-              id: create
-            - value: Edit
-              id: edit
-            - value: Delete
-              id: delete
+            - value: entries
+              id: entries
+            - value: count
+              id: count
+            - value: search
+              id: search
+            - value: filter
+              id: filter
+            - value: columns
+              id: columns
             - value: Upload
               id: upload
             - value: Download
               id: download
+        - value: Functionality and Events
+          id: events
+          subLinks:
+            - value: actions
+              id: actions
+            - value: create
+              id: create
+            - value: created
+              id: created
+            - value: model:create
+              id: model:create
+            - value: model:created
+              id: model:created
+            - value: edit
+              id: edit
+            - value: edited
+              id: edited
+            - value: model:edit
+              id: model:edit
+            - value: model:edited
+              id: model:edited
+            - value: delete
+              id: delete
+            - value: deleted
+              id: deleted
+            - value: model:delete
+              id: model:delete
+            - value: model:deleted
+              id: model:deleted
 
 
 
