@@ -39,7 +39,7 @@ The required options are:
     <!--options -->
     <a name="options" style="display:block;position:relative;top:-40px"></a>
     <br>
-    <h3>(Object) Options</h3>
+    <h2>(Object) Options</h2>
     <ul>
     <li>(Object) options : This is the only parameter passed into GrapheneDataGrid:<br></li>
         <pre><code>&emsp;var grid_constructor = new GrapheneDataGrid(options)</code></pre>
@@ -158,10 +158,10 @@ var Grid = new GrapheneDataGrid(options);
 <ul>
     <li>(Array[ColumnNames]) multiEdit = [ ColumnName1, ColumnName2 ]</li>
     <li><b>Default:</b> []</li>
-    <li>multiEdit allows multiple elements to be edited at the same time under the following conditions:
+    <li>multiEdit allows multiple models to be edited at the same time under the following conditions:
         <ul>
             <li>Only columns included in the multiEdit array may be edited.</li>
-            <li>Every selected element must have the same value in the respective column</li>
+            <li>Every selected model must have the same value in its respective column</li>
         </ul>
     </li>
     <li><b>Example: Select all columns below and press edit</b></li>
@@ -195,7 +195,7 @@ var Grid = new GrapheneDataGrid(options);
 <h4>(Array[Integers]) entries:</h4>
 <ul>
     <li>(Array of Integers) entries = [ 25,50,75]</li>
-    <li>Allows user to select the maximum number of elements displayed. The default number of elements displayed is set by <b>'count'</b>. Read more on <b>'count'</b> below</li>
+    <li>Allows user to change the number of models displayed. The initial number of models displayed is set by <b>'count'</b>. Read more on <b>'count'</b> below</li>
     <li><b>Default:</b> [25,50,100]</li>
 </ul>
 
@@ -204,7 +204,7 @@ var Grid = new GrapheneDataGrid(options);
 <h4>(Integer) count:</h4>
 <ul>
     <li>(Integer) count = 25</li>
-    <li>Defines the number of elements that will be displayed when the grid first loads.</li>
+    <li>Defines the number of models that will be displayed when the grid first loads.</li>
     <li><b>Default:</b> 25</li>
 </ul>
 
@@ -259,7 +259,7 @@ var Grid = new GrapheneDataGrid(options);
 <a name="events" style="display:block;position:relative;top:-40px"></a>
 <a name = 'actions' style="display:block;position:relative;top:-40px"></a>
     <br>
-    <h3>Functionality and Events</h3>
+    <h2>Functionality and Events</h2>
     
     <br>
     <ul>
@@ -283,8 +283,8 @@ var Grid = new GrapheneDataGrid(options);
     <ul>
         <li><b>(String) name :</b> the defined name of the event</li>
         <li><b>(String) type:</b> the defined type of the event. Examples: "success", "primary", "danger" (See <a href="https://getbootstrap.com/docs/4.0/components/buttons/" target="_blank" >Bootstrap Classes)</a> for more</li>
-        <li><b>(Integer) min:</b> the minimum number of elements that must be selected for this action to be available for use.</li>
-        <li><b>(Integer) max:</b> the minimum number of elements that can be selected for this action to be available for use.</li>
+        <li><b>(Integer) min:</b> the minimum number of models that must be selected for this action to be available for use.</li>
+        <li><b>(Integer) max:</b> the minimum number of models that can be selected for this action to be available for use.</li>
         <li><b>All of these values are adjustable.</b></li>
 
     </ul>
@@ -328,7 +328,7 @@ var Grid = new GrapheneDataGrid(options);
                 //Create Some Stuff!
             });
     </code></pre>
-    <p>-    In this code the <b>'delete'</b> event has the default functionality because no function is explicitly mapped to it. Try it out by selecting an element! <br>
+    <p>-    In this code the <b>'delete'</b> event has the default functionality because no function is explicitly mapped to it. Try it out by selecting a model! (Click on a checkbox on the left-side of the grid) <br>
     -   The <b>'new'</b> event has custom functionality mapped to it. Note the 'preventDefault()' function. This will stop any default behaviors from occuring while you map your custom functions. Try it out!<br>
     -   Finally, we have the <b>'custom'</b>. We made the function custom(e) which will ad some text to an HTML element. Try it out!</p>
     <p><b>NOTE: We removed the 'edit' event.</b></p>
@@ -358,8 +358,8 @@ var Grid = new GrapheneDataGrid(options);
 
     <h4>(Event) create</h4>
     <ul>
-        <li>Pressing the 'new' button by default will trigger a modal (window pop-up) to appear on the screen prompting the creation of a new table element.</li>
-        <li>The 'create' event is triggered when save' is pressed on the model. Try: .on('create', function(e){ e.preventDefault() } to prevent default behavior and define your own create function.</li>
+        <li>Pressing the 'new' button by default will trigger a modal (window pop-up) to appear on the screen prompting the creation of a new table model.</li>
+        <li>The 'create' event is triggered when save is pressed on the model. Try: .on('create', function(e){ e.preventDefault() } to prevent default behavior and define your own create function.</li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('create', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -368,7 +368,7 @@ var Grid = new GrapheneDataGrid(options);
 
     <h4>(Event) created</h4>
     <ul>
-        <li>The 'created' event is triggered after the element has been created and visually displayed in the DataGrid. </li>
+        <li>The 'created' event is triggered after a model has been created and visually displayed in the DataGrid. </li>
         <li><b>Triggers after the 'create' event.</b></li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('created', function(e){ //DOSTUFF })</li>
     </ul>
@@ -377,10 +377,10 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) model:created</h4>
     <ul>
-        <li>The 'model:created' event is similar to the 'created' event. It is triggered after the element has been created and visually displayed in the DataGrid.</li>
-        <li>The <b>difference between 'model:created' and 'created'</b> is that the first parameter of the function triggerd by 'model:created' contains a reference to the newly created element.</li>
-        <li>Use the new elements reference to change the visual display of the element in the grid.</li>
-        <li>Use 'model:created' to trigger a function that will <b>persistently store the new element</b>, such as in a .csv file or a database.</li>
+        <li>The 'model:created' event is similar to the 'created' event. It is triggered after a model has been created and visually displayed in the DataGrid.</li>
+        <li>The <b>difference between 'model:created' and 'created'</b> is that the first parameter of the function triggerd by 'model:created' contains a reference to the newly created model.</li>
+        <li>Use the new model's reference to change the visual display of the model in the grid.</li>
+        <li>Use 'model:created' to trigger a function that will <b>persistently store the new model</b>, such as in a .csv file or a database.</li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('model:created', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -388,7 +388,8 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) edit</h4>
     <ul>
-        <li>'edit' is called the instant the edit button is selected. The <b>default behavior</b> allows one element to be edited at a time.</li>
+        <li>'edit' is called the instant the edit button is selected.</li>
+        <li><b>Default:</b> allows one model to be edited at a time. Editing allows values to be updated.</li>
         <li>Use .on('edit', function(e){ e.preventDefault() } to stop default behavior and define a custom edit function.</li>
         <li> See <a href="#actions">'actions'</a> to learn more about adjusting 'edit's default settings.</li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('edit', function(e){ //DOSTUFF })</li>
@@ -398,7 +399,7 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) edited</h4>
     <ul>
-        <li>The 'edited' event is triggered after the element has been created and visually displayed in the DataGrid.</li>
+        <li>The 'edited' event is triggered after a model has been created and visually displayed in the DataGrid.</li>
         <li><b>Triggers after the 'edit' event.</b></li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('edited', function(e){ //DOSTUFF })</li>
     </ul>
@@ -410,8 +411,8 @@ var Grid = new GrapheneDataGrid(options);
         <li>'model:edit is triggered at the same time as <a href="#edit">'edit'</a>. </li>
         <li><b>The differences are:</b></li>
         <ul>
-            <li>'model:edit' contains a reference to the element (model) that is currently being edited</li>
-            <li>If multiple elements are selected to be edited ( and the correct behavior is set for multiple elements to be edited), 'model:edit' will be called for each selected element.</li>
+            <li>'model:edit' contains a reference to the model that is currently being edited.</li>
+            <li>If multiple models are selected to be edited (this is possible by changing the defualt behavior has been changed to allow multiple models to be edited), 'model:edit' will be called for each selected model.</li>
         </ul>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('model:edit', function(e){ //DOSTUFF })</li>
     </ul>
@@ -420,7 +421,8 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) model:edited</h4>
     <ul>
-
+        <li>'model:edited' contains a reference to the model that has finished being edited.</li>
+        <li>In other words, after you edit a model and press save, this event triggers.</li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('model:edited', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -428,7 +430,10 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) delete</h4>
     <ul>
-
+        <li>'delete' is triggered once the delete button has been pressed.</li>
+        <li><b>Default:</b> Deletes one, and only one, model from the table, removing it from the tables data as well as visually.</li>
+        <li><b>Use 'delete'</b> to call functions that update external data sources, such as databases or .csv sheets.</li>
+        <li><b>Note: You can call e.preventDefault() to prevent default behavior</b></li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('delete', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -436,7 +441,8 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) deleted</h4>
     <ul>
-
+        <li>'deleted' is triggered once a model has been deleted.</li>
+        <li>Use this to display Success or Error messages for deletion</li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('deleted', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -444,7 +450,14 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) model:delete</h4>
     <ul>
-
+        <li>'model:delete' is similar to 'delete' as they are both triggered once the delete button is pressed; 
+            <br>However, 'model:delete' additionally contains a reference to the model to be deleted. </li>
+            <li><b>Use 'model:delete'</b> when:
+                <ul>
+                    <li>You want a reference to the model you are deleting or</li>
+                    <li>you have overidden the default delete functionality to delete multiple models at once, and would like references to each model.</li>
+                </ul></li>
+            <li><b>Note: See <a href="#delete">'delete'</a> for default deletion functionality.</b></li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('model:delete', function(e){ //DOSTUFF })</li>
     </ul>
 
@@ -452,7 +465,9 @@ var Grid = new GrapheneDataGrid(options);
     <br>
     <h4>(Event) model:deleted</h4>
     <ul>
-
+        <li>'model:deleted' is similar to 'deleted' as they are both triggered once a model has been deleted; 
+            <br>However, 'model:deleted' additionally contains a reference to the model that was deleted. </li>
+            <li><b>Note: See <a href="#deleted">'deleted'</a> for information on its functionality.</b></li>
         <li><b>Example:</b> new GrapheneDataGrid( ... ).on('model:deleted', function(e){ //DOSTUFF })</li>
     </ul>
 

@@ -1,6 +1,6 @@
 topNavBar: 
 
-- name: Docs
+- name: Documentation
   link: ./WhatIs.html
 - name: Demo
   link: ./demo.html
@@ -74,6 +74,3 @@ sideNavBar:
               id: model:delete
             - value: model:deleted
               id: model:deleted
-
-
-

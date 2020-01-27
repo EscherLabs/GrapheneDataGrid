@@ -37,37 +37,20 @@
                 <li >
                     <a href="./WhatIs.html"><i 
                         class="fa fa-life-ring"
-                    >Docs</i></a>
+                    > Documentation</i></a>
                 </li>
                 
                 <li >
                     <a href="./demo.html"><i 
                         class="fa fa-flask"
-                    >Demo</i></a>
+                    > Demo</i></a>
                 </li>
                 
 			</ul>
 		</div><!-- /.nav-collapse -->
     </div><!-- /.container -->
 </div><!-- /.navbar -->
-		<!-- <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="">
-		<meta name="author" content="Adam Smallcomb">
-		
-		<title>Graphene Data Grid</title>
-
-		<link rel='stylesheet' type='text/css' href='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'>
-		<link rel='stylesheet' type='text/css' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
-		<link rel='stylesheet' type='text/css' href='assets/css/demo.css'>
-		<link rel='stylesheet' type='text/css' href='assets/vendor/css/colorpicker.min.css'>
-
-	</head> -->
-
-	<body>		
+			<body>		
 		<div class="container">
 			<div class="row">
  				<div class="col-md-12 col-xs-12">
@@ -75,15 +58,15 @@
 
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#first" aria-controls="first" role="tab" data-toggle="tab">First</a></li>
-    <li role="presentation"><a href="#second" aria-controls="second" role="tab" data-toggle="tab">Second</a></li>
-    <li role="presentation"><a href="#third" aria-controls="third" role="tab" data-toggle="tab">Third</a></li>
+    <!-- <li role="presentation"><a href="#second" aria-controls="second" role="tab" data-toggle="tab">Second</a></li> -->
+    <!-- <li role="presentation"><a href="#third" aria-controls="third" role="tab" data-toggle="tab">Third</a></li> -->
   </ul>
 
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="first">...</div>
-    <div role="tabpanel" class="tab-pane" id="second">...</div>
-    <div role="tabpanel" class="tab-pane" id="third">...</div>
+    <!-- <div role="tabpanel" class="tab-pane" id="second">...</div> -->
+    <!-- <div role="tabpanel" class="tab-pane" id="third">...</div> -->
   </div>
 
 </div>
@@ -99,76 +82,29 @@
 
 
 		<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
-		<!-- <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js'></script> -->
-
-		<!-- // <script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3//jquery-ui.min.js'></script> -->
-
 		<script type="text/javascript" src="assets/js/lodash.min.js"></script>
 		<script type="text/javascript" src="assets/js/sortable.js"></script>
 		<script type='text/javascript' src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>	
 		<script type="text/javascript" src="assets/js/gform_bootstrap.min.js"></script>
-		<!-- <script type="text/javascript" src="assets/js/bin/gform.js"></script> -->
-		<!-- <script type="text/javascript" src="assets/js/gform.js"></script> -->
 		<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="assets/js/GrapheneDataGrid.full.js"></script>
-		
-		<!-- <script type='text/javascript' src='assets/js/form.cob.js'></script> -->
 		<script type='text/javascript' src='../data/data.js'></script>	
 		<script type='text/javascript' src='assets/js/model.js'></script>
-		<!-- <script type='text/javascript' src='../src/js/view.js'></script> -->
 		<script type='text/javascript' src='assets/js/mixin.js'></script>
 
 		<script type='text/javascript' src='assets/js/views.js'></script>
-		<!-- <script type='text/javascript' src='src/js/view.js'></script>
-		<script type='text/javascript' src='src/js/model'></script>
-		<script type='text/javascript' src='src/js/utils.js'></script>
-		<script type='text/javascript' src='src/js/views.js'></script>-->
 
 		<script type='text/javascript'>
 		var options = {el: '#first',
-				// filter: false,
-				// sort: false,
-				// search: false,
-				// columns: false,
-				// upload:false,
-				// download:false,
 				autoSize: 10,
 				multiEdit:['gform_id', 'status'],
 				title:'Demo Content',
-				// editComplete:function(models){
-
-				// 	console.log(models)
-				// },
-				// create:{},
 				edit:{fields:[
 					{type:"text", name:"order2", label:"Order2",type:'select',placeholder:"Select one",options:["asfdasdfnasldfjl;asjdlfka"]}
 				]},
-				// click: function(model){
-				// 	model.toggle();
-				// },
 				name:"bt",
 				entries:[2,5,10],
 				count:10000,
-				// defaultSort: 'order',
-				onSort: function(){
-
-				},
-// 				item_template: `<tr><td colspan="100%" class="filterable">		
-// 	
-
-// 	<span style="">
-// 		<input type="checkbox" #checkedchecked="checked"/checked data-event="mark" style="margin: 0 8px 0 4px;">
-//    	</span>
-// 		
-// <div>
-// 	
-// 	<div class="row" style="min-width:85px"><span class="col-sm-3" style="text-align:right"><b>:</b></span><span class="col-sm-9 col-xs-12">}</span></div>
-// 	
-// 	</div>
-// </td></tr>`,
-				// preDraw: function(model){
-				// 	model.stuff = 'yippe';
-				// },
 				actions:[
 					{type:"success",name:'create',min:0,label:'<i class="fa fa-pencil-square-o"></i> Newest' },
 					{type:"info",name:'sort',min:0,max:0,label:'<i class="fa fa-pencil-sort"></i> sort' },
@@ -178,15 +114,7 @@
 					'|',
 					{type:"danger",name:'delete',min:1,max:100,label:'<i class="fa fa-times"></i> Delete' },
 				],
-				// actions:[
-				// 	{'name': 'manage', 'label': '<i class="fa fa-cogs"></i> Manage', callback: function(model){
-				// 		console.log(model.attributes);
-				// 	}, multiEdit: true, complete: function(){alert('Manage');}},
-				// 	{'name': 'sort', 'label': '<i class="fa fa-sort"></i> Sort', 
-				// 	callback: function(collection){
-				// 		console.log(collection[0].attributes);
-				// 	}, global: true}
-				// ],
+
 				events:{'model:set':[function(e){
 					e.model.stuff = 'yippe';
 				}]},
@@ -221,93 +149,23 @@
         // },
 				// {type:"contenteditable", name:"test", label:"Test", required:false, template:"}"},
 				{type:"select", name:"status", label: "Status", default: {name: 'External (no auth)', value: 'External', target:''}, showColumn: true,format:{label:''}, options:'./assets/js/options.json'}
-
 			], data: data}
-
-			// bt = new GrapheneDataGrid(options).on('model:manage',function(e){
-			// 	console.log(e.model.attributes);
-			// }).on('model:add',function(e){
-			// 	// e.preventDefault();
-			// 	console.log(e.table.models[0].attributes);
-			// }).on('delete',function(e){
-			// 	if(typeof e.model !== 'undefined'){
-			// 		e.preventDefault();
-			// 		e.model.delete();
-			// 		e.table.draw();
-			// 	}else{
-			// 		if(e.table.getSelected().length > 1){
-			// 			e.preventDefault();
-			// 		}
-			// 	}
-			// }).on('added',function(e){
-			// 	// e.model.waiting(true);
-			// 	// e.model.owner.draw();
-			// }).on('click',function(e){
-			// 	// e.model.waiting = false;
-			// 	e.model.toggle();
-
-			// 	// e.model.waiting(!e.model.waiting());
-
-
-			// }).on('draw',function(){
-			// 	debugger;
-			// })
-
-			// options.schema = [
-			// 	{name:"Favorite Food",label:"Favorite Food"},
-			// 	{name:"Birthday",label:"Birthday"},
-			// 	{name:"Full Name (last,first)",label:"Full Name (last,first)"},
-			// 	{name:"Favorite Color",label:"Favorite Color"},
-
-			// ]
-			// options.data = []
-
-			grid = new GrapheneDataGrid(options);
 			
-			new GrapheneDataGrid($.extend({},options,{el: '#second', name: 'second'}))
-			new GrapheneDataGrid($.extend({},options,{el: '#third', name: 'third'}))
-			// bt = new GrapheneDataGrid({
-			// 	container: '#first',
-			// 	search: false,
-			// 	columns: false,
-			// 	upload:false,
-			// 	download:false,
-			// 	edit:false,
-			// 	add: true,
-			// 	click: function(model){
-			// 		model.toggle();
-			// 	},
-			// 	delete:true,
-			// 	entries:[],
-			// 	count:1,
-			// 	schema:[
-			// 		{type:"text", name:"name", label:"Name", required:true},
-			// 	], data: [
-			// 	{name:'first'},
-			// 	{name:'second'},
-			// ]})
-			
-           // bt = new GrapheneDataGrid({container:'#first',
-           // search: false,columns: false,upload:false,download:false,title:'Demo Content',
-           // edit:true,
-           // add: true,
-           // click: function(model){model.toggle();},
-           // delete:true,
-           // entries:[],
-           // count:4,
-           // schema:[
-           //     {type:"text", name:"name", label:"Name", required:true},
-           // ], data: [
-           //     {name:'fifth'},
-           //     {name:'fourth'},
-           //     {name:'third'},
-           //     {name:'second'},
-           //     {name:'first'},
-           // ]})
+           bt = new GrapheneDataGrid({el:'#first',
+           search: false,columns: false,upload:false,download:false,title:'Demo Content',
+           entries:[],
+           count:4,
+           schema:[
+               {type:"text", name:"name", label:"Name", required:true},
+           ], data: [
+               {name:'fifth'},
+               {name:'fourth'},
+               {name:'third'},
+               {name:'second'},
+               {name:'first'},
+           ]})
 
-					//  console.log(localStorage.getItem('bt'));
 		</script>
 
-<!-- </body></html> -->
 	</body>
 </html>
