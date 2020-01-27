@@ -50,7 +50,7 @@
 		</div><!-- /.nav-collapse -->
     </div><!-- /.container -->
 </div><!-- /.navbar -->
-		<!DOCTYPE html>
+		<!-- <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
@@ -65,7 +65,7 @@
 		<link rel='stylesheet' type='text/css' href='assets/css/demo.css'>
 		<link rel='stylesheet' type='text/css' href='assets/vendor/css/colorpicker.min.css'>
 
-	</head>
+	</head> -->
 
 	<body>		
 		<div class="container">
@@ -106,18 +106,19 @@
 		<script type="text/javascript" src="assets/js/lodash.min.js"></script>
 		<script type="text/javascript" src="assets/js/sortable.js"></script>
 		<script type='text/javascript' src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>	
-		<!--/*<script type="text/javascript" src="assets/js/bin/gform_bootstrap.min.js"></script>*/-->
-		<script type="text/javascript" src="assets/js/bin/gform.js"></script>
-		<script type="text/javascript" src="assets/js/bin/bootstrap.js"></script>
+		<script type="text/javascript" src="assets/js/gform_bootstrap.min.js"></script>
+		<!-- <script type="text/javascript" src="assets/js/bin/gform.js"></script> -->
+		<!-- <script type="text/javascript" src="assets/js/gform.js"></script> -->
+		<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="assets/js/GrapheneDataGrid.full.js"></script>
 		
-		<!-- // <script type='text/javascript' src='assets/js/form.cob.js'></script>		 -->
-		<script type='text/javascript' src='data/data.js'></script>
-		<script type='text/javascript' src='../src/js/GrapheneDataGrid.js'></script>
-		<script type='text/javascript' src='../src/js/model'></script>
+		<!-- <script type='text/javascript' src='assets/js/form.cob.js'></script> -->
+		<script type='text/javascript' src='../data/data.js'></script>	
+		<script type='text/javascript' src='assets/js/model.js'></script>
 		<!-- <script type='text/javascript' src='../src/js/view.js'></script> -->
-		<script type='text/javascript' src='../src/js/mixin.js'></script>
+		<script type='text/javascript' src='assets/js/mixin.js'></script>
 
-		<script type='text/javascript' src='../src/js/views.js'></script>
+		<script type='text/javascript' src='assets/js/views.js'></script>
 		<!-- <script type='text/javascript' src='src/js/view.js'></script>
 		<script type='text/javascript' src='src/js/model'></script>
 		<script type='text/javascript' src='src/js/utils.js'></script>
@@ -263,8 +264,8 @@
 
 			grid = new GrapheneDataGrid(options);
 			
-			// new GrapheneDataGrid($.extend({},options,{container: '#second', name: 'second'}))
-			// new GrapheneDataGrid($.extend({},options,{container: '#third', name: 'third'}))
+			new GrapheneDataGrid($.extend({},options,{el: '#second', name: 'second'}))
+			new GrapheneDataGrid($.extend({},options,{el: '#third', name: 'third'}))
 			// bt = new GrapheneDataGrid({
 			// 	container: '#first',
 			// 	search: false,
@@ -307,6 +308,6 @@
 					//  console.log(localStorage.getItem('bt'));
 		</script>
 
-</body></html>
+<!-- </body></html> -->
 	</body>
 </html>

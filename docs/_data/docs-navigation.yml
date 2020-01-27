@@ -50,12 +50,12 @@ sideNavBar:
           subLinks:
             - value: actions
               id: actions
+            - value: Tenses
+              id: tenses
             - value: create
               id: create
             - value: created
               id: created
-            - value: model:create
-              id: model:create
             - value: model:created
               id: model:created
             - value: edit
