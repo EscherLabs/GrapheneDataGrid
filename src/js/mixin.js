@@ -51,6 +51,7 @@
 
   csvToArray: function(csvString) {
     var trimQuotes = function (stringArray) {
+      if(stringArray !== null && typeof stringArray !== "undefined")
       for (var i = 0; i < stringArray.length; i++) {
           // stringArray[i] = _.trim(stringArray[i], '"');
           if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
@@ -60,14 +61,16 @@
       }
       return stringArray;
     }
-    var csvRowArray    = csvString.split(/\n/);
+    var csvRowArray    = csvString.split(/\r?\n/);
     var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
     var objectArray     = [];
-    
     while (csvRowArray.length) {
+        
         var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-        var rowObject    = _.zipObject(headerCellArray, rowCellArray);
-        objectArray.push(rowObject);
+        if(rowCellArray !== null){
+            var rowObject    = _.zipObject(headerCellArray, rowCellArray);
+            objectArray.push(rowObject);
+        }
     }
     return(objectArray);
   },
