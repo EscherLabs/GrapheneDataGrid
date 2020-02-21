@@ -271,6 +271,8 @@ GrapheneDataGrid = function(options) {
 		val.show = [];
 		delete val.delete;
 		delete val.size;
+		delete val.pre;
+		delete val.opst;
 		// val.isEnabled = true;
 		val.edit = true;
 		val.help = '';
@@ -346,7 +348,7 @@ GrapheneDataGrid = function(options) {
 			if(typeof options.create == 'object'){
 				fields = options.create.fields;
 			}
-			new gform({name:'modal',data:options.defaultData,table:this,collections:this.collections,methods:this.methods,events:(options.create||options.form||{}).events, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
+			new gform({name:'modal',data:options.defaultData||{},table:this,collections:this.collections,methods:this.methods,events:(options.create||options.form||{}).events, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
 				if(e.form.validate(true)){
 					this.add(e.form.get(),{validate:false})
 					e.form.trigger('close');
