@@ -1,5 +1,5 @@
 name: GrapheneDataGrid Docs
-markdrown: kramdown
+markdown: kramdown
 collections:
   docpages:
     output: true

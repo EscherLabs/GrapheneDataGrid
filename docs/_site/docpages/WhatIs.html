@@ -61,10 +61,11 @@
                 
 
                 
-                <a href="./WhatIs.html"><h4>What is GrapheneDataGrid.js?</h4></a>    
-                        <ul>
+                <a href="./WhatIs.html"><h4 style="text-align:center;">What is GrapheneDataGrid.js?</h4></a>    
+                        <ul style="margin:0;padding:0;">
                             <!-- For Every item that is a child of the page -->
                             
+                            <!-- <li class="list-unstyled" ><a href= -->
                             <li class="list-unstyled" ><a href=
                                 
                                 "./WhatIs.html#intro"
@@ -73,6 +74,16 @@
                                 <!-- If the subItem has children, display those under the subItem -->
                                 
                             
+                            <!-- <li class="list-unstyled" ><a href= -->
+                            <li class="list-unstyled" ><a href=
+                                
+                                "./WhatIs.html#basic_example"
+                                
+                            ><i class="fa fa-chevron-right"></i> Example Grid</a></li>
+                                <!-- If the subItem has children, display those under the subItem -->
+                                
+                            
+                            <!-- <li class="list-unstyled" ><a href= -->
                             <li class="list-unstyled" ><a href=
                                 
                                 "./WhatIs.html#getting_started"
@@ -87,10 +98,11 @@
                 
 
                 
-                <a href="./MakingAGrid.html"><h4>Making a Grid</h4></a>    
-                        <ul>
+                <a href="./MakingAGrid.html"><h4 style="text-align:center;">Making a Grid</h4></a>    
+                        <ul style="margin:0;padding:0;">
                             <!-- For Every item that is a child of the page -->
                             
+                            <!-- <li class="list-unstyled" ><a href= -->
                             <li class="list-unstyled" ><a href=
                                 
                                 "./MakingAGrid.html#options"
@@ -184,7 +196,7 @@
                                     
                                         "./MakingAGrid.html#upload"
                                     
-                                    ><i class="fa fa-chevron-right"></i> Upload</a></li>
+                                    ><i class="fa fa-chevron-right"></i> upload</a></li>
                                     </ul>
                                 
                                     <ul>
@@ -192,11 +204,12 @@
                                     
                                         "./MakingAGrid.html#download"
                                     
-                                    ><i class="fa fa-chevron-right"></i> Download</a></li>
+                                    ><i class="fa fa-chevron-right"></i> download</a></li>
                                     </ul>
                                 
                                 
                             
+                            <!-- <li class="list-unstyled" ><a href= -->
                             <li class="list-unstyled" ><a href=
                                 
                                 "./MakingAGrid.html#events"
@@ -218,7 +231,7 @@
                                     
                                         "./MakingAGrid.html#tenses"
                                     
-                                    ><i class="fa fa-chevron-right"></i> Tenses</a></li>
+                                    ><i class="fa fa-chevron-right"></i> tenses</a></li>
                                     </ul>
                                 
                                     <ul>
@@ -329,8 +342,10 @@
         </div><!--/row-->
 
     <!-- Insert Page Content Here -->
-    				<a name="intro" style="display:block;position:relative;top:-40px"></a>
-				<h2>About GrapheneDataGrid:</h2>
+    				<!-- Adding Scrolling Navigation Button -->
+				<a class="btn btn-primary" style="position:fixed;bottom:5vh;right: 5vw;" role="button" href="./MakingAGrid.html">Making a Grid <i class="fa fa-arrow-right"></i></a>
+				<a name="intro" style="display:block;position:relative;top:-40px"></a>
+				<h2><u>About GrapheneDataGrid:</u></h2>
 				<div class="container mx-auto text-justify">
 					<p>
 							GrapheneDataGrid provides a full tabular interface for managing, manipulating, and displaying data. The DataGrid offers:
@@ -345,7 +360,9 @@
 						</ul>
 					</p>
 				</div>
+				<a name="basic_example" style="display:block;position:relative;top:-40px"></a>
 				<hr>
+				
 				<h3>Here's a Basic Example of a Grid</h3>
 				<h4>Result:</h4>
 				<div id="myGrapheneDataGrid"></div>
@@ -497,6 +514,7 @@ schema:[
 &lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
+
 
 <!-- Code Example of Bootstrap Method ->End -->
 <!-- Bootstrap Method  -> End -->

@@ -11,7 +11,8 @@ sideNavBar:
     subLinks:
       - value: Introduction
         id: intro
-
+      - value: Example Grid
+        id: basic_example
       - value: Getting Started
         id: getting_started
   
@@ -41,16 +42,16 @@ sideNavBar:
               id: filter
             - value: columns
               id: columns
-            - value: Upload
+            - value: upload
               id: upload
-            - value: Download
+            - value: download
               id: download
         - value: Functionality and Events
           id: events
           subLinks:
             - value: actions
               id: actions
-            - value: Tenses
+            - value: tenses
               id: tenses
             - value: create
               id: create

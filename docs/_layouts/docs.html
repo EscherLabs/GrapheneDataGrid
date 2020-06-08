@@ -18,10 +18,11 @@ title: GrapheneDataGrid Docs
                 {% endif %}
 
                 
-                <a href="{{ item.view }}"><h4>{{ item.page }}</h4></a>    
-                        <ul>
+                <a href="{{ item.view }}"><h4 style="text-align:center;">{{ item.page }}</h4></a>    
+                        <ul style="margin:0;padding:0;">
                             <!-- For Every item that is a child of the page -->
                             {% for subItem in item.subLinks %}
+                            <!-- <li class="list-unstyled" ><a href= -->
                             <li class="list-unstyled" ><a href=
                                 {% if !current %}
                                 "#{{ subItem.id }}"

@@ -271,6 +271,8 @@ GrapheneDataGrid = function(options) {
 		val.show = [];
 		delete val.delete;
 		delete val.size;
+		delete val.pre;
+		delete val.opst;
 		// val.isEnabled = true;
 		val.edit = true;
 		val.help = '';
@@ -346,7 +348,7 @@ GrapheneDataGrid = function(options) {
 			if(typeof options.create == 'object'){
 				fields = options.create.fields;
 			}
-			new gform({name:'modal',data:options.defaultData,table:this,collections:this.collections,methods:this.methods,events:(options.create||options.form||{}).events, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
+			new gform({name:'modal',data:options.defaultData||{},table:this,collections:this.collections,methods:this.methods,events:(options.create||options.form||{}).events, actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"create",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Create New', fields:  fields}).on('save', function(e) {
 				if(e.form.validate(true)){
 					this.add(e.form.get(),{validate:false})
 					e.form.trigger('close');
@@ -426,77 +428,80 @@ GrapheneDataGrid = function(options) {
     if (window.FileReader) {
         // FileReader are supported.
       (function (fileToRead) {
-	      var reader = new FileReader();
-	      // Read file into memory as UTF-8      
-	      reader.readAsText(fileToRead);
-	      reader.onload = function (event) {
-		      var csv = event.target.result;
-		      var temp = _.csvToArray(csv);
-			//   CSVParser
-		      var valid = true;
+		var reader = new FileReader();
+		// Read file into memory as UTF-8      
+		reader.readAsText(fileToRead);
+		reader.onload = function (event) {
+			var csv = event.target.result;
+			var temp = _.csvToArray(csv);
+		//   CSVParser
+			var valid = true;
 
-					// $('#myModal').remove();
-					var ref = $(gform.render('modal_container',{title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
-					ref.modal();
-					ref.on('hidden.bs.modal', function () {
-		      			this.importing = false;
-					}.bind(this));
+			// $('#myModal').remove();
+			var ref = $(gform.render('modal_container',{title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
+			ref.modal();
+			ref.on('hidden.bs.modal', function () {
+				this.importing = false;
+			}.bind(this));
 
-					var itemCount = temp.length-1;
-					var totalProgress = itemCount*2;
-					var items = [];
-					this.importing = true;
-					temp[0] = _.map(temp[0], function(item){
-						var search = _.find(options.schema, {label:item});
-						if(search == null){
-							search = item;
-						}else{
-							search = search.name;
-						}
-						return search;
+			var itemCount = temp.length;
+			var totalProgress = itemCount*2;
+			var items = [];
+			this.importing = true;
+
+
+			
+			var keys = _.map(temp[0], function(item,key){
+				var search = _.find(options.schema, {label:key});
+				 return ((search == null) ? {name:key,label:key} : search);
+
+			})
+			for(var i = 0; i<temp.length; i++){
+				if(!this.importing) return false;
+				if(keys.length == _.values(temp[i]).length){
+					var newtemp = {};
+					_.each(keys,function(key){
+						newtemp[key.name] = temp[i][key.label]||"";
 					})
-		      for(var i = 1; i<temp.length; i++){
-		      	if(!this.importing) return false;
-		      	if(temp[0].length == temp[i].length){
-				      var newtemp = {}
-				      for(var j in temp[0]){
-				      	newtemp[temp[0][j]] = temp[i][j]
-				      }
-				      valid = table.validate(newtemp);
-				      if(!valid){
-								 break;
-								}
-				      items.push(valid);
-			    	}else{
-			    		itemCount--;
-			    	}
-						ref.find('.progress-bar').width((i/totalProgress)*100 +'%')
-			    }
-
-			    if(valid){
-			    	ref.find('.status').html('Adding Items...');
-			      for(var i = 0; i<items.length; i++){
-			      	if(!this.importing) return false;
-				      table.add(items[i],{draw:false});
-							ref.find('.progress-bar').width(((i+itemCount)/totalProgress)*100 +'%')
-				    }
-			    }else{
-			    	ref.find('.btn').html('Done');
-			    	ref.find('.status').html('<div class="alert alert-danger">Error(s) in row '+i+ ', failed to validate!<ul><li>'+_.filter(table.errors,function(item){return item.length;}).join('</li><li>')+'</li></div>')
-			    	return;
-			    }
-		    	ref.find('.status').html('<div class="alert alert-success">Successfully processed file, '+itemCount+ ' rows were added!</div>')
-		    	ref.find('.btn').toggleClass('btn-danger btn-success').html('Done');
-		    	ref.find('.progress').hide();
-					if(typeof table.options.sortBy !== 'undefined'){
-						table.models = _.sortBy(table.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(table)).reverse();
+					valid = table.validate(newtemp);
+					if(!valid){
+						break;
 					}
+					items.push(valid);
+				}else{
+					itemCount--;
+				}
+				ref.find('.progress-bar').width((i/totalProgress)*100 +'%')
+			}
 
-		    	if(typeof table.options.onBulkLoad == 'function'){
-						table.options.onBulkLoad();
-					}		    	
 
-		    }
+
+
+			if(valid){
+				ref.find('.status').html('Adding Items...');
+				for(var i = 0; i<items.length; i++){
+				if(!this.importing) return false;
+					table.add(items[i],{draw:false});
+					ref.find('.progress-bar').width(((i+itemCount)/totalProgress)*100 +'%')
+				}
+			}else{
+				ref.find('.btn').html('Done');
+				ref.find('.status').html('<div class="alert alert-danger">Error(s) in row '+i+ ', failed to validate!<ul><li>'+_.filter(table.errors,function(item){return item;}).join('</li><li>')+'</li></div>')
+				return;
+			}
+			ref.find('.status').html('<div class="alert alert-success">Successfully processed file, '+itemCount+ ' rows were added!</div>')
+			ref.find('.btn').toggleClass('btn-danger btn-success').html('Done');
+			ref.find('.progress').hide();
+
+			if(typeof table.options.sortBy !== 'undefined'){
+				table.models = _.sortBy(table.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(table)).reverse();
+			}
+
+			if(typeof table.options.onBulkLoad == 'function'){
+				table.options.onBulkLoad();
+			}
+
+		}
 	      reader.onerror = function (evt) {
 		      if(evt.target.error.name == "NotReadableError") {
 		          alert("Canno't read file !");
@@ -731,7 +736,8 @@ GrapheneDataGrid = function(options) {
 
 	this.validate = function(item){
 		var status = false;
-		var tempForm = new gform({collections:this.collections,fields: options.schema,attributes:item});
+		var tempForm = new gform({collections:this.collections,fields: options.schema,methods:this.methods});
+		tempForm.set(item);
 		if(tempForm.validate()){
 			status = tempForm.toJSON();
 		}else{
@@ -744,6 +750,7 @@ GrapheneDataGrid = function(options) {
 
 
 	this.add = function(item,config){
+		config = config||{validate:false, silent:false}
 		var newModel = new gridModel(this, item,{
 			'*':[function(e){
 			e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
@@ -762,7 +769,7 @@ GrapheneDataGrid = function(options) {
 			}
 			// this.updateCount(this.summary.checked_count);
 			if(config.silent !== true){
-        this.eventBus.dispatch('created',newModel)
+        		this.eventBus.dispatch('created',newModel)
 				this.eventBus.dispatch('model:created',newModel)
 			}
 			// if(typeof this.options.add == 'function'){
@@ -1000,11 +1007,12 @@ GrapheneDataGrid = function(options) {
 		if(typeof title !== "string") {
 			title =this.options.title
 		}
+
 		_.csvify(
 			_.map(this.filtered, function(item){return item.attributes}),
-			_.map(_.filter(this.summary.items, function(item){return item.isEnabled}) ,function(item){
-				return {label:item.label,name:this.filterMap[item.cname]} 
-			}),
+			_.map(_.filter(this.summary.items, function(item){return item.isEnabled}) ,function(filterMap,item){
+				return {label:item.label,name:filterMap[item.cname]} 
+			}.bind(null,this.filterMap)),
 			title 
 		)
 	}
@@ -1082,6 +1090,7 @@ GrapheneDataGrid.version = '0.0.4.1';
 
   csvToArray: function(csvString) {
     var trimQuotes = function (stringArray) {
+      if(stringArray !== null && typeof stringArray !== "undefined")
       for (var i = 0; i < stringArray.length; i++) {
           // stringArray[i] = _.trim(stringArray[i], '"');
           if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
@@ -1091,14 +1100,16 @@ GrapheneDataGrid.version = '0.0.4.1';
       }
       return stringArray;
     }
-    var csvRowArray    = csvString.split(/\n/);
+    var csvRowArray    = csvString.split(/\r?\n/);
     var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
     var objectArray     = [];
-    
     while (csvRowArray.length) {
+        
         var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-        var rowObject    = _.zipObject(headerCellArray, rowCellArray);
-        objectArray.push(rowObject);
+        if(rowCellArray !== null){
+            var rowObject    = _.zipObject(headerCellArray, rowCellArray);
+            objectArray.push(rowObject);
+        }
     }
     return(objectArray);
   },
