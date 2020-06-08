@@ -368,22 +368,23 @@
 				<div id="myGrapheneDataGrid"></div>
 				<hr>
 				<h4>Code:</h4>
-		<pre><code class="prettyprint">
-gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
-search: false,columns: false,upload:false,download:false,title:'Demo Content',
-entries:[],
-count:4,
-schema:[
-	{type:"text", name:"name", label:"Name", required:true},
-	{type:"text", name:"number",label:"Age"}
-], data: [
-	{name:'Bob'},
-	{name:'Adam', number: 30},
-	{name:'Tim', number: 30.5},
-	{name:'Lauri', number: 21},
-	{name:'Scott'},
-]
-})
+<pre><code class="prettyprint">&lt;script&gt;			
+	gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+	search: false,columns: false,upload:false,download:false,title:'Demo Content',
+	entries:[],
+	count:4,
+	schema:[
+		{type:"text", name:"name", label:"Name", required:true},
+		{type:"text", name:"number",label:"Age"}
+	], data: [
+		{name:'Bob'},
+		{name:'Adam', number: 30},
+		{name:'Tim', number: 30.5},
+		{name:'Lauri', number: 21},
+		{name:'Scott'},
+	]
+	})
+&lt;/script&gt;
 			</code></pre>
 			
 				<hr>
@@ -472,9 +473,9 @@ schema:[
 					<p>
 					<i> - Bootstrap's get started page helps you setup jquery -</i><br>
 <pre><code class="prettyprint">
-&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'&gt;&lt;/style&gt;
-
 &lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
+
+&lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'&gt;&lt;/style&gt;
 
 </code></pre>
 					</p>
@@ -484,7 +485,8 @@ schema:[
 					gform.js</a>, otherwise known as GrapheneForms. You will need to include one dependency for GrapheneForms called Lodash 
 					(<a href="https://lodash.com/" target="_blank">lodash.js</a>) <u>before</u> the include of GrapheneForms **.  <br>
 					 - <i>You can click the above links to see the documentation for GrapheneForms or Lodash</i> -<br>
-					 <p class="fa"> -- View <a href="#setting_up_gform">Setting up GrapheneForms. #TODO</a> --</p></li>
+					 <p class="fa"> --<b>To Set Up GrapheneForms, navigate to </b><a href="https://docs.escherlabs.com/GrapheneForms/">Graphene Forms</a>, go to the top of the page and select "Get Code".
+						Include the downloaded code in your project--</p></li>
 			</ul>
 			<hr>
 					 <b>NOTES:</b>
@@ -500,18 +502,25 @@ schema:[
 &lt;html&gt;
 &lt;head&gt;
 
+&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
 &lt;style src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'&gt;&lt;/style&gt;
 &lt;style src='//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'&gt;&lt;/style&gt;
 
-&lt;script src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript' src='gform.bootstrap.min.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript' src='GrapheneDataGrid.min.js'&gt;&lt;/script&gt;
+
+//CSS Includes
+
 &lt;/head&gt;
 &lt;body&gt;
-&lt;div class="myTable"&gt;
+	&lt;div class="myTable"&gt;
+	//Other HTML
 &lt;/div&gt;
+&lt;script&gt;
+	//Make DataGrids Here
+&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
 
@@ -525,7 +534,7 @@ schema:[
 <script src="assets/js/gform_bootstrap.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>  
 <script src='assets/js/GrapheneDataGrid.full.js'></script>
- <script>
+<script>
 	 
 	 gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
 	search: false,columns: false,upload:false,download:false,title:'Demo Content',
