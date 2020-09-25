@@ -149,7 +149,7 @@ var Grid = new GrapheneDataGrid(options);
 <ul>
     <li>(Name) sort = //Name of column taken from schema</li>
     <li>If you pass a value into sort, then the column will be automatically sorted in decreasing order when the table loads.</li>
-    <li>See Example Below:</li>
+    <li>See Example Below, which is a grid with the option: <strong>sort: 'number':</strong></li>
 </ul>
 <div id="options_sort_example"></div>
 
@@ -506,11 +506,11 @@ var options_sort = {
 el: '#options_sort_example',
 data : [
 //First Column of Data
-{number : 432, string : "value"},
+{number : 432, string : "a"},
 //Second Column of Data
-{number : 10000, string : "value"},
+{number : 10000, string : "b"},
 //Third Column of Data
-{number : 3, string : "value"}
+{number : 3, string : "c"}
 ],
 filter: false,
 actions : [], upload: false, download:false, columns:false, entries:[], search:false, sort: 'number',
