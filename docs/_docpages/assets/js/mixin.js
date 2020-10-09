@@ -61,11 +61,12 @@
       return stringArray;
     }
     var csvRowArray    = csvString.split(/\n/);
-    var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
+    var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]*)(?=\s*,|\s*$)/g));
+
     var objectArray     = [];
     
     while (csvRowArray.length) {
-        var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
+        var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]*)(?=\s*,|\s*$)/g));
         var rowObject    = _.zipObject(headerCellArray, rowCellArray);
         objectArray.push(rowObject);
     }

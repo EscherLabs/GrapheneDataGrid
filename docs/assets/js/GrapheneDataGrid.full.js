@@ -34,19 +34,19 @@ GrapheneDataGrid = function(options) {
 	var loaded = false;
 	if (window.localStorage && options.name) {
 		try{
-			loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
+			loaded = JSON.parse(localStorage.getItem('dg_'+options.name));
 		}catch(e){};
 	}
 	if(typeof options.item_template !== 'string' ){
 		if(window.outerWidth > 767 || window.outerWidth == 0){
-			options.item_template = gform.stencils['table_row'];
+			options.item_template = gform.stencils['data_grid_row'];
 		}else{
 			this.mobile = true;
 			options.item_template = gform.stencils['mobile_row'];
 		}
 	}
 	this.toJSON =function(){
-		return _.pluck(this.getModels(),'attributes')
+		return _.map(this.getModels(),'attributes')
 	}
 	this.filterValues = {};
 	this.draw = function() {
@@ -122,14 +122,14 @@ GrapheneDataGrid = function(options) {
 		},options)
 
 		this.renderObj = renderObj;
-		// this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
+		// this.$el.find('.paginate-footer').html(templates['data_grid_footer'].render(this.renderObj, templates));
 		this.updateCount();
 
-		this.$el.find('.paginate-footer').html(gform.render('table_footer',this.renderObj));
+		this.$el.find('.paginate-footer').html(gform.render('data_grid_footer',this.renderObj));
 
 		this.fixStyle();
 		if (window.localStorage && options.name) {
-			localStorage.setItem('bt_'+options.name, JSON.stringify(this.state.get())) ;
+			localStorage.setItem('dg_'+options.name, JSON.stringify(this.state.get())) ;
 		}
 	}
 
@@ -214,7 +214,7 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call({options:{default:{type:'text'}}},val),'parent','columns');
+		val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -335,10 +335,10 @@ GrapheneDataGrid = function(options) {
 	}else{
 		if(!this.mobile){
 			// template = Hogan.compile(templates['table'].render(summary, templates));
-			template = gform.render('table',summary)
+			template = gform.render('data_grid',summary)
 		}else{
-			// template = Hogan.compile(templates['mobile_table'].render(summary, templates));
-			template = gform.render('mobile_table',summary)
+			// template = Hogan.compile(templates['mobile_data_grid'].render(summary, templates));
+			template = gform.render('mobile_data_grid',summary)
 
 		}
 	}
@@ -369,7 +369,8 @@ GrapheneDataGrid = function(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+						debugger;
+						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(selectedModels,e){
 							if(e.form.validate(true)){
 								var newValues = e.form.get();
 								_.map(selectedModels,function(model){
@@ -379,7 +380,7 @@ GrapheneDataGrid = function(options) {
 				
 								e.form.trigger('close');
 							}
-						}).on('close', function(){
+						}.bind(this,selectedModels)).on('close', function(){
 							this.draw();
 							this.eventBus.dispatch('edited')
 						}.bind(this)).on('cancel',function(e){e.form.trigger('close')}).modal()
@@ -980,6 +981,8 @@ GrapheneDataGrid = function(options) {
 			
 			if(typeof this.filter !== 'undefined') {
 				this.filter.set(this.filterValues)
+				this.filterValues = this.filter.toJSON();
+
 			}
 			if(typeof settings.search !== 'undefined' && settings.search !== '') {
 				this.$el.find('[name="search"]').val(settings.search)
@@ -1122,7 +1125,7 @@ GrapheneDataGrid.version = '0.0.4.1';
         return JSON.stringify(_.map(_.values(_.extend(empty,_.pick(d,labels))),function(item){
           if(typeof item == 'string'){
             return item.split('"').join('""');
-          }else{return item}
+          }else{ return _.isArray(item)? item.join():item; }
         }))
         //return JSON.stringify(_.values(_.extend(empty,_.pick(d,labels))))
     },this)
@@ -1450,7 +1453,7 @@ gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">
 {{/items}}
 </div>
 </td></tr>`
-gform.stencils.mobile_table=`<div class="well table-well">
+gform.stencils.mobile_data_grid=`<div class="well table-well">
 <div style="height:40px;">
   <div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
 
@@ -1521,7 +1524,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
 
 
 
-gform.stencils.table=`<div class="well table-well">
+gform.stencils.data_grid=`<div class="well table-well">
 <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 <div class="hiddenForm" style="display:none"></div>
 
@@ -1569,7 +1572,7 @@ gform.stencils.table=`<div class="well table-well">
 {{#options.autoSize}}
 <table class="table {{^options.noborder}}table-bordered{{/options.noborder}}" style="margin-bottom:0px">
 <thead class="head">
-{{>table_head}}
+{{>data_grid_head}}
 </thead>
 </table>
 {{/options.autoSize}}
@@ -1579,7 +1582,7 @@ gform.stencils.table=`<div class="well table-well">
   <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px;{{#options.autoSize}}margin-top: -19px;{{/options.autoSize}}">
     {{^options.autoSize}}
     <thead class="head">
-    {{>table_head}}
+    {{>data_grid_head}}
     </thead>
     {{/options.autoSize}}
 {{#options.autoSize}}
@@ -1608,7 +1611,7 @@ gform.stencils.table=`<div class="well table-well">
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
-gform.stencils.table_footer=`<div>
+gform.stencils.data_grid_footer=`<div>
 {{#multiPage}}
 <nav class="pull-right" style="margin-left: 10px;">
 {{#size}}
@@ -1644,7 +1647,7 @@ gform.stencils.table_footer=`<div>
   </span>
   {{/entries.length}}
 </div>`
-gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
+gform.stencils.data_grid_head=`  <tr style="cursor:pointer" class="noselect table-sort">
 {{^options.hideCheck}}
 <th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i name="select_all" class="fa fa-2x fa-square-o"></i></th>
 {{/options.hideCheck}}
@@ -1671,7 +1674,7 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 {{/items}}
 </tr>
 {{/options.filter}}`
-gform.stencils.table_row=`{{^options.hideCheck}}
+gform.stencils.data_grid_row=`{{^options.hideCheck}}
 
 <td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
   <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>

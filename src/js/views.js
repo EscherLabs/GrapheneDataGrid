@@ -82,7 +82,7 @@ gform.stencils.mobile_row=`<tr><td colspan="100%" class="filterable">
 {{/items}}
 </div>
 </td></tr>`
-gform.stencils.mobile_table=`<div class="well table-well">
+gform.stencils.mobile_data_grid=`<div class="well table-well">
 <div style="height:40px;">
   <div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
 
@@ -153,7 +153,7 @@ gform.stencils.mobile_table=`<div class="well table-well">
 
 
 
-gform.stencils.table=`<div class="well table-well">
+gform.stencils.data_grid=`<div class="well table-well">
 <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 <div class="hiddenForm" style="display:none"></div>
 
@@ -201,7 +201,7 @@ gform.stencils.table=`<div class="well table-well">
 {{#options.autoSize}}
 <table class="table {{^options.noborder}}table-bordered{{/options.noborder}}" style="margin-bottom:0px">
 <thead class="head">
-{{>table_head}}
+{{>data_grid_head}}
 </thead>
 </table>
 {{/options.autoSize}}
@@ -211,7 +211,7 @@ gform.stencils.table=`<div class="well table-well">
   <table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px;{{#options.autoSize}}margin-top: -19px;{{/options.autoSize}}">
     {{^options.autoSize}}
     <thead class="head">
-    {{>table_head}}
+    {{>data_grid_head}}
     </thead>
     {{/options.autoSize}}
 {{#options.autoSize}}
@@ -240,7 +240,7 @@ gform.stencils.table=`<div class="well table-well">
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`
-gform.stencils.table_footer=`<div>
+gform.stencils.data_grid_footer=`<div>
 {{#multiPage}}
 <nav class="pull-right" style="margin-left: 10px;">
 {{#size}}
@@ -276,7 +276,7 @@ gform.stencils.table_footer=`<div>
   </span>
   {{/entries.length}}
 </div>`
-gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-sort">
+gform.stencils.data_grid_head=`  <tr style="cursor:pointer" class="noselect table-sort">
 {{^options.hideCheck}}
 <th style="width: 60px;min-width:60px;padding: 0 0 0 20px;" class="select-column"><i name="select_all" class="fa fa-2x fa-square-o"></i></th>
 {{/options.hideCheck}}
@@ -303,7 +303,7 @@ gform.stencils.table_head=`  <tr style="cursor:pointer" class="noselect table-so
 {{/items}}
 </tr>
 {{/options.filter}}`
-gform.stencils.table_row=`{{^options.hideCheck}}
+gform.stencils.data_grid_row=`{{^options.hideCheck}}
 
 <td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
   <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>

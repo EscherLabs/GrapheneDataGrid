@@ -34,19 +34,19 @@ GrapheneDataGrid = function(options) {
 	var loaded = false;
 	if (window.localStorage && options.name) {
 		try{
-			loaded = JSON.parse(localStorage.getItem('bt_'+options.name));
+			loaded = JSON.parse(localStorage.getItem('dg_'+options.name));
 		}catch(e){};
 	}
 	if(typeof options.item_template !== 'string' ){
 		if(window.outerWidth > 767 || window.outerWidth == 0){
-			options.item_template = gform.stencils['table_row'];
+			options.item_template = gform.stencils['data_grid_row'];
 		}else{
 			this.mobile = true;
 			options.item_template = gform.stencils['mobile_row'];
 		}
 	}
 	this.toJSON =function(){
-		return _.pluck(this.getModels(),'attributes')
+		return _.map(this.getModels(),'attributes')
 	}
 	this.filterValues = {};
 	this.draw = function() {
@@ -122,14 +122,14 @@ GrapheneDataGrid = function(options) {
 		},options)
 
 		this.renderObj = renderObj;
-		// this.$el.find('.paginate-footer').html(templates['table_footer'].render(this.renderObj, templates));
+		// this.$el.find('.paginate-footer').html(templates['data_grid_footer'].render(this.renderObj, templates));
 		this.updateCount();
 
-		this.$el.find('.paginate-footer').html(gform.render('table_footer',this.renderObj));
+		this.$el.find('.paginate-footer').html(gform.render('data_grid_footer',this.renderObj));
 
 		this.fixStyle();
 		if (window.localStorage && options.name) {
-			localStorage.setItem('bt_'+options.name, JSON.stringify(this.state.get())) ;
+			localStorage.setItem('dg_'+options.name, JSON.stringify(this.state.get())) ;
 		}
 	}
 
@@ -214,7 +214,7 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call({options:{default:{type:'text'}}},val),'parent','columns');
+		val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -335,10 +335,10 @@ GrapheneDataGrid = function(options) {
 	}else{
 		if(!this.mobile){
 			// template = Hogan.compile(templates['table'].render(summary, templates));
-			template = gform.render('table',summary)
+			template = gform.render('data_grid',summary)
 		}else{
-			// template = Hogan.compile(templates['mobile_table'].render(summary, templates));
-			template = gform.render('mobile_table',summary)
+			// template = Hogan.compile(templates['mobile_data_grid'].render(summary, templates));
+			template = gform.render('mobile_data_grid',summary)
 
 		}
 	}
@@ -369,7 +369,8 @@ GrapheneDataGrid = function(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(e){
+						debugger;
+						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(selectedModels,e){
 							if(e.form.validate(true)){
 								var newValues = e.form.get();
 								_.map(selectedModels,function(model){
@@ -379,7 +380,7 @@ GrapheneDataGrid = function(options) {
 				
 								e.form.trigger('close');
 							}
-						}).on('close', function(){
+						}.bind(this,selectedModels)).on('close', function(){
 							this.draw();
 							this.eventBus.dispatch('edited')
 						}.bind(this)).on('cancel',function(e){e.form.trigger('close')}).modal()
@@ -980,6 +981,8 @@ GrapheneDataGrid = function(options) {
 			
 			if(typeof this.filter !== 'undefined') {
 				this.filter.set(this.filterValues)
+				this.filterValues = this.filter.toJSON();
+
 			}
 			if(typeof settings.search !== 'undefined' && settings.search !== '') {
 				this.$el.find('[name="search"]').val(settings.search)
