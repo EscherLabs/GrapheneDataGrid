@@ -214,7 +214,9 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		// val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		val = _.omit(gform.field.normalize(new gform({options:{default:{type:'text'}}})).call(null,{},val),'parent','columns');
+
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -233,7 +235,7 @@ GrapheneDataGrid = function(options) {
 				var temp = _.pick(val,['options','max','min','path','format'])
 				val = _.omit(val,['options','max','min','path','format'])
 				temp.type = 'optgroup';
-				val.options = [{type:'optgroup',options:[{label:'No Filter',value:''}],format:{label:"{{label}}"}},temp]
+				val.options = [{type:'optgroup',options:[],format:{label:"{{label}}"}},temp]
 				break;
 
 		case 'fieldset':
@@ -278,6 +280,8 @@ GrapheneDataGrid = function(options) {
 		val.edit = true;
 		val.help = '';
 		val.array = false;
+
+		// val.type = 'smallcombo';
 		return val;
 	});
 	if(typeof options.columns == 'object'){
@@ -370,7 +374,6 @@ GrapheneDataGrid = function(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						debugger;
 						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(selectedModels,e){
 							if(e.form.validate(true)){
 								var newValues = e.form.get();
@@ -786,6 +789,7 @@ GrapheneDataGrid = function(options) {
 		
 	}
 	this.search = function(options) {
+
 		var ordered = _.sortBy(this.getModels(), function(obj) { return obj.attributes[options.sort]; });
 		if(!options.reverse){
 			ordered = ordered.reverse();
@@ -1289,6 +1293,7 @@ function gridModel (owner, initial, events) {
             searchables = this.attributes[item.name];
 
             if(typeof this.attributes[item.name] !== "object")searchables = [searchables]
+			debugger;
             this.display[item.name] = _.reduce(searchables,function(display,search){
             if(display.length)display+="\r\n"
                 if(typeof item.options !== 'undefined'){
@@ -1315,7 +1320,7 @@ function gridModel (owner, initial, events) {
                     if(typeof display == 'undefined' || display =="")display += search;
                 }
                 return display;
-            },"")
+            }.bind(this),"")
 
 		}.bind(this))
 	}

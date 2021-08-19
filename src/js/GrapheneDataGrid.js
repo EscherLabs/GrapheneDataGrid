@@ -225,6 +225,7 @@ GrapheneDataGrid = function(options) {
                 val.options = temp.getoptions();
                 val.options = _.defaults(val.options,[{label: 'False', value: 'false'},{label: 'True', value: 'true'}])
 			case 'radio':
+			case 'smallcombo':
 				val.type = 'select';
 			case 'select':
 				val.placeholder = false;
@@ -395,7 +396,8 @@ GrapheneDataGrid = function(options) {
         }
 				new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:fields} ).on('save', function(e) {
 					if(e.form.validate(true)){
-						this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
+						// this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
+						this.getSelected()[0].set(e.form.toJSON());
 						this.eventBus.dispatch('edited')
 						this.eventBus.dispatch('model:edited',this.getSelected()[0])
 						this.draw();
@@ -797,7 +799,11 @@ GrapheneDataGrid = function(options) {
 					if(_.filter(options.filterFields, {id:filter})[0] && typeof _.filter(options.filterFields, {id:filter})[0].options == 'undefined') {
 						temp = (_.score((anyModel.display[this.filterMap[filter]]+'').replace(/\s+/g, " ").toLowerCase(), (options.search[filter]+'').toLowerCase() ) > 0.40);
 					}else{
-						temp = (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'')
+                        temp =  (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || 
+                                (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'') || 
+                                (typeof anyModel.attributes[this.filterMap[filter]] == "object" &&  (anyModel.attributes[this.filterMap[filter]].indexOf(options.search[filter])!=-1 || 
+                                                                                                    anyModel.attributes[this.filterMap[filter]].indexOf(options.search[filter]+"")!=-1)                         
+                                )
 					}
 					keep = temp;
 					if(!keep){break;}
@@ -1039,4 +1045,4 @@ GrapheneDataGrid = function(options) {
 		this.state.set(loaded);
 	}
 }
-GrapheneDataGrid.version = '0.0.4.1';
+GrapheneDataGrid.version = '0.0.4.2';

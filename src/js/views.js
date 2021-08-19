@@ -283,7 +283,7 @@ gform.stencils.data_grid_head=`  <tr style="cursor:pointer" class="noselect tabl
 
 {{#items}}
 {{#visible}}
-<th {{#options.sort}}data-sort="{{cname}}"{{/options.sort}}><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
+<th {{#options.sort}}data-sort="{{cname}}"{{/options.sort}}><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{{label}}}</h6></th>
 {{/visible}}
 {{/items}}
 </tr>

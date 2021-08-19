@@ -489,8 +489,8 @@ GrapheneDataGrid = function(options) {
 					}
 
 		    	if(typeof table.options.onBulkLoad == 'function'){
-						table.options.onBulkLoad();
-					}		    	
+					table.options.onBulkLoad();
+				}		    	
 
 		    }
 	      reader.onerror = function (evt) {

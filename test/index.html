@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+		<title>GrapheneDataGrid</title>
+		<link rel="stylesheet" href='./assets/css/bootstrap.min.css'>
+		<link rel="stylesheet" href='./assets/css/font-awesome.min.css'>
+<body>
+	<div id="myGrapheneDataGrid">
+</div>
+<script type='text/javascript' src='./assets/js/jquery.min.js'></script>
+<script type='text/javascript' src='./assets/js/lodash.min.js'></script>
+<script type='text/javascript' src='./assets/js/bootstrap.min.js'></script>
+<script type='text/javascript' src='./assets/js/gform_bootstrap.js'></script>
+<script type='text/javascript' src='./assets/js/GrapheneDataGrid.full.js'></script>
+<script>
+		gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
+	title:'Demo Content',
+	schema:[
+		{type:"text", name:"name", label:"Name", required:true, template:"{{attributes.name}} - {{index}}"},
+		{type:"text", name:"number",label:"Age"}
+	], 
+	data: [
+		{name:'Bob'},
+		{name:'Adam', number: 30},
+		{name:'Tim', number: 30.5},
+		{name:'Lauri', number: 21},
+		{name:'Scott'}
+	]
+	})
+</script>
+
+</body>
+</html>

@@ -225,6 +225,7 @@ GrapheneDataGrid = function(options) {
                 val.options = temp.getoptions();
                 val.options = _.defaults(val.options,[{label: 'False', value: 'false'},{label: 'True', value: 'true'}])
 			case 'radio':
+			case 'smallcombo':
 				val.type = 'select';
 			case 'select':
 				val.placeholder = false;
@@ -232,7 +233,7 @@ GrapheneDataGrid = function(options) {
 				var temp = _.pick(val,['options','max','min','path','format'])
 				val = _.omit(val,['options','max','min','path','format'])
 				temp.type = 'optgroup';
-				val.options = [{type:'optgroup',options:[{label:'No Filter',value:''}],format:{label:"{{label}}"}},temp]
+				val.options = [{type:'optgroup',options:[],format:{label:"{{label}}"}},temp]
 				break;
 
 		case 'fieldset':
@@ -277,6 +278,8 @@ GrapheneDataGrid = function(options) {
 		val.edit = true;
 		val.help = '';
 		val.array = false;
+
+		val.type = 'smallcombo';
 		return val;
 	});
 	if(typeof options.columns == 'object'){
@@ -395,7 +398,8 @@ GrapheneDataGrid = function(options) {
         }
 				new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,name:'modal',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], legend: '<i class="fa fa-pencil-square-o"></i> Edit', data: this.getSelected()[0].attributes,fields:fields} ).on('save', function(e) {
 					if(e.form.validate(true)){
-						this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
+						// this.getSelected()[0].set(_.extend({}, this.getSelected()[0].attributes, e.form.toJSON()));
+						this.getSelected()[0].set(e.form.toJSON());
 						this.eventBus.dispatch('edited')
 						this.eventBus.dispatch('model:edited',this.getSelected()[0])
 						this.draw();
@@ -797,7 +801,11 @@ GrapheneDataGrid = function(options) {
 					if(_.filter(options.filterFields, {id:filter})[0] && typeof _.filter(options.filterFields, {id:filter})[0].options == 'undefined') {
 						temp = (_.score((anyModel.display[this.filterMap[filter]]+'').replace(/\s+/g, " ").toLowerCase(), (options.search[filter]+'').toLowerCase() ) > 0.40);
 					}else{
-						temp = (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'')
+                        temp =  (anyModel.display[this.filterMap[filter]]+'' == options.search[filter]+'') || 
+                                (anyModel.attributes[this.filterMap[filter]]+'' == options.search[filter]+'') || 
+                                (typeof anyModel.attributes[this.filterMap[filter]] == "object" &&  (anyModel.attributes[this.filterMap[filter]].indexOf(options.search[filter])!=-1 || 
+                                                                                                    anyModel.attributes[this.filterMap[filter]].indexOf(options.search[filter]+"")!=-1)                         
+                                )
 					}
 					keep = temp;
 					if(!keep){break;}
@@ -1091,31 +1099,60 @@ GrapheneDataGrid.version = '0.0.4.1';
       return( false );
   },
 
-  csvToArray: function(csvString) {
-    var trimQuotes = function (stringArray) {
-      if(stringArray !== null && typeof stringArray !== "undefined")
-      for (var i = 0; i < stringArray.length; i++) {
-          // stringArray[i] = _.trim(stringArray[i], '"');
-          if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
-            stringArray[i] = stringArray[i].substr(1,stringArray[i].length-2)
-          }
-          stringArray[i] = stringArray[i].split('""').join('"')
-      }
-      return stringArray;
-    }
-    var csvRowArray    = csvString.split(/\r?\n/);
-    var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-    var objectArray     = [];
-    while (csvRowArray.length) {
+  // csvToArray: function(csvString) {
+  //   var trimQuotes = function (stringArray) {
+  //     if(stringArray !== null && typeof stringArray !== "undefined")
+  //     for (var i = 0; i < stringArray.length; i++) {
+  //         // stringArray[i] = _.trim(stringArray[i], '"');
+  //         if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
+  //           stringArray[i] = stringArray[i].substr(1,stringArray[i].length-2)
+  //         }
+  //         stringArray[i] = stringArray[i].split('""').join('"')
+  //     }
+  //     return stringArray;
+  //   }
+  //   var csvRowArray    = csvString.split(/\r?\n/);
+  //   var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
+  //   var objectArray     = [];
+  //   while (csvRowArray.length) {
         
-        var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-        if(rowCellArray !== null){
-            var rowObject    = _.zipObject(headerCellArray, rowCellArray);
-            objectArray.push(rowObject);
-        }
-    }
-    return(objectArray);
-  },
+  //       var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
+  //       if(rowCellArray !== null){
+  //           var rowObject    = _.zipObject(headerCellArray, rowCellArray);
+  //           objectArray.push(rowObject);
+  //       }
+  //   }
+  //   return(objectArray);
+  // },
+
+  processCsvLine:function (text) {
+    var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
+    var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+    // Return NULL if input string is not well formed CSV string.
+    if (!re_valid.test(text)) return null;
+    var a = [];                     // Initialize array to receive values.
+    text.replace(re_value, // "Walk" the string using replace with callback.
+        function(m0, m1, m2, m3) {
+            // Remove backslash from \' in single quoted values.
+            if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
+            // Remove backslash from \" in double quoted values.
+            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+            else if (m3 !== undefined) a.push(m3);
+            return ''; // Return empty string.
+        });
+    // Handle special case of empty last value.
+    if (/,\s*$/.test(text)) a.push('');
+    return a;
+},
+csvToArray: function(csvString,options) {
+options = options||{skip:0}
+var csvRowArray    = csvString.split(/\n/).slice(options.skip);    
+var headerCellArray = _.processCsvLine(csvRowArray.shift());//trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]*)(?=\s*,|\s*$)/g));
+
+return _.map(csvRowArray,function(row){
+    return _.zipObject(headerCellArray, _.processCsvLine(row)) 
+})
+},
   csvify: function(data, columns, title){
 
     var csv = '"'+_.map(columns,'label').join('","')+'"\n';
@@ -1248,78 +1285,39 @@ function gridModel (owner, initial, events) {
 	var processAtts = function() {
 		_.each(this.schema, function(item){
 
-			if(typeof item.options !== 'undefined'){
-				// var option;
+            var options;
+            var temp = _.find(this.owner.checkForm.fields,{name:item.name})
 
+            searchables = this.attributes[item.name];
 
-				// if(typeof item.value_key !== 'undefined'){
-				// 	if(item.value_key == 'index'){
-				// 		option = item.options[this.attributes[item.name]]
-				// 	}else{
-				// 		var search = {};
-				// 		search[item.value_key] = this.attributes[item.name];
-				// 		option = _.find(item.options, search);
-				// 		if(_.isFinite(this.attributes[item.name])){
-				// 			search[item.value_key] = parseInt(this.attributes[item.name]);
-				// 			if(typeof option === 'undefined'){
-				// 				option = _.find(item.options, search);
-				// 			}
-				// 			if(typeof option === 'undefined'){
-				// 				option = _.find(item.options, search);
-				// 			}
-				// 		}
-				// 	}
-				// }else{
-				// 	option =  _.find(item.options, {value:this.attributes[item.name]});
-				// 	if(typeof option === 'undefined'){
-				// 		option = _.find(item.options, {id:this.attributes[item.name]});
-				// 	}
-        //   if(_.isFinite(this.attributes[item.name])){
-        //     if(typeof option === 'undefined'){
-        //       option = _.find(item.options, {value:parseInt(this.attributes[item.name], 10)});
-        //     }
-        //     if(typeof option === 'undefined'){
-        //       option = _.find(item.options, {id:parseInt(this.attributes[item.name], 10)});
-        //     }
-        //   }
-				// }
+            if(typeof this.attributes[item.name] !== "object")searchables = [searchables]
+            this.display[item.name] = _.reduce(searchables,function(display,search){
+            if(display.length)display+="\r\n"
+                if(typeof item.options !== 'undefined'){
 
-				// if(typeof option === 'object') {
-				// 	this.display[item.name] = option[item.label_key] || option.label || option.name;
-				// }else{
-				// 	this.display[item.name] = this.attributes[item.name];
-				// }
-				var temp = _.find(this.owner.checkForm.fields,{name:item.name})
+                    //look for matching string value
+                    options = _.find(temp.mapOptions.getoptions(),{value:search+""});
+                    
+                    if(typeof options == 'undefined' && _.isFinite(search)){
+                        options = _.find(temp.mapOptions.getoptions(),{value:parseInt(search)});
+                    }
+                    if(typeof options == 'undefined'){
+                        options = _.find(temp.mapOptions.getoptions(),{value:search});
+                    }
+                }
 
-				var options = _.find(temp.mapOptions.getoptions(),{value:this.attributes[item.name]+""});
-				if(typeof options !== 'undefined'){
-					this.display[item.name] = options.label;
-				}else{
-					if(_.isFinite(this.attributes[item.name])){
-						options = _.find(temp.mapOptions.getoptions(),{value:parseInt(this.attributes[item.name])});
-					}if(typeof options !== 'undefined'){
-						this.display[item.name] = options.label;
-					}else{
-						// this.display[item.name] = this.attributes[item.name];
-						if(item.template){
-							this.display[item.name] = gform.renderString(item.template,this)
-							
-						}else{
-							this.display[item.name] = this.attributes[item.name];
-						}
-					}
-				}
+                if(typeof options !== 'undefined'){
+                    display += options.label;
+                }
 
-			}else{
-				if(item.template){
-					this.display[item.name] = gform.renderString(item.template,this)
-					
-				}else{
-					this.display[item.name] = this.attributes[item.name];
-				}
-			}
-
-
+                if(item.template){
+                    display += gform.renderString(item.template,this)
+                    
+                }else{
+                    if(typeof display == 'undefined' || display =="")display += search;
+                }
+                return display;
+            },"")
 
 		}.bind(this))
 	}
@@ -1355,7 +1353,8 @@ function gridModel (owner, initial, events) {
 	}
 	this.set(initial)
 	processAtts.call(this);
-	this.toJSON = function() {return this.attributes}
+	this.toJSON = function() {
+		return this.attributes}
 	this.undo = function() {
 		if(this.deleted){this.deleted = false;this.owner.draw();}else{
 			if(this.attribute_history.length){
