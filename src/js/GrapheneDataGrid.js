@@ -214,7 +214,8 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		// val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		val = _.omit(gform.field.normalize(new gform({options:{default:{type:'text'}}})).call(null,{},val),'parent','columns');
 		name = val.name;
 		val.value = '';
 		switch(val.type){

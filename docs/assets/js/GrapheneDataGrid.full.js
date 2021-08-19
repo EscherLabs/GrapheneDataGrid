@@ -214,7 +214,8 @@ GrapheneDataGrid = function(options) {
 	options.schema = options.schema || options.form.fields;
 
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
-		val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		// val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
+		val = _.omit(gform.field.normalize(new gform({options:{default:{type:'text'}}})).call(null,{},val),'parent','columns');
 		name = val.name;
 		val.value = '';
 		switch(val.type){
@@ -233,7 +234,7 @@ GrapheneDataGrid = function(options) {
 				var temp = _.pick(val,['options','max','min','path','format'])
 				val = _.omit(val,['options','max','min','path','format'])
 				temp.type = 'optgroup';
-				val.options = [{type:'optgroup',options:[],format:{label:"{{label}}"}},temp]
+				val.options = [{type:'optgroup',options:[{label:'No Filter',value:''}],format:{label:"{{label}}"}},temp]
 				break;
 
 		case 'fieldset':
@@ -278,8 +279,6 @@ GrapheneDataGrid = function(options) {
 		val.edit = true;
 		val.help = '';
 		val.array = false;
-
-		val.type = 'smallcombo';
 		return val;
 	});
 	if(typeof options.columns == 'object'){
@@ -1047,7 +1046,7 @@ GrapheneDataGrid = function(options) {
 		this.state.set(loaded);
 	}
 }
-GrapheneDataGrid.version = '0.0.4.1';
+GrapheneDataGrid.version = '0.0.4.2';
 
  _.mixin({
   score: function(base, abbr, offset) {
@@ -1124,7 +1123,8 @@ GrapheneDataGrid.version = '0.0.4.1';
   //   }
   //   return(objectArray);
   // },
-
+  
+//https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
   processCsvLine:function (text) {
     var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
     var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
@@ -1653,7 +1653,7 @@ gform.stencils.data_grid_head=`  <tr style="cursor:pointer" class="noselect tabl
 
 {{#items}}
 {{#visible}}
-<th {{#options.sort}}data-sort="{{cname}}"{{/options.sort}}><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{label}}</h6></th>
+<th {{#options.sort}}data-sort="{{cname}}"{{/options.sort}}><h6 style="margin: 2px;font-size:13px;white-space: nowrap">{{#options.sort}}<i class="fa fa-sort text-muted"></i> {{/options.sort}}{{{label}}}</h6></th>
 {{/visible}}
 {{/items}}
 </tr>
