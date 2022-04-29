@@ -578,6 +578,7 @@ GrapheneDataGrid = function(options) {
 				for(var i in data) {
 					this.models.push(new gridModel(this, data[i],{
 					'*':[function(e){
+						debhgger;
 					e.model.owner.eventBus.dispatch('model:'+e.event,e.model)
 					}],
 					'check': [function(e){

@@ -1254,7 +1254,6 @@ function gridModel (owner, initial, events) {
 					}if(typeof options !== 'undefined'){
 						this.display[item.name] = options.label
 					}else{
-						debugger;
 						// this.display[item.name] = this.attributes[item.name];
 						if(item.template){
 							this.display[item.name] = gform.renderString(item.template,this)
@@ -1266,7 +1265,6 @@ function gridModel (owner, initial, events) {
 				}
 
 			}else{
-				debugger;
 
 				if(item.template){
 					this.display[item.name] = gform.renderString(item.template,this)

@@ -211,8 +211,12 @@ GrapheneDataGrid = function(options) {
 	// 		return field;
 	// 	})
 	// }
-	options.schema = options.schema || options.form.fields;
 
+	// options.schema = options.schema || options.form.fields;
+	options.schema = _.map(options.schema || options.form.fields,field=>{
+		field.name = (field.name || (gform.renderString(field.legend || field.label || field.title, field)||'').toLowerCase().split(' ').join('_') || field.id) +'';
+    return field;
+	}) ;
 	options.filterFields = _.map(_.extend({}, options.schema), function(val){
 		// val = _.omit(gform.normalizeField.call(new gform({options:{default:{type:'text'}}}) ,val),'parent','columns');
 		val = _.omit(gform.field.normalize(new gform({options:{default:{type:'text'}}})).call(null,{},val),'parent','columns');
@@ -371,7 +375,6 @@ GrapheneDataGrid = function(options) {
 				// } else {
 					var newSchema = _.filter(this.options.schema, function(item){return common_fields.indexOf(item.name) >= 0})
 					if(newSchema.length > 0 ){
-						debugger;
 						new gform({collections:this.collections,methods:this.methods,events:(options.edit||options.form||{}).events,legend:'('+selectedModels.length+') Common Field Editor',actions:[{type:'cancel',modifiers: "btn btn-danger pull-left"},{type:'save'},{type:'hidden',name:"_method",value:"edit",parse:function(){return false}}], fields:newSchema, data: _.extend({},_.pick(selectedModels[0].attributes, common_fields))}).on('save', function(selectedModels,e){
 							if(e.form.validate(true)){
 								var newValues = e.form.get();
@@ -391,6 +394,7 @@ GrapheneDataGrid = function(options) {
 					}
 				// }
 			}else{
+				if(!this.getSelected().length) return;
 				var fields = options.schema;
         if(typeof options.edit == 'object'){
           fields = options.edit.fields;
@@ -767,6 +771,8 @@ GrapheneDataGrid = function(options) {
 			this.models.push(newModel);
 			if(typeof this.options.sortBy !== 'undefined'){
 				this.models = _.sortBy(this.models, function(obj) { return obj.attributes[this.options.sortBy]; }.bind(this)).reverse();
+				// _.orderBy(gdg.models, ['attributes.color','attributes.name'], ['asc', 'desc']);
+
 			}
 			if(config.draw !== false){
 				this.draw();

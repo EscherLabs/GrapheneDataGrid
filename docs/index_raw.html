@@ -672,11 +672,35 @@
 <script src="./assets/js/bootstrap.min.js"></script>  
 <script src="./assets/js/GrapheneDataGrid.full.js"></script>
 <script>
-	 
 	 gdg = new GrapheneDataGrid({el:'#myGrapheneDataGrid',
 	search: false,columns: false,upload:false,download:false,title:'Demo Content',
 	entries: [],
 	count: 4,
+	item_template:`{{^options.hideCheck}}
+
+<td data-event="mark" data-id="{{[[}}id{{]]}}" style="width: 60px;min-width:60px;text-align:left;padding:0;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;">
+  <span class="text-muted fa {{[[}}#iswaiting{{]]}}fa-spinner fa-spin {{[[}}/iswaiting{{]]}} {{[[}}^iswaiting{{]]}} {{[[}}#checked{{]]}}fa-check-square-o{{[[}}/checked{{]]}} {{[[}}^checked{{]]}}fa-square-o{{[[}}/checked{{]]}}{{[[}}/iswaiting{{]]}} " style="margin:6px 0 6px 20px; cursor:pointer;font-size:24px"></span>
+   </td>
+
+  {{/options.hideCheck}}
+{{#items}}
+{{#visible}}{{#isEnabled}}<td style="min-width:85px">{{{name}}}</td>{{/isEnabled}}{{/visible}}
+{{/items}}`
+,
+	events:[{
+		event:'model:drawn',
+		handler:function(e){
+			_.each(e.model.row.querySelectorAll('td'),(td_item)=>{
+				if(typeof td_item !== 'undefined'){
+
+					let newcolor = e.model.attributes.color;//use conditions or logic or something here
+					
+					td_item.setAttribute('style',td_item.getAttribute('style')+";background-color:"+ newcolor)
+
+				}
+			})
+		}
+	}],
 	schema:[
 		{type:"text", name:"name", label:"Name", required:true},
 		{type:"text", name:"number",label:"Age"},
