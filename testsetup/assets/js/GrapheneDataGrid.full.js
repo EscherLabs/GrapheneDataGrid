@@ -116,7 +116,7 @@ GrapheneDataGrid = function (options) {
       }
     } else {
       this.resetSearch();
-      this.query = typeof models == "string" ? models : this.query;
+      this.query = typeof models == "string" ? models : this.query || "";
       models = this.query ? this.advancedFilter(this.query) : models;
       this.lastGrabbed = models.length;
       this.filtered = models;
@@ -992,9 +992,7 @@ GrapheneDataGrid = function (options) {
       '[name="advancedsearch"]',
       _.debounce(
         function (e) {
-          this.query = e.currentTarget.value.length
-            ? e.currentTarget.value
-            : null;
+          this.query = e.currentTarget.value;
           this.draw();
         }.bind(this),
         300
@@ -1279,6 +1277,8 @@ GrapheneDataGrid = function (options) {
       parameters = this.tokenize(parameters);
     }
     const {
+      checked,
+      deleted,
       sort = [
         {
           invert: options.reverse,
@@ -1288,8 +1288,16 @@ GrapheneDataGrid = function (options) {
       search = "",
       ...searchFields
     } = _.groupBy(parameters, "key");
+    debugger;
+    let modelFilter = {
+      deleted: !!(deleted && deleted[0].search[0] == "true"),
+    };
+    if (checked && checked[0].search[0] == "true") {
+      modelFilter.checked = true;
+    }
+
     let ordered = _.orderBy(
-      _.filter(this.models, { deleted: false }),
+      _.filter(this.models, modelFilter),
       _.map(sort, ({ search }) => "attributes." + search[0]),
       _.map(sort, ({ invert }) => (!!invert ? "asc" : "desc"))
     );
