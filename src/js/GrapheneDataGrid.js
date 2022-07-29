@@ -445,12 +445,25 @@ GrapheneDataGrid = function(options) {
 		//   CSVParser
 			var valid = true;
 
-			// $('#myModal').remove();
-			var ref = $(gform.render('modal_container',{title: "Importing CSV ",footer:'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>', body:'<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>'}));
+
+			$("#myModal").remove();
+			var temp = gform.create(
+					gform.render("modal_container", {
+							title: "Importing CSV ",
+							footer:
+									'<div class="btn btn-danger" data-dismiss="modal">Cancel</div>',
+							body: '<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">50% Complete</span></div></div><div class="status">Validating Items...</div>',
+					})
+			);
+			var ref = $(temp.querySelector("#myModal"));
+			document.body.appendChild(ref[0]);
 			ref.modal();
-			ref.on('hidden.bs.modal', function () {
-				this.importing = false;
-			}.bind(this));
+			ref.on(
+					"hidden.bs.modal",
+					function () {
+							this.importing = false;
+					}.bind(this)
+			);
 
 			var itemCount = temp.length;
 			var totalProgress = itemCount*2;
