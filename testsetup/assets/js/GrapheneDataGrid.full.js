@@ -1226,7 +1226,7 @@ GrapheneDataGrid = function (options) {
 
       (searches, search) => {
         var temp = search.match(
-          /(?<invert>-)?(?<key>[^\s]+):(?<search>[^\s"]+|"[^"]*")+/
+          /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
         );
         let token = !!temp
           ? temp.groups
@@ -1234,8 +1234,9 @@ GrapheneDataGrid = function (options) {
               key: "search",
               search: search,
               invert: false,
+              action: "~",
             };
-
+        console.log(token.action);
         token.search = _.map(token.search.split(","), s =>
           _.trim(s, ['"', " "])
         );
@@ -1260,14 +1261,25 @@ GrapheneDataGrid = function (options) {
         ? !filter.invert
         : filter.invert;
     } else {
-      return _.some(
-        filter.searchStringLower,
-        search =>
-          _.score(
-            model.display[filter.key].replace(/\s+/g, " ").toLowerCase(),
-            search
-          ) > 0.4
-      )
+      let mapfunc;
+      let finding = model.display[filter.key]
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+      switch (filter.action) {
+        case "~":
+          mapfunc = search => _.score(finding, search) > 0.4;
+          break;
+        case "=":
+          mapfunc = search => finding.indexOf(search) >= 0;
+          break;
+      }
+      if (filter.action == "~") {
+        mapfunc = search => _.score(finding, search) > 0.4;
+      } else {
+        mapfunc = search => finding.indexOf(search) >= 0;
+      }
+
+      return _.some(filter.searchStringLower, mapfunc)
         ? !filter.invert
         : filter.invert;
     }
@@ -1288,7 +1300,7 @@ GrapheneDataGrid = function (options) {
       search = "",
       ...searchFields
     } = _.groupBy(parameters, "key");
-    debugger;
+    // debugger;
     let modelFilter = {
       deleted: !!(deleted && deleted[0].search[0] == "true"),
     };
@@ -1302,23 +1314,27 @@ GrapheneDataGrid = function (options) {
       _.map(sort, ({ invert }) => (!!invert ? "asc" : "desc"))
     );
 
-    let filters = _.map(_.flatMap(searchFields), filter => {
-      let { key, search } = filter;
-      filter.logic = "&&";
-      filter.exact =
-        gform.types[_.find(options.filterFields, { search: key }).type].base !==
-        "input";
+    let filters = _.compact(
+      _.map(_.flatMap(searchFields), filter => {
+        let { key, search } = filter;
+        let field = _.find(options.filterFields, { search: key });
+        if (!field) return false;
+        filter.logic = "&&";
+        filter.exact =
+          gform.types[_.find(options.filterFields, { search: key }).type]
+            .base !== "input";
 
-      filter.searchString = _.map(search, f => f + "");
-      filter.searchStringLower = _.map(filter.searchString, f =>
-        f.toLowerCase()
-      );
+        filter.searchString = _.map(search, f => f + "");
+        filter.searchStringLower = _.map(filter.searchString, f =>
+          f.toLowerCase()
+        );
 
-      return filter;
-    });
+        return filter;
+      })
+    );
 
     if (search.length) {
-      debugger;
+      // debugger;
       var searches = [].concat.apply([], _.map(search, "search"));
       _.reduce(
         options.filterFields,
