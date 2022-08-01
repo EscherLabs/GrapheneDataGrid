@@ -1236,10 +1236,54 @@ GrapheneDataGrid = function (options) {
               invert: false,
               action: "~",
             };
-        console.log(token.action);
-        token.search = _.map(token.search.split(","), s =>
-          _.trim(s, ['"', " "])
-        );
+        // console.log(token.action);
+        // debugger;
+        token.search = _.map(token.search.split(","), s => {
+          let raw = _.trim(s, " ");
+
+          let quoted = /"+?([^"]+)"+/.test(raw);
+
+          raw = _.trim(s, '"');
+          let looseEnd = /\*$/.test(raw);
+          let looseStart = /^\*/.test(raw);
+          debugger;
+
+          let action = "~"; //fuzzy
+          if (quoted && looseEnd && looseStart) action = "*"; //contains
+          if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
+          if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
+          if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
+
+          return {
+            // exact: /"+?([^"]+)"+/.test(_.trim(s, " ")),
+            // looseEnd: /\*$/.test(raw),
+            // looseStart: /^\*/.test(raw),
+            action,
+            string: raw + "",
+            lower: (raw + "").toLowerCase(),
+            raw,
+          };
+        });
+
+        // token.exact = /"??([^"]+)"?/.test(token.search);
+
+        //        //     /^(?<start>["*])??(?:[^*^"\\]|\\.)+(?<end>["*])?/
+
+        // token.search = _.map(token.search.split(","), s => _.trim(s, " "));
+        // console.log().match(/^(?<start>["*])??(?:[^*^"\\]|\\.)+(?<end>["*])?/).groups
+
+        //  if (token.search[0] == '"') {
+        //    token.starts = true;
+        //    token.strictStart = true;
+        //  }
+        //  if (token.search[0] == "*") token.strictStart = true;
+
+        //  if (token.search[0] == '"') {
+        // 		token.starts = true;
+        // 		token.strictStart = true;
+        // }
+        // if (token.search[0] == "*") token.strictEnd = true;
+        // debugger;
         token.invert = !!token.invert;
         searches.push(token);
         return searches;
@@ -1251,13 +1295,13 @@ GrapheneDataGrid = function (options) {
     if (filter.exact) {
       let atts = model.attributes[filter.key];
 
-      return _.includes(filter.searchString, model.display[filter.key]) ||
+      return _.includes(filter.string, model.display[filter.key]) ||
         (typeof atts == "object"
           ? _.intersection(
-              filter.searchString,
+              filter.string,
               _.map(atts, a => a + "")
             ).length
-          : _.includes(filter.searchString, atts + ""))
+          : _.includes(filter.string, atts + ""))
         ? !filter.invert
         : filter.invert;
     } else {
@@ -1272,16 +1316,15 @@ GrapheneDataGrid = function (options) {
         case "=":
           mapfunc = search => finding.indexOf(search) >= 0;
           break;
+        default:
       }
-      if (filter.action == "~") {
+      if (filter.action == "~" || filter.action == ":") {
         mapfunc = search => _.score(finding, search) > 0.4;
       } else {
         mapfunc = search => finding.indexOf(search) >= 0;
       }
 
-      return _.some(filter.searchStringLower, mapfunc)
-        ? !filter.invert
-        : filter.invert;
+      return _.some(filter.lower, mapfunc) ? !filter.invert : filter.invert;
     }
   };
   this.advancedFilter = parameters => {
@@ -1300,14 +1343,19 @@ GrapheneDataGrid = function (options) {
       search = "",
       ...searchFields
     } = _.groupBy(parameters, "key");
-    // debugger;
+    debugger;
     let modelFilter = {
-      deleted: !!(deleted && deleted[0].search[0] == "true"),
+      deleted: !!(
+        deleted && !(deleted[0].invert == (deleted[0].search[0] == "true"))
+      ),
     };
-    if (checked && checked[0].search[0] == "true") {
-      modelFilter.checked = true;
+    if (checked) {
+      modelFilter.checked = !(
+        checked[0].invert ==
+        (checked[0].search[0] == "true")
+      );
     }
-
+    console.log(modelFilter);
     let ordered = _.orderBy(
       _.filter(this.models, modelFilter),
       _.map(sort, ({ search }) => "attributes." + search[0]),
@@ -1317,24 +1365,24 @@ GrapheneDataGrid = function (options) {
     let filters = _.compact(
       _.map(_.flatMap(searchFields), filter => {
         let { key, search } = filter;
+        debugger;
         let field = _.find(options.filterFields, { search: key });
         if (!field) return false;
         filter.logic = "&&";
         filter.exact =
           gform.types[_.find(options.filterFields, { search: key }).type]
             .base !== "input";
+        // filter.searchRaw = _.map(filter.search, f => f.raw);
+        // filter.string = _.map(search, f => f.raw + "");
+        // filter.lower = _.map(filter.string, f => f.toLowerCase());
 
-        filter.searchString = _.map(search, f => f + "");
-        filter.searchStringLower = _.map(filter.searchString, f =>
-          f.toLowerCase()
-        );
+        // delete filter.search;
 
         return filter;
       })
     );
 
     if (search.length) {
-      // debugger;
       var searches = [].concat.apply([], _.map(search, "search"));
       _.reduce(
         options.filterFields,
@@ -1345,10 +1393,11 @@ GrapheneDataGrid = function (options) {
             logic: "||",
             search: searches,
           };
-          filter.searchString = _.map(filter.search, f => f + "");
-          filter.searchStringLower = _.map(filter.searchString, f =>
-            f.toLowerCase()
-          );
+
+          // filter.searchRaw = _.map(filter.search, f => f.raw);
+          // filter.string = _.map(filter.search, f => f.raw + "");
+          // filter.lower = _.map(filter.string, f => f.toLowerCase());
+          // delete filter.search;
           filters.push(filter);
           return filters;
         },
