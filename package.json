@@ -1,0 +1,27 @@
+{
+  "name": "graphenedatagrid",
+  "version": "1.0.0",
+  "description": "<div><img height=\"100px\" src=\"https://docs.escherlabs.com/GrapheneDataGrid/assets/images/graphene_datagrid_logo.png\"></div>",
+  "main": "cypress.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EscherLabs/GrapheneDataGrid.git"
+  },
+  "author": "Adam Smallcomb",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EscherLabs/GrapheneDataGrid/issues"
+  },
+  "homepage": "https://github.com/EscherLabs/GrapheneDataGrid#readme",
+  "dependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0"
+  }
+}

@@ -1236,8 +1236,7 @@ GrapheneDataGrid = function (options) {
               invert: false,
               action: "~",
             };
-        // console.log(token.action);
-        // debugger;
+
         token.search = _.map(token.search.split(","), s => {
           let raw = _.trim(s, " ");
 
@@ -1246,7 +1245,6 @@ GrapheneDataGrid = function (options) {
           raw = _.trim(s, '"');
           let looseEnd = /\*$/.test(raw);
           let looseStart = /^\*/.test(raw);
-          debugger;
 
           let action = "~"; //fuzzy
           if (quoted && looseEnd && looseStart) action = "*"; //contains
@@ -1295,13 +1293,16 @@ GrapheneDataGrid = function (options) {
     if (filter.exact) {
       let atts = model.attributes[filter.key];
 
-      return _.includes(filter.string, model.display[filter.key]) ||
+      return _.includes(
+        _.map(filter.search, "string"),
+        model.display[filter.key]
+      ) ||
         (typeof atts == "object"
           ? _.intersection(
-              filter.string,
+              _.map(filter.search, "string"),
               _.map(atts, a => a + "")
             ).length
-          : _.includes(filter.string, atts + ""))
+          : _.includes(_.map(filter.search, "string"), atts + ""))
         ? !filter.invert
         : filter.invert;
     } else {
@@ -1318,13 +1319,15 @@ GrapheneDataGrid = function (options) {
           break;
         default:
       }
-      if (filter.action == "~" || filter.action == ":") {
+      if (filter.action == "~") {
         mapfunc = search => _.score(finding, search) > 0.4;
       } else {
         mapfunc = search => finding.indexOf(search) >= 0;
       }
 
-      return _.some(filter.lower, mapfunc) ? !filter.invert : filter.invert;
+      return _.some(_.map(filter.search, "lower"), mapfunc)
+        ? !filter.invert
+        : filter.invert;
     }
   };
   this.advancedFilter = parameters => {
@@ -1343,7 +1346,6 @@ GrapheneDataGrid = function (options) {
       search = "",
       ...searchFields
     } = _.groupBy(parameters, "key");
-    debugger;
     let modelFilter = {
       deleted: !!(
         deleted && !(deleted[0].invert == (deleted[0].search[0] == "true"))
@@ -1356,16 +1358,31 @@ GrapheneDataGrid = function (options) {
       );
     }
     console.log(modelFilter);
+
+    let sortarray = _.reduce(
+      sort,
+      (result, { invert, search }) => {
+        _.each(search, ({ raw }) => {
+          result.push({ invert, sort: raw });
+        });
+
+        return result;
+      },
+      []
+    );
+    // sort[0].invert
+    // sort[0].search[0]
+    // debugger;
+    console.log(sortarray);
     let ordered = _.orderBy(
       _.filter(this.models, modelFilter),
-      _.map(sort, ({ search }) => "attributes." + search[0]),
-      _.map(sort, ({ invert }) => (!!invert ? "asc" : "desc"))
+      _.map(sortarray, ({ sort }) => "attributes." + sort),
+      _.map(sortarray, ({ invert }) => (!!invert ? "asc" : "desc"))
     );
 
     let filters = _.compact(
       _.map(_.flatMap(searchFields), filter => {
         let { key, search } = filter;
-        debugger;
         let field = _.find(options.filterFields, { search: key });
         if (!field) return false;
         filter.logic = "&&";
