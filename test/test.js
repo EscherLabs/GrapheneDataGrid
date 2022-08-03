@@ -1,23 +1,28 @@
 // var assert = require("assert");
 const { assert } = require("chai");
 var _ = require("./assets/js/lodash.min");
+var { createFilters } = require("./assets/js/createFilters");
 var tokenize = string => {
   return _.reduce(
     string.match(/(?:[^\s"]+|"[^"]*")+/g),
 
     (searches, search) => {
-      var temp = search.match(
-        /(?<invert>-)?(?<key>[^\s:<>=~]??)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-      );
+      var temp =
+        search.length > 3
+          ? search.match(
+              /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
+            )
+          : { groups: false };
 
-      let token = !!temp.groups.action
-        ? temp.groups
-        : {
-            key: "search",
-            search: search,
-            invert: false,
-            action: "~",
-          };
+      let token =
+        !!temp.groups && temp.groups.action
+          ? temp.groups
+          : {
+              key: "search",
+              search: search,
+              invert: false,
+              action: "~",
+            };
 
       token.search = _.map(token.search.split(","), s => {
         let raw = _.trim(s, " ");
