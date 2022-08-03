@@ -29,7 +29,7 @@ GrapheneDataGrid = function (options) {
     },
   ];
   this.resource = options.resource;
-  this.query = "";
+  this.queryString = "";
   this.eventBus = new gform.eventBus(
     { owner: "grid", item: "model", handlers: options.events || {} },
     this
@@ -105,7 +105,7 @@ GrapheneDataGrid = function (options) {
       }
     });
     var pagebuffer = options.pagebuffer || 2;
-    if (!models && this.query == "") {
+    if (!models && this.queryString == "") {
       if (
         this.$el.find('[name="search"]').length &&
         this.$el.find('[name="search"]').val().length
@@ -116,8 +116,9 @@ GrapheneDataGrid = function (options) {
       }
     } else {
       this.resetSearch();
-      this.query = typeof models == "string" ? models : this.query || "";
-      models = this.query ? this.advancedFilter(this.query) : models;
+      this.queryString =
+        typeof models == "string" ? models : this.queryString || "";
+      models = this.queryString ? this.query(this.queryString) : models;
       this.lastGrabbed = models.length;
       this.filtered = models;
     }
@@ -989,10 +990,10 @@ GrapheneDataGrid = function (options) {
 
     this.$el.on(
       "input",
-      '[name="advancedsearch"]',
+      '[name="query"]',
       _.debounce(
         function (e) {
-          this.query = e.currentTarget.value;
+          this.queryString = e.currentTarget.value;
           this.draw();
         }.bind(this),
         300
@@ -1029,7 +1030,7 @@ GrapheneDataGrid = function (options) {
     this.$el.on("click", '[name="reset-search"]', () => {
       this.resetSearch();
 
-      this.query = "";
+      this.queryString = "";
       processSort();
     });
 
@@ -1225,17 +1226,22 @@ GrapheneDataGrid = function (options) {
       string.match(/(?:[^\s"]+|"[^"]*")+/g),
 
       (searches, search) => {
-        var temp = search.match(
-          /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-        );
-        let token = !!temp
-          ? temp.groups
-          : {
-              key: "search",
-              search: search,
-              invert: false,
-              action: "~",
-            };
+        var temp =
+          search.length > 3
+            ? search.match(
+                /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
+              )
+            : { groups: false };
+
+        let token =
+          !!temp.groups && temp.groups.action
+            ? temp.groups
+            : {
+                key: "search",
+                search: search,
+                invert: false,
+                action: "~",
+              };
 
         token.search = _.map(token.search.split(","), s => {
           let raw = _.trim(s, " ");
@@ -1253,35 +1259,12 @@ GrapheneDataGrid = function (options) {
           if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
 
           return {
-            // exact: /"+?([^"]+)"+/.test(_.trim(s, " ")),
-            // looseEnd: /\*$/.test(raw),
-            // looseStart: /^\*/.test(raw),
             action,
             string: raw + "",
             lower: (raw + "").toLowerCase(),
             raw,
           };
         });
-
-        // token.exact = /"??([^"]+)"?/.test(token.search);
-
-        //        //     /^(?<start>["*])??(?:[^*^"\\]|\\.)+(?<end>["*])?/
-
-        // token.search = _.map(token.search.split(","), s => _.trim(s, " "));
-        // console.log().match(/^(?<start>["*])??(?:[^*^"\\]|\\.)+(?<end>["*])?/).groups
-
-        //  if (token.search[0] == '"') {
-        //    token.starts = true;
-        //    token.strictStart = true;
-        //  }
-        //  if (token.search[0] == "*") token.strictStart = true;
-
-        //  if (token.search[0] == '"') {
-        // 		token.starts = true;
-        // 		token.strictStart = true;
-        // }
-        // if (token.search[0] == "*") token.strictEnd = true;
-        // debugger;
         token.invert = !!token.invert;
         searches.push(token);
         return searches;
@@ -1330,34 +1313,28 @@ GrapheneDataGrid = function (options) {
         : filter.invert;
     }
   };
-  this.advancedFilter = parameters => {
-    if (typeof parameters == "string") {
-      parameters = this.tokenize(parameters);
-    }
+  this.createFilters = parameters => {
     const {
       checked,
       deleted,
-      sort = [
-        {
-          invert: options.reverse,
-          search: [options.sort || this.options.sortBy],
-        },
-      ],
+      sort,
       search = "",
       ...searchFields
     } = _.groupBy(parameters, "key");
-    let modelFilter = {
-      deleted: !!(
-        deleted && !(deleted[0].invert == (deleted[0].search[0] == "true"))
-      ),
-    };
+    let modelFilter = { deleted: false };
+
+    if (deleted) {
+      modelFilter.deleted = !(
+        deleted[0].invert ==
+        (deleted[0].search[0].string == "true")
+      );
+    }
     if (checked) {
       modelFilter.checked = !(
         checked[0].invert ==
-        (checked[0].search[0] == "true")
+        (checked[0].search[0].string == "true")
       );
     }
-    console.log(modelFilter);
 
     let sortarray = _.reduce(
       sort,
@@ -1370,15 +1347,6 @@ GrapheneDataGrid = function (options) {
       },
       []
     );
-    // sort[0].invert
-    // sort[0].search[0]
-    // debugger;
-    console.log(sortarray);
-    let ordered = _.orderBy(
-      _.filter(this.models, modelFilter),
-      _.map(sortarray, ({ sort }) => "attributes." + sort),
-      _.map(sortarray, ({ invert }) => (!!invert ? "asc" : "desc"))
-    );
 
     let filters = _.compact(
       _.map(_.flatMap(searchFields), filter => {
@@ -1389,12 +1357,6 @@ GrapheneDataGrid = function (options) {
         filter.exact =
           gform.types[_.find(options.filterFields, { search: key }).type]
             .base !== "input";
-        // filter.searchRaw = _.map(filter.search, f => f.raw);
-        // filter.string = _.map(search, f => f.raw + "");
-        // filter.lower = _.map(filter.string, f => f.toLowerCase());
-
-        // delete filter.search;
-
         return filter;
       })
     );
@@ -1410,11 +1372,6 @@ GrapheneDataGrid = function (options) {
             logic: "||",
             search: searches,
           };
-
-          // filter.searchRaw = _.map(filter.search, f => f.raw);
-          // filter.string = _.map(filter.search, f => f.raw + "");
-          // filter.lower = _.map(filter.string, f => f.toLowerCase());
-          // delete filter.search;
           filters.push(filter);
           return filters;
         },
@@ -1422,15 +1379,37 @@ GrapheneDataGrid = function (options) {
       );
     }
 
+    return {
+      model: modelFilter,
+      sort: sortarray,
+      or: _.filter(filters, { logic: "||" }),
+      and: _.filter(filters, { logic: "&&" }),
+    };
+  };
+  this.query = parameters => {
+    if (typeof parameters == "string") {
+      parameters = this.tokenize(parameters);
+    }
+    const filters = this.createFilters(parameters);
+    filters.sort = filters.sort || [
+      {
+        invert: options.reverse,
+        search: [options.sort || this.options.sortBy],
+      },
+    ];
+    debugger;
+    let ordered = _.orderBy(
+      _.filter(this.models, filters.model),
+      _.map(filters.sort, ({ sort }) => "attributes." + sort),
+      _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
+    );
     return _.filter(ordered, model => {
-      let orFilters = _.filter(filters, { logic: "||" });
-      let andFilters = _.filter(filters, { logic: "&&" });
       return (
-        (andFilters.length
-          ? _.every(andFilters, this.applyFilter.bind(null, model))
+        (filters.and.length
+          ? _.every(filters.and, this.applyFilter.bind(null, model))
           : true) &&
-        (orFilters.length
-          ? _.some(orFilters, this.applyFilter.bind(null, model))
+        (filters.or.length
+          ? _.some(filters.or, this.applyFilter.bind(null, model))
           : true)
       );
     });
@@ -2321,8 +2300,7 @@ gform.stencils.mobile_data_grid = `<div class="well table-well">
 </div>`;
 
 gform.stencils.data_grid = `<div class="well table-well">
-<div class="row">
-{{#options.search}}<input type="text" name="advancedsearch" class="form-control pull-right" style=" margin-bottom:10px" placeholder="not:deleted">{{/options.search}}
+<div>
 </div>
 <input type="file" class="csvFileInput" accept=".csv" style="display:none">
 <div class="hiddenForm" style="display:none"></div>
@@ -2358,6 +2336,7 @@ gform.stencils.data_grid = `<div class="well table-well">
     </div>
     {{/options.columns}}
   </div>
+  {{#options.query}}<input type="text" name="query" class="form-control pull-left" style=" margin-bottom:10px;max-width:{{options.query}}%;" placeholder="deleted:false">{{/options.query}}
 
   {{#options.search}}<input type="text" name="search" class="form-control pull-right" style="max-width:300px; margin-bottom:10px" placeholder="Search">{{/options.search}}
 

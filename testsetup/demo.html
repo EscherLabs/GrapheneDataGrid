@@ -920,8 +920,9 @@
         // sort: false,
         // search: false,
         // columns: false,
-        // upload:false,
-        // download:false,
+        // upload: false,
+        // download: false,
+        query: 50,
         autoSize: 10,
         multiEdit: ["g_id", "status"],
         title: "Demo Content",
@@ -1001,7 +1002,11 @@
               '{{#attributes.COMPLETE}}<span class="fa fa-check-square-o"></span>{{/attributes.COMPLETE}}{{^attributes.COMPLETE}}<span class="fa fa-square-o"></span>{{/attributes.COMPLETE}}',
           }, // {type:"select", name:"priority", label: "Stat", showColumn: true, choices:'./assets/js/options.json'}
           // ,							{label: 'Endpoint', name:'endpoint', default: {name: 'External (no auth)', value: 'External', target:''}, type: 'select', choices: '/endpoints/list/'+model.group_id},
-          { name: "dob", label: "DOB", template: "{{attributes.dob}}" },
+          {
+            name: "createdAt",
+            label: "Created At",
+            template: "{{attributes.createdAt}}",
+          },
           // {"name":"age","label":"Age
           {
             name: "profile",

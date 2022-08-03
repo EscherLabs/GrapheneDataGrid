@@ -7,7 +7,7 @@ var tokenize = string => {
 
     (searches, search) => {
       var temp = search.match(
-        /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
+        /(?<invert>-)?(?<key>[^\s:<>=~]??)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
       );
 
       let token = !!temp.groups.action
@@ -90,7 +90,6 @@ describe("Tokenize", function () {
     });
 
     it("should return a column search  with exact matching", function () {
-      console.log(tokenize('title:"hello"'));
       assert.equal(tokenize('title:"hello"').length, 1);
     });
   });
