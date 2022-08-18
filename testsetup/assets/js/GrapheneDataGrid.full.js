@@ -119,7 +119,7 @@ GrapheneDataGrid = function (options) {
       this.queryString =
         typeof models == "string" ? models : this.queryString || "";
       models = this.queryString
-        ? this.query(this.queryString, this.models)
+        ? this.query(this.models, this.queryString)
         : models;
       this.lastGrabbed = models.length;
       this.filtered = models;
@@ -1230,200 +1230,201 @@ GrapheneDataGrid = function (options) {
     return newModel;
   };
 
-  this.tokenize = string => {
-    return _.reduce(
-      string.match(/(?:[^\s"]+|"[^"]*")+/g),
+  // this.tokenize = string => {
+  //   return _.reduce(
+  //     string.match(/(?:[^\s"]+|"[^"]*")+/g),
 
-      (searches, search) => {
-        var temp =
-          search.length > 3
-            ? search.match(
-                /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-              )
-            : { groups: false };
+  //     (searches, search) => {
+  //       var temp =
+  //         search.length > 3
+  //           ? search.match(
+  //               /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
+  //             )
+  //           : { groups: false };
 
-        let token =
-          !!temp.groups && temp.groups.action
-            ? temp.groups
-            : {
-                key: "search",
-                search: search,
-                invert: false,
-                action: "~",
-              };
+  //       let token =
+  //         !!temp.groups && temp.groups.action
+  //           ? temp.groups
+  //           : {
+  //               key: "search",
+  //               search: search,
+  //               invert: false,
+  //               action: "~",
+  //             };
 
-        token.search = _.map(token.search.split(","), s => {
-          let raw = _.trim(s, " ");
+  //       token.search = _.map(token.search.split(","), s => {
+  //         let raw = _.trim(s, " ");
 
-          let quoted = /"+?([^"]+)"+/.test(raw);
+  //         let quoted = /"+?([^"]+)"+/.test(raw);
 
-          raw = _.trim(s, '"');
-          let looseEnd = /\*$/.test(raw);
-          let looseStart = /^\*/.test(raw);
+  //         raw = _.trim(s, '"');
+  //         let looseEnd = /\*$/.test(raw);
+  //         let looseStart = /^\*/.test(raw);
 
-          let action = "~"; //fuzzy
-          if (quoted && looseEnd && looseStart) action = "*"; //contains
-          if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
-          if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
-          if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
+  //         let action = "~"; //fuzzy
+  //         if (quoted && looseEnd && looseStart) action = "*"; //contains
+  //         if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
+  //         if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
+  //         if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
 
-          return {
-            action,
-            string: raw + "",
-            lower: (raw + "").toLowerCase(),
-            raw,
-          };
-        });
-        token.invert = !!token.invert;
-        searches.push(token);
-        return searches;
-      },
-      []
-    );
-  };
+  //         return {
+  //           action,
+  //           string: raw + "",
+  //           lower: (raw + "").toLowerCase(),
+  //           raw,
+  //         };
+  //       });
+  //       token.invert = !!token.invert;
+  //       searches.push(token);
+  //       return searches;
+  //     },
+  //     []
+  //   );
+  // };
 
-  this.createFilters = (parameters, options = { keys: [] }) => {
-    const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
+  // this.createFilters = (parameters, options = { keys: [] }) => {
+  //   const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
 
-    let modelFilter = { deleted: false };
+  //   let modelFilter = { deleted: false };
 
-    _.each(options.keys, key => {
-      if (searchFields[key]) {
-        modelFilter[key] = !(
-          searchFields[key][0].invert ==
-          (searchFields[key][0].search[0].string == "true")
-        );
-      }
-      delete searchFields[key];
-    });
+  //   _.each(options.keys, key => {
+  //     if (searchFields[key]) {
+  //       modelFilter[key] = !(
+  //         searchFields[key][0].invert ==
+  //         (searchFields[key][0].search[0].string == "true")
+  //       );
+  //     }
+  //     delete searchFields[key];
+  //   });
 
-    let sortarray = _.reduce(
-      sort,
-      (result, { invert, search }) => {
-        _.each(search, ({ raw }) => {
-          result.push({ invert, sort: raw });
-        });
+  //   let sortarray = _.reduce(
+  //     sort,
+  //     (result, { invert, search }) => {
+  //       _.each(search, ({ raw }) => {
+  //         result.push({ invert, sort: raw });
+  //       });
 
-        return result;
-      },
-      []
-    );
+  //       return result;
+  //     },
+  //     []
+  //   );
 
-    let filters = _.compact(
-      _.map(_.flatMap(searchFields), filter => {
-        let { key, search } = filter;
-        let field = _.find(options.queryFields, { key: key });
-        if (!field) return false;
-        filter.logic = "&&";
-        filter.exact = field.base !== "input";
-        return filter;
-      })
-    );
+  //   let filters = _.compact(
+  //     _.map(_.flatMap(searchFields), filter => {
+  //       let { key, search } = filter;
+  //       let field = _.find(options.queryFields, { key: key });
+  //       if (!field) return false;
+  //       filter.logic = "&&";
+  //       filter.exact = field.base !== "input";
+  //       return filter;
+  //     })
+  //   );
 
-    if (search.length) {
-      var searches = [].concat.apply([], _.map(search, "search"));
-      _.reduce(
-        options.filterFields,
-        (filters, field) => {
-          let filter = {
-            exact: false,
-            key: field.search,
-            logic: "||",
-            search: searches,
-          };
-          filters.push(filter);
-          return filters;
-        },
-        filters
-      );
-    }
+  //   if (search.length) {
+  //     var searches = [].concat.apply([], _.map(search, "search"));
+  //     _.reduce(
+  //       options.filterFields,
+  //       (filters, field) => {
+  //         let filter = {
+  //           exact: false,
+  //           key: field.search,
+  //           logic: "||",
+  //           search: searches,
+  //         };
+  //         filters.push(filter);
+  //         return filters;
+  //       },
+  //       filters
+  //     );
+  //   }
 
-    return {
-      model: modelFilter,
-      sort: sortarray,
-      or: _.filter(filters, { logic: "||" }),
-      and: _.filter(filters, { logic: "&&" }),
-    };
-  };
+  //   return {
+  //     model: modelFilter,
+  //     sort: sortarray,
+  //     or: _.filter(filters, { logic: "||" }),
+  //     and: _.filter(filters, { logic: "&&" }),
+  //   };
+  // };
 
-  this.applyFilter = function (model, filter) {
-    if (filter.exact) {
-      let atts = model.attributes[filter.key];
+  // this.applyFilter = function (model, filter) {
+  //   if (filter.exact) {
+  //     let atts = model.attributes[filter.key];
 
-      return _.includes(
-        _.map(filter.search, "string"),
-        model.display[filter.key]
-      ) ||
-        (typeof atts == "object"
-          ? _.intersection(
-              _.map(filter.search, "string"),
-              _.map(atts, a => a + "")
-            ).length
-          : _.includes(_.map(filter.search, "string"), atts + ""))
-        ? !filter.invert
-        : filter.invert;
-    } else {
-      let mapfunc;
-      let finding = model.display[filter.key]
-        .replace(/\s+/g, " ")
-        .toLowerCase();
-      switch (filter.action) {
-        case "~":
-          mapfunc = search => _.score(finding, search) > 0.4;
-          break;
-        case "=":
-          mapfunc = search => finding.indexOf(search) >= 0;
-          break;
-        default:
-      }
-      if (filter.action == "~") {
-        mapfunc = search => _.score(finding, search) > 0.4;
-      } else {
-        mapfunc = search => finding.indexOf(search) >= 0;
-      }
+  //     return _.includes(
+  //       _.map(filter.search, "string"),
+  //       model.display[filter.key]
+  //     ) ||
+  //       (typeof atts == "object"
+  //         ? _.intersection(
+  //             _.map(filter.search, "string"),
+  //             _.map(atts, a => a + "")
+  //           ).length
+  //         : _.includes(_.map(filter.search, "string"), atts + ""))
+  //       ? !filter.invert
+  //       : filter.invert;
+  //   } else {
+  //     let mapfunc;
+  //     let finding = model.display[filter.key]
+  //       .replace(/\s+/g, " ")
+  //       .toLowerCase();
+  //     switch (filter.action) {
+  //       case "~":
+  //         mapfunc = search => _.score(finding, search) > 0.4;
+  //         break;
+  //       case "=":
+  //         mapfunc = search => finding.indexOf(search) >= 0;
+  //         break;
+  //       default:
+  //     }
+  //     if (filter.action == "~") {
+  //       mapfunc = search => _.score(finding, search) > 0.4;
+  //     } else {
+  //       mapfunc = search => finding.indexOf(search) >= 0;
+  //     }
 
-      // return _.some(_.map(filter.search, "lower"), mapfunc)
-      //   ? !filter.invert
-      //   : filter.invert;
+  //     // return _.some(_.map(filter.search, "lower"), mapfunc)
+  //     //   ? !filter.invert
+  //     //   : filter.invert;
 
-      return !_.some(_.map(filter.search, "lower"), mapfunc) != !filter.invert;
-    }
-  };
+  //     return !_.some(_.map(filter.search, "lower"), mapfunc) != !filter.invert;
+  //   }
+  // };
 
-  this.inquire = (
-    parameters,
-    models,
-    options = { path: "", keys: [], queryFields: [] }
-  ) => {
-    debugger;
-    if (typeof parameters == "string") {
-      parameters = this.tokenize(parameters);
-    }
-    if (typeof parameters !== "object" || !options.queryFields.length) {
-      return [];
-    }
-    const filters = this.createFilters(parameters, options);
+  // this.inquire = (
+  //   parameters,
+  //   models,
+  //   options = { path: "", keys: [], queryFields: [] }
+  // ) => {
+  //   debugger;
+  //   if (typeof parameters == "string") {
+  //     parameters = this.tokenize(parameters);
+  //   }
+  //   if (typeof parameters !== "object" || !options.queryFields.length) {
+  //     return [];
+  //   }
+  //   const filters = this.createFilters(parameters, options);
 
-    filters.sort = filters.sort || [
-      options.sort || { invert: false, search: options.queryFields[0].key },
-    ];
-    let ordered = _.orderBy(
-      _.filter(models, filters.model),
-      _.map(filters.sort, ({ sort }) => options.path + sort),
-      _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
-    );
-    return _.filter(ordered, model => {
-      let modelFilter = _.partial(this.applyFilter, model);
-      return (
-        (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
-        (filters.or.length ? _.some(filters.or, modelFilter) : true)
-      );
-    });
-  };
+  //   filters.sort = filters.sort || [
+  //     options.sort || { invert: false, search: options.queryFields[0].key },
+  //   ];
+  //   let ordered = _.orderBy(
+  //     _.filter(models, filters.model),
+  //     _.map(filters.sort, ({ sort }) => options.path + sort),
+  //     _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
+  //   );
+  //   return _.filter(ordered, model => {
+  //     let modelFilter = _.partial(this.applyFilter, model);
+  //     return (
+  //       (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
+  //       (filters.or.length ? _.some(filters.or, modelFilter) : true)
+  //     );
+  //   });
+  // };
 
-  this.query = _.partialRight(this.inquire, {
-    path: "attributes.",
+  this.query = _.partialRight(_.query, {
+    path: "attributes",
     keys: ["checked", "deleted"],
+    modelFilter: { deleted: false },
     sort: {
       invert: options.reverse,
       search: [options.sort || this.options.sortBy],
@@ -1801,6 +1802,235 @@ GrapheneDataGrid = function (options) {
 GrapheneDataGrid.version = "1.0.5";
 
 _.mixin({
+  tokenize: string => {
+    return _.reduce(
+      string.match(/(?:[^\s"]+|"[^"]*")+/g),
+
+      (searches, search) => {
+        var temp =
+          search.length > 3
+            ? search.match(
+                /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
+              )
+            : { groups: false };
+
+        let token =
+          !!temp.groups && temp.groups.action
+            ? temp.groups
+            : {
+                key: "search",
+                search: search,
+                invert: false,
+                action: "~",
+              };
+
+        token.search = _.map(token.search.split(","), s => {
+          debugger;
+          let raw = _.trim(s, " ");
+
+          let quoted = /"+?([^"]+)"+/.test(raw);
+
+          raw = _.trim(s, '"');
+          let looseEnd = /\*$/.test(raw);
+          let looseStart = /^\*/.test(raw);
+
+          let action = "~"; //fuzzy
+          if (quoted && looseEnd && looseStart) action = "*"; //contains
+          if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
+          if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
+          if (quoted && !looseEnd && !looseStart) action = "="; //exactly
+          raw = _.trim(raw, "*");
+
+          return {
+            action,
+            string: raw + "",
+            lower: (raw + "").toLowerCase(),
+            raw,
+          };
+        });
+        token.invert = !!token.invert;
+        searches.push(token);
+        return searches;
+      },
+      []
+    );
+  },
+  createFilters: (parameters, config) => {
+    let { keys = [], queryFields = [], modelFilter = {}, ...options } = config;
+
+    const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
+
+    _.each(options.keys, key => {
+      if (searchFields[key]) {
+        modelFilter[key] = !(
+          searchFields[key][0].invert ==
+          (searchFields[key][0].search[0].string == "true")
+        );
+      }
+      delete searchFields[key];
+    });
+
+    let sortarray = _.reduce(
+      sort,
+      (result, { invert, search }) => {
+        _.each(search, ({ raw }) => {
+          result.push({ invert, sort: raw });
+        });
+
+        return result;
+      },
+      []
+    );
+
+    let filters = _.compact(
+      _.map(_.flatMap(searchFields), filter => {
+        let { key, search } = filter;
+        if (!queryFields.length) {
+          filter.logic = "&&";
+          filter.exact = false;
+        } else {
+          let field = _.find(queryFields, { key: key });
+          if (!field) return false;
+          filter.logic = "&&";
+          filter.exact = field.base !== "input";
+        }
+
+        return filter;
+      })
+    );
+
+    if (search.length) {
+      var searches = [].concat.apply([], _.map(search, "search"));
+      _.reduce(
+        options.filterFields,
+        (filters, field) => {
+          let filter = {
+            exact: false,
+            key: field.search,
+            logic: "||",
+            search: searches,
+          };
+          filters.push(filter);
+          return filters;
+        },
+        filters
+      );
+    }
+
+    return {
+      model: modelFilter,
+      sort: sortarray,
+      or: _.filter(filters, { logic: "||" }),
+      and: _.filter(filters, { logic: "&&" }),
+    };
+  },
+  applyFilter: function (model, filter) {
+    if (filter.exact) {
+      let atts = model.attributes[filter.key];
+
+      return _.includes(
+        _.map(filter.search, "string"),
+        model.display[filter.key]
+      ) ||
+        (typeof atts == "object"
+          ? _.intersection(
+              _.map(filter.search, "string"),
+              _.map(atts, a => a + "")
+            ).length
+          : _.includes(_.map(filter.search, "string"), atts + ""))
+        ? !filter.invert
+        : filter.invert;
+    } else {
+      //not exact
+
+      let mapfunc;
+      let finding = model.attributes[filter.key].replace(/\s+/g, " ");
+      //.toLowerCase();
+
+      // switch (filter.action) {
+      //   case "~":
+      //     mapfunc = search => _.score(finding, search) > 0.4;
+      //     break;
+      //   case "=":
+      //     mapfunc = search => finding.indexOf(search) >= 0;
+      //     break;
+      //   default:
+      // }
+      //
+      //
+      //
+      if (filter.action == "~") {
+        mapfunc = search => _.score(finding, search) > 0.4;
+      } else {
+        mapfunc = search => {
+          debugger;
+          let index = finding.indexOf(search.string);
+          switch (search.action) {
+            case "~": //fuzzy
+              mapfunc = search =>
+                _.score(finding.toLowerCase(), search.lower) > 0.4;
+              break;
+            case "*": //contains
+              return index >= 0;
+            case "^": //startsWith
+              debugger;
+              return index == 0;
+
+            case "$": //endsWith
+              return (index = finding.length - search.string.length);
+
+            case "=": //exactly
+              return finding == search.string;
+
+            default:
+              return finding.indexOf(search.string) >= 0;
+          }
+        };
+      }
+
+      return !_.some(filter.search, mapfunc) != !filter.invert;
+    }
+  },
+  query: (models, parameters, config) => {
+    let { path = "", keys = [], queryFields = [], sort, ...options } = config;
+    if (typeof parameters == "string") {
+      parameters = _.tokenize(parameters);
+    }
+    if (typeof parameters !== "object" && queryFields.length) {
+      return [];
+    }
+    const filters = _.createFilters(parameters, {
+      queryFields,
+      sort,
+      keys,
+      modelFilter: options.modelFilter,
+    });
+
+    filters.sort = filters.sort.length
+      ? filters.sort
+      : [
+          sort || {
+            invert: false,
+            search: (queryFields.length ? queryFields : [{ key: "id" }])[0].key,
+          },
+        ];
+    let ordered = _.orderBy(
+      _.filter(models, filters.model),
+      _.map(filters.sort, ({ sort }) => {
+        return path.split(".").concat([sort]).join(".");
+      }),
+      _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
+    );
+
+    return _.filter(ordered, model => {
+      let modelFilter = _.partial(_.applyFilter, model);
+      return (
+        (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
+        (filters.or.length ? _.some(filters.or, modelFilter) : true)
+      );
+    });
+  },
+
   score: function (base, abbr, offset) {
     offset = offset || 0; // TODO: I think this is unused... remove
 
