@@ -1,6 +1,6 @@
-window = {};
-var $ = require("./jquery.min");
-var _ = require("./lodash.min");
+// window = {};
+// var $ = require("./jquery.min");
+// var _ = require("./lodash.min");
 
 var gform = function (optionsIn, el) {
   "use strict";
@@ -8755,3 +8755,5 @@ gform.types["combobox"] = _.extend({}, gform.types["input"], {
     this.el.addEventListener("input", this.onchangeEvent.bind(null, true));
   },
 });
+
+exports.gform = gform;

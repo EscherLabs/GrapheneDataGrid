@@ -118,7 +118,9 @@ GrapheneDataGrid = function (options) {
       this.resetSearch();
       this.queryString =
         typeof models == "string" ? models : this.queryString || "";
-      models = this.queryString ? this.query(this.queryString) : models;
+      models = this.queryString
+        ? this.query(this.queryString, this.models)
+        : models;
       this.lastGrabbed = models.length;
       this.filtered = models;
     }
@@ -241,11 +243,13 @@ GrapheneDataGrid = function (options) {
       } else {
         options.reverse = reverse;
       }
-      var current = this.$el.find(
-        ".reverse, [data-sort=" +
-          _.find(this.options.filterFields, { search: sortField }).id +
-          "]"
-      );
+      var current = sortField
+        ? this.$el.find(
+            ".reverse, [data-sort=" +
+              _.find(this.options.filterFields, { search: sortField }).id +
+              "]"
+          )
+        : undefined;
       if (typeof current !== "undefined") {
         if (options.reverse) {
           current.find("i").attr("class", "fa fa-sort-asc");
@@ -1278,28 +1282,20 @@ GrapheneDataGrid = function (options) {
     );
   };
 
-  this.createFilters = parameters => {
-    const {
-      checked,
-      deleted,
-      sort,
-      search = "",
-      ...searchFields
-    } = _.groupBy(parameters, "key");
+  this.createFilters = (parameters, options = { keys: [] }) => {
+    const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
+
     let modelFilter = { deleted: false };
 
-    if (deleted) {
-      modelFilter.deleted = !(
-        deleted[0].invert ==
-        (deleted[0].search[0].string == "true")
-      );
-    }
-    if (checked) {
-      modelFilter.checked = !(
-        checked[0].invert ==
-        (checked[0].search[0].string == "true")
-      );
-    }
+    _.each(options.keys, key => {
+      if (searchFields[key]) {
+        modelFilter[key] = !(
+          searchFields[key][0].invert ==
+          (searchFields[key][0].search[0].string == "true")
+        );
+      }
+      delete searchFields[key];
+    });
 
     let sortarray = _.reduce(
       sort,
@@ -1316,12 +1312,10 @@ GrapheneDataGrid = function (options) {
     let filters = _.compact(
       _.map(_.flatMap(searchFields), filter => {
         let { key, search } = filter;
-        let field = _.find(options.filterFields, { search: key });
+        let field = _.find(options.queryFields, { key: key });
         if (!field) return false;
         filter.logic = "&&";
-        filter.exact =
-          gform.types[_.find(options.filterFields, { search: key }).type]
-            .base !== "input";
+        filter.exact = field.base !== "input";
         return filter;
       })
     );
@@ -1388,36 +1382,60 @@ GrapheneDataGrid = function (options) {
         mapfunc = search => finding.indexOf(search) >= 0;
       }
 
-      return _.some(_.map(filter.search, "lower"), mapfunc)
-        ? !filter.invert
-        : filter.invert;
+      // return _.some(_.map(filter.search, "lower"), mapfunc)
+      //   ? !filter.invert
+      //   : filter.invert;
+
+      return !_.some(_.map(filter.search, "lower"), mapfunc) != !filter.invert;
     }
   };
 
-  this.query = parameters => {
+  this.inquire = (
+    parameters,
+    models,
+    options = { path: "", keys: [], queryFields: [] }
+  ) => {
+    debugger;
     if (typeof parameters == "string") {
       parameters = this.tokenize(parameters);
     }
-    const filters = this.createFilters(parameters);
+    if (typeof parameters !== "object" || !options.queryFields.length) {
+      return [];
+    }
+    const filters = this.createFilters(parameters, options);
+
     filters.sort = filters.sort || [
-      {
-        invert: options.reverse,
-        search: [options.sort || this.options.sortBy],
-      },
+      options.sort || { invert: false, search: options.queryFields[0].key },
     ];
     let ordered = _.orderBy(
-      _.filter(this.models, filters.model),
-      _.map(filters.sort, ({ sort }) => "attributes." + sort),
+      _.filter(models, filters.model),
+      _.map(filters.sort, ({ sort }) => options.path + sort),
       _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
     );
-    let aF = _.partial(this.applyFilter, model);
     return _.filter(ordered, model => {
+      let modelFilter = _.partial(this.applyFilter, model);
       return (
-        (filters.and.length ? _.every(filters.and, aF) : true) &&
-        (filters.or.length ? _.some(filters.or, aF) : true)
+        (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
+        (filters.or.length ? _.some(filters.or, modelFilter) : true)
       );
     });
   };
+
+  this.query = _.partialRight(this.inquire, {
+    path: "attributes.",
+    keys: ["checked", "deleted"],
+    sort: {
+      invert: options.reverse,
+      search: [options.sort || this.options.sortBy],
+    },
+    queryFields: _.map(options.filterFields, field => {
+      return {
+        key: field.search,
+        type: field.type,
+        base: gform.types[field.type].base,
+      };
+    }),
+  });
 
   this.search = function (options) {
     var ordered = _.sortBy(this.getModels(), function (obj) {

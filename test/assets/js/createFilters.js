@@ -1,3 +1,5 @@
+const options = {};
+options.filterFields = [{ type: "text", search: "title" }];
 createFilters = parameters => {
   const {
     checked,
@@ -72,4 +74,5 @@ createFilters = parameters => {
   };
 };
 
-export { createFilters };
+// export { createFilters };
+exports.createFilters = createFilters;

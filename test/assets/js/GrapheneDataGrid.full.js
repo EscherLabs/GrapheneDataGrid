@@ -240,11 +240,13 @@ GrapheneDataGrid = function (options) {
       } else {
         options.reverse = reverse;
       }
-      var current = this.$el.find(
-        ".reverse, [data-sort=" +
-          _.find(this.options.filterFields, { search: sortField }).id +
-          "]"
-      );
+      var current = sortField
+        ? this.$el.find(
+            ".reverse, [data-sort=" +
+              _.find(this.options.filterFields, { search: sortField }).id +
+              "]"
+          )
+        : undefined;
       if (typeof current !== "undefined") {
         if (options.reverse) {
           current.find("i").attr("class", "fa fa-sort-asc");
