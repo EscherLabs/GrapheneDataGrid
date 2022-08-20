@@ -1312,7 +1312,7 @@ GrapheneDataGrid = function (options) {
   //   let filters = _.compact(
   //     _.map(_.flatMap(searchFields), filter => {
   //       let { key, search } = filter;
-  //       let field = _.find(options.queryFields, { key: key });
+  //       let field = _.find(options.fields, { key: key });
   //       if (!field) return false;
   //       filter.logic = "&&";
   //       filter.exact = field.base !== "input";
@@ -1393,19 +1393,19 @@ GrapheneDataGrid = function (options) {
   // this.inquire = (
   //   parameters,
   //   models,
-  //   options = { path: "", keys: [], queryFields: [] }
+  //   options = { path: "", keys: [], fields: [] }
   // ) => {
   //   debugger;
   //   if (typeof parameters == "string") {
   //     parameters = this.tokenize(parameters);
   //   }
-  //   if (typeof parameters !== "object" || !options.queryFields.length) {
+  //   if (typeof parameters !== "object" || !options.fields.length) {
   //     return [];
   //   }
   //   const filters = this.createFilters(parameters, options);
 
   //   filters.sort = filters.sort || [
-  //     options.sort || { invert: false, search: options.queryFields[0].key },
+  //     options.sort || { invert: false, search: options.fields[0].key },
   //   ];
   //   let ordered = _.orderBy(
   //     _.filter(models, filters.model),
@@ -1423,13 +1423,14 @@ GrapheneDataGrid = function (options) {
 
   this.query = _.partialRight(_.query, {
     path: "attributes",
-    keys: ["checked", "deleted"],
+    bools: ["checked", "deleted"],
     modelFilter: { deleted: false },
+    keys: ["attributes", "display"],
     sort: {
       invert: options.reverse,
       search: [options.sort || this.options.sortBy],
     },
-    queryFields: _.map(options.filterFields, field => {
+    fields: _.map(options.filterFields, field => {
       return {
         key: field.search,
         type: field.type,
@@ -1825,7 +1826,6 @@ _.mixin({
               };
 
         token.search = _.map(token.search.split(","), s => {
-          debugger;
           let raw = _.trim(s, " ");
 
           let quoted = /"+?([^"]+)"+/.test(raw);
@@ -1856,11 +1856,17 @@ _.mixin({
     );
   },
   createFilters: (parameters, config) => {
-    let { keys = [], queryFields = [], modelFilter = {}, ...options } = config;
+    let {
+      bools = [],
+      keys = [],
+      fields = [],
+      modelFilter = {},
+      ...options
+    } = config;
 
     const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
 
-    _.each(options.keys, key => {
+    _.each(options.bools, key => {
       if (searchFields[key]) {
         modelFilter[key] = !(
           searchFields[key][0].invert ==
@@ -1885,11 +1891,11 @@ _.mixin({
     let filters = _.compact(
       _.map(_.flatMap(searchFields), filter => {
         let { key, search } = filter;
-        if (!queryFields.length) {
+        if (!fields.length) {
           filter.logic = "&&";
           filter.exact = false;
         } else {
-          let field = _.find(queryFields, { key: key });
+          let field = _.find(fields, { key: key });
           if (!field) return false;
           filter.logic = "&&";
           filter.exact = field.base !== "input";
@@ -1924,22 +1930,23 @@ _.mixin({
       and: _.filter(filters, { logic: "&&" }),
     };
   },
-  applyFilter: function (model, filter) {
-    if (filter.exact) {
-      let atts = model.attributes[filter.key];
+  applyFilter: function (model, options, filter) {
+    let { keys } = options;
+    let atts = _.reduce(
+      keys,
+      (atts, key) => {
+        let att = model[key][filter.key];
 
-      return _.includes(
-        _.map(filter.search, "string"),
-        model.display[filter.key]
-      ) ||
-        (typeof atts == "object"
-          ? _.intersection(
-              _.map(filter.search, "string"),
-              _.map(atts, a => a + "")
-            ).length
-          : _.includes(_.map(filter.search, "string"), atts + ""))
-        ? !filter.invert
-        : filter.invert;
+        att = typeof att == "object" ? _.map(att, a => a + "") : [att + ""];
+        return atts.concat(att);
+      },
+      []
+    );
+
+    if (filter.exact) {
+      let strArray = _.map(filter.search, "string");
+
+      return !_.intersection(strArray, atts).length != !filter.invert;
     } else {
       //not exact
 
@@ -1947,41 +1954,23 @@ _.mixin({
       let finding = model.attributes[filter.key].replace(/\s+/g, " ");
       //.toLowerCase();
 
-      // switch (filter.action) {
-      //   case "~":
-      //     mapfunc = search => _.score(finding, search) > 0.4;
-      //     break;
-      //   case "=":
-      //     mapfunc = search => finding.indexOf(search) >= 0;
-      //     break;
-      //   default:
-      // }
-      //
-      //
-      //
       if (filter.action == "~") {
         mapfunc = search => _.score(finding, search) > 0.4;
       } else {
         mapfunc = search => {
-          debugger;
           let index = finding.indexOf(search.string);
+
           switch (search.action) {
             case "~": //fuzzy
-              mapfunc = search =>
-                _.score(finding.toLowerCase(), search.lower) > 0.4;
-              break;
+              return _.score(finding.toLowerCase(), search.lower) > 0.4;
             case "*": //contains
               return index >= 0;
             case "^": //startsWith
-              debugger;
               return index == 0;
-
             case "$": //endsWith
-              return (index = finding.length - search.string.length);
-
+              return index == finding.length - search.string.length;
             case "=": //exactly
               return finding == search.string;
-
             default:
               return finding.indexOf(search.string) >= 0;
           }
@@ -1991,18 +1980,18 @@ _.mixin({
       return !_.some(filter.search, mapfunc) != !filter.invert;
     }
   },
-  query: (models, parameters, config) => {
-    let { path = "", keys = [], queryFields = [], sort, ...options } = config;
+  query: (models, parameters, config = {}) => {
+    let { path = "", bools = [], fields = [], sort, ...options } = config;
     if (typeof parameters == "string") {
       parameters = _.tokenize(parameters);
     }
-    if (typeof parameters !== "object" && queryFields.length) {
+    if (typeof parameters !== "object" && fields.length) {
       return [];
     }
     const filters = _.createFilters(parameters, {
-      queryFields,
+      fields,
       sort,
-      keys,
+      bools,
       modelFilter: options.modelFilter,
     });
 
@@ -2011,7 +2000,7 @@ _.mixin({
       : [
           sort || {
             invert: false,
-            search: (queryFields.length ? queryFields : [{ key: "id" }])[0].key,
+            search: (fields.length ? fields : [{ key: "id" }])[0].key,
           },
         ];
     let ordered = _.orderBy(
@@ -2023,7 +2012,7 @@ _.mixin({
     );
 
     return _.filter(ordered, model => {
-      let modelFilter = _.partial(_.applyFilter, model);
+      let modelFilter = _.partial(_.applyFilter, model, options);
       return (
         (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
         (filters.or.length ? _.some(filters.or, modelFilter) : true)

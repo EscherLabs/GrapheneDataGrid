@@ -1,0 +1,77 @@
+bool
+ defaults to matching
+
+ true/false/undefined
+ "True"/"False"/"intermediate"/"undefined"
+ field - options[0]/options[1]/options[2]
+
+array
+ defaults to matching
+
+ field search - keys, "options.value", "options.display"
+
+text
+ defaults to fuzzy
+
+
+
+fuzzy
+ key:"created stuff"
+ key:created
+ key~"created stuff"
+ key~created
+ created
+ "Text like this"
+
+contains
+ key:"*created stuff*"
+ key:*created*
+ *created*
+ "*Text like this*"
+
+starts_with
+ key:"created stuff*"
+ key:created*
+ created*
+ "Text like this*"
+
+ends_with
+ key:"*created stuff"
+ key:*created
+ *created
+ "*Text like this"
+
+exactly
+ key="created stuff"
+ key=created
+
+case_insensitive
+ key="created stuff"
+ key=created
+
+count
+ at least (3 or more)
+ key:[3]
+ less than (less than 3)
+ -key:[3]
+
+ exactly
+ key=[3]
+
+range
+
+ key: 1-100
+ key: 1><100
+
+ key: 1=<100
+ key: 1>=100
+ key: 1==100
+
+ key: <=100
+ key: <100
+ key: 1>=
+ key: 1>
+
+ key: 1/1/2000<>1/1/2020
+ key: 1/1/2000-1/1/2020
+

@@ -1,107 +1,83 @@
 const { assert } = require("chai");
-_ = require("./assets/js/lodash.min");
 
-// gform = require("./assets/js/gform_bootstrap");
-var { createFilters } = require("./assets/js/createFilters");
-// var tokenize = string => {
-//   return _.reduce(
-//     string.match(/(?:[^\s"]+|"[^"]*")+/g),
+var { _ } = require("./assets/js/query");
 
-//     (searches, search) => {
-//       var temp =
-//         search.length > 3
-//           ? search.match(
-//               /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-//             )
-//           : { groups: false };
+var { models } = require("./assets/data/models");
+models = _.map(models, model => {
+  return { attributes: model };
+});
 
-//       let token =
-//         !!temp.groups && temp.groups.action
-//           ? temp.groups
-//           : {
-//               key: "search",
-//               search: search,
-//               invert: false,
-//               action: "~",
-//             };
+describe("Tokenize", function () {
+  describe("sort", function () {
+    it("should return a sort token", function () {
+      let result = _.tokenize("sort:title");
 
-//       token.search = _.map(token.search.split(","), s => {
-//         let raw = _.trim(s, " ");
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "sort");
+      assert.deepInclude(result, {
+        invert: false,
+        key: "sort",
+        action: ":",
+        search: [
+          {
+            action: "~",
+            lower: "title",
+            raw: "title",
+            string: "title",
+          },
+        ],
+      });
+    });
+    it("should return an inverted sort token", function () {
+      let result = _.tokenize("-sort:title");
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "sort");
+      assert.deepInclude(result, {
+        invert: true,
+        key: "sort",
+        action: ":",
+        search: [
+          {
+            action: "~",
+            lower: "title",
+            raw: "title",
+            string: "title",
+          },
+        ],
+      });
+    });
 
-//         let quoted = /"+?([^"]+)"+/.test(raw);
+    it("should return an startswith search token", function () {
+      let result = _.tokenize('title:"add*"');
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "title");
+      assert.deepInclude(result, {
+        invert: false,
+        key: "title",
+        action: ":",
+        search: [
+          {
+            action: "^",
+            lower: "add",
+            raw: "add",
+            string: "add",
+          },
+        ],
+      });
+    });
+  });
+});
 
-//         raw = _.trim(s, '"');
-//         let looseEnd = /\*$/.test(raw);
-//         let looseStart = /^\*/.test(raw);
+describe("Query", function () {
+  describe("Fuzzy", function () {
+    let result = _.query(models, "title:add", {
+      keys: ["attributes"],
+      fields: [{ key: "title", type: "text", base: "input" }],
+    });
 
-//         let action = "~"; //fuzzy
-//         if (quoted && looseEnd && looseStart) action = "*"; //contains
-//         if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
-//         if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
-//         if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
-
-//         return {
-//           action,
-//           string: raw + "",
-//           lower: (raw + "").toLowerCase(),
-//           raw,
-//         };
-//       });
-//       token.invert = !!token.invert;
-//       searches.push(token);
-//       return searches;
-//     },
-//     []
-//   );
-// };
-
-// describe("Tokenize", function () {
-//   describe("Sort", function () {
-//     it("should return a search object", function () {
-//       assert.equal(tokenize("sort title").length, 2);
-//       assert.equal(tokenize('"sort title"').length, 1);
-//       assert.equal(tokenize('"sort title"')[0].search[0].raw, "sort title");
-//     });
-//     it("should return a sort object", function () {
-//       assert.equal(tokenize("sort:title")[0].key, "sort");
-
-//       token_2 = tokenize("sort:title -sort:size");
-//       assert.equal(token_2.length, 2);
-//       assert.deepInclude(token_2, {
-//         invert: false,
-//         key: "sort",
-//         action: ":",
-//         search: [
-//           {
-//             action: "~",
-//             lower: "title",
-//             raw: "title",
-//             string: "title",
-//           },
-//         ],
-//       });
-//       assert.deepInclude(token_2, {
-//         invert: true,
-//         key: "sort",
-//         action: ":",
-//         search: [
-//           {
-//             action: "~",
-//             lower: "size",
-//             raw: "size",
-//             string: "size",
-//           },
-//         ],
-//       });
-//     });
-
-//     it("should return a column search  with exact matching", function () {
-//       assert.equal(tokenize('title:"hello"').length, 1);
-//     });
-
-//     it("import", function () {
-//       console.log(createFilters(tokenize('title:"hello"')));
-//       // assert.equal(createFilters('title:"hello"').length, 1);
-//     });
-//   });
-// });
+    it("should return a search object", function () {
+      assert.equal(result.length, 4);
+      assert.equal(result[0].attributes.title, "Add Home page");
+    });
+  });
+});
