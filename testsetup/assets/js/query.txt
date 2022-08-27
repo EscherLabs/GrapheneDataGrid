@@ -25,8 +25,8 @@ fuzzy
 
 contains
  key:"*created stuff*"
- key:*created*
- *created*
+ key:"*created*"
+ "*created*"
  "*Text like this*"
 
 starts_with
@@ -41,9 +41,15 @@ ends_with
  *created
  "*Text like this"
 
+
 exactly
  key="created stuff"
  key=created
+
+
+
+
+
 
 case_insensitive
  key="created stuff"
@@ -75,3 +81,6 @@ range
  key: 1/1/2000<>1/1/2020
  key: 1/1/2000-1/1/2020
 
+
+limit
+sort

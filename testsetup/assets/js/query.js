@@ -1,4 +1,3 @@
-_ = require("./lodash.min");
 _.mixin({
   tokenize: string => {
     return _.reduce(
@@ -116,13 +115,15 @@ _.mixin({
         if (filter.action == "~") {
         }
 
+        debugger;
         filter.search = _.map(filter.search, search => ({
           ...search,
-          action: (filter.action != ":" &&
-          ["~", "="].indexOf(search.action) >= 0
-            ? filter
-            : search
-          ).action,
+          action:
+            filter.action == "~" && ["~", "="].indexOf(search.action) >= 0
+              ? "~"
+              : filter.action == "=" && ["~", "="].indexOf(search.action) >= 0
+              ? "="
+              : search.action,
         }));
 
         return filter;
@@ -414,5 +415,3 @@ _.mixin({
     return true;
   },
 });
-
-exports._ = _;
