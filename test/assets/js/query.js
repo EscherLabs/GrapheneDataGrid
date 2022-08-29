@@ -173,7 +173,8 @@ _.mixin({
     };
   },
   applyFilter: function (model, options, filter) {
-    let { keys } = options;
+    let { keys = [], path = null } = options;
+    let _model = path !== null ? model[path] : model;
     let atts = _.reduce(
       keys,
       (atts, key) => {
@@ -193,11 +194,11 @@ _.mixin({
       //not exact
 
       let mapfunc;
-      let finding = model.attributes[filter.key].replace(/\s+/g, " ");
+      let finding = (_model[filter.key] || "").replace(/\s+/g, " ");
       //.toLowerCase();
 
       if (filter.action == "~") {
-        mapfunc = search => _.score(finding, search) > 0.4;
+        mapfunc = search => _.score(finding, search.lower) > 0.4;
       } else {
         mapfunc = search => {
           let index = finding.indexOf(search.string);

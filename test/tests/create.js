@@ -22,6 +22,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -41,6 +42,7 @@ exports.create = function suite() {
     it('should return a fuzzy filter on "key" for "created" object', function () {
       let result = _.createFilters(_.tokenize("key:created"));
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -60,6 +62,7 @@ exports.create = function suite() {
     it('should return a fuzzy filter on "key" for "created stuff" object', function () {
       let result = _.createFilters(_.tokenize('key~"created stuff"'));
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -79,6 +82,7 @@ exports.create = function suite() {
     it('should return a fuzzy filter on "key" for "created" object', function () {
       let result = _.createFilters(_.tokenize("key~created"));
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -100,6 +104,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -122,6 +127,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -154,6 +160,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -176,6 +183,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -197,6 +205,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -218,6 +227,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -248,6 +258,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -270,6 +281,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -291,6 +303,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -312,6 +325,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -342,6 +356,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -364,6 +379,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -385,6 +401,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -406,6 +423,7 @@ exports.create = function suite() {
         fields: [{ key: "key", base: "input" }],
       });
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "||",
@@ -426,6 +444,7 @@ exports.create = function suite() {
   // exactly
   // key="created stuff"
   // key=created
+  // key=created,closed
 
   describe("Exactly", function () {
     it('should return a search of key containing "created stuff" object', function () {
@@ -434,6 +453,7 @@ exports.create = function suite() {
       });
 
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -454,8 +474,8 @@ exports.create = function suite() {
       let result = _.createFilters(_.tokenize("key=created"), {
         fields: [{ key: "key", base: "input" }],
       });
-      console.log(result.filters[0]);
       assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
         invert: false,
         logic: "&&",
@@ -467,6 +487,34 @@ exports.create = function suite() {
             lower: "created",
             raw: "created",
             string: "created",
+          },
+        ],
+      });
+    });
+
+    it('should return a search of key containing "created" object', function () {
+      let result = _.createFilters(_.tokenize("key=created,closed"), {
+        fields: [{ key: "key", base: "input" }],
+      });
+      assert.equal(result.filters.length, 1);
+      assert.equal(result.filters[0].search.length, 2);
+      assert.deepInclude(result.filters, {
+        invert: false,
+        logic: "&&",
+        key: "key",
+        action: "=",
+        search: [
+          {
+            action: "=",
+            lower: "created",
+            raw: "created",
+            string: "created",
+          },
+          {
+            action: "=",
+            lower: "closed",
+            raw: "closed",
+            string: "closed",
           },
         ],
       });
