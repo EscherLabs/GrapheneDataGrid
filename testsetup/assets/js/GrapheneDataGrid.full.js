@@ -2490,49 +2490,85 @@ gform.stencils.mobile_row = `<tr><td colspan="100%" class="filterable">
 </div>
 </td></tr>`;
 gform.stencils.mobile_data_grid = `<div class="well table-well">
+<style>
+.dropdown-menu>li>a.disabled{
+  cursor:not-allowed;
+  color:#999;
+}
+</style>
 <div style="height:40px;">
-<div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" ></div>
+	<div name="actions" class=" pull-left" style="margin-bottom:10px;width:62%" >
+   
+  <div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+  <button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      Actions
+      <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu pull-left" style="padding-top:10px" aria-labelledby="enables_{{options.id}}">
+  
+     
+{{#options.actions}}
 
-<input type="file" class="csvFileInput" accept=".csv" style="display:none">
-
-<div class="hiddenForm" style="display:none"></div>
-<div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
-	{{#showAdd}}
-	<div data-event="add" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> New</div>
-	{{/showAdd}}
-
-	{{#options.actions}}
-			{{#global}}<div class="btn btn-default custom-event" data-event="{{name}}" data-id="{{[[}}id{{]]}}">{{{label}}}</div>{{/global}}
-	{{/options.actions}}
-	{{#options.download}}
-	<div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
-	{{/options.download}}
-	{{#options.upload}}
-	<div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
-	{{/options.upload}}
+{{#name}}
+<li><a href="javascript:void(0);" style="" data-event="{{name}}" class="grid-action disabled">{{{label}}}</a></li>
 
 
-	{{#options.columns}}
-	<div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
-			<button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-					<i class="fa fa-list"></i>
-					<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu pull-right" style="padding-top:10px" aria-labelledby="enables_{{options.id}}">
-					{{#items}}
-					{{#visible}}
-					<li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}} style="margin: 5px 0 5px 15px;"> {{label}}</label></li>
-					{{/visible}}
-					{{/items}}
-			</ul>
-	</div>
-	{{/options.columns}}
+{{/name}}
+
+
+
+
+{{/options.actions}}
+
+</ul>
+</div>
 
 </div>
 
+	<input type="file" class="csvFileInput" accept=".csv" style="display:none">
+
+	<div class="hiddenForm" style="display:none"></div>
+  <div class="btn-group pull-left" style="white-space: nowrap; font-size: 0;" role="group" aria-label="...">
+
+
+
+
+
+
+
+</div>
+	<div class="btn-group pull-right" style="margin-bottom:10px" role="group" aria-label="...">
+      
+ 
+			{{#options.download}}
+			<div class="btn btn-default hidden-xs" name="bt-download" data-toggle="tooltip" data-placement="left" title="Download"><i class="fa fa-download"></i></div>
+			{{/options.download}}
+			{{#options.upload}}
+			<div class="btn btn-default hidden-xs" name="bt-upload" data-toggle="tooltip" data-placement="left" title="Upload"><i class="fa fa-upload"></i></div>
+			{{/options.upload}}
+
+
+			{{#options.columns}}
+			<div class="btn-group columnEnables" data-toggle="tooltip" data-placement="left" title="Display Columns">
+					<button class="btn btn-default dropdown-toggle" type="button" id="enables_{{options.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+							<i class="fa fa-list"></i>
+							<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu pull-right" style="padding-top:10px" aria-labelledby="enables_{{options.id}}">
+							{{#items}}
+							{{#visible}}
+							<li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}} style="margin: 5px 0 5px 15px;"> {{label}}</label></li>
+							{{/visible}}
+							{{/items}}
+					</ul>
+			</div>
+			{{/options.columns}}
+
+	</div>
+
 
 </div>	
-	{{>mobile_head}}
+			{{>mobile_head}}
 
 
 {{^options.hideCheck}}
@@ -2542,20 +2578,19 @@ gform.stencils.mobile_data_grid = `<div class="well table-well">
 <div class="table-container" style="width:100%;overflow:auto">
 
 <div style="min-height:100px">
-<table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
-	<tbody class="list-group">
-			<tr><td colspan="100">
-					<div class="alert alert-info" role="alert">You have no items.</div>
-			</td></tr>
-	</tbody>
+	<table class="table {{^options.noborder}}table-bordered{{/options.noborder}} table-striped table-hover dataTable" style="margin-bottom:0px">
+			<tbody class="list-group">
+					<tr><td colspan="100">
+							<div class="alert alert-info" role="alert">You have no items.</div>
+					</td></tr>
+			</tbody>
 
-</table>
+	</table>
 </div>
 
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`;
-
 gform.stencils.data_grid = `<div class="well table-well">
 <div>
 </div>

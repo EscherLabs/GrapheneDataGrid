@@ -7,6 +7,7 @@ var { models } = require("../assets/data/models");
 models = _.map(models, model => {
   return { attributes: model };
 });
+var options = require("../assets/data/fields");
 
 exports.create = function suite() {
   // key:"created stuff"
@@ -17,9 +18,7 @@ exports.create = function suite() {
   // "Text like this"
   describe("Fuzzy", function () {
     it("should return a search object", function () {
-      let result = _.createFilters(_.tokenize('key:"created stuff"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"created stuff"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -100,9 +99,7 @@ exports.create = function suite() {
     });
 
     it('should return a fuzzy search filter "created" object', function () {
-      let result = _.createFilters(_.tokenize("created"), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize("created"), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -122,9 +119,7 @@ exports.create = function suite() {
     });
     it('should return a fuzzy search filter "Text like this" object', function () {
       // let result = _.createFilters(_.tokenize('"Text like this"'));
-      let result = _.createFilters(_.tokenize('"Text like this"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"Text like this"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -155,9 +150,10 @@ exports.create = function suite() {
 
   describe("Contains", function () {
     it('should return a search of key containing "created stuff" object', function () {
-      let result = _.createFilters(_.tokenize('key:"*created stuff*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(
+        _.tokenize('key:"*created stuff*"'),
+        options
+      );
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -178,9 +174,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('key:"*created*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"*created*"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -201,9 +195,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"*created*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"*created*"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -223,9 +215,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"*Text like this*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"*Text like this*"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -253,9 +243,7 @@ exports.create = function suite() {
 
   describe("Starts With", function () {
     it('should return a search of key containing "created stuff" object', function () {
-      let result = _.createFilters(_.tokenize('key:"created stuff*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"created stuff*"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -276,9 +264,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('key:"created*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"created*"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -299,9 +285,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"created*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"created*"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -321,9 +305,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"Text like this*"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"Text like this*"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -351,9 +333,7 @@ exports.create = function suite() {
 
   describe("Ends With", function () {
     it('should return a search of key containing "created stuff" object', function () {
-      let result = _.createFilters(_.tokenize('key:"*created stuff"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"*created stuff"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -374,9 +354,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('key:"*created"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key:"*created"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -397,9 +375,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"*created"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"*created"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -419,9 +395,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize('"*Text like this"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('"*Text like this"'), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -448,9 +422,7 @@ exports.create = function suite() {
 
   describe("Exactly", function () {
     it('should return a search of key containing "created stuff" object', function () {
-      let result = _.createFilters(_.tokenize('key="created stuff"'), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize('key="created stuff"'), options);
 
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
@@ -471,9 +443,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize("key=created"), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize("key=created"), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 1);
       assert.deepInclude(result.filters, {
@@ -493,9 +463,7 @@ exports.create = function suite() {
     });
 
     it('should return a search of key containing "created" object', function () {
-      let result = _.createFilters(_.tokenize("key=created,closed"), {
-        fields: [{ key: "key", base: "input" }],
-      });
+      let result = _.createFilters(_.tokenize("key=created,closed"), options);
       assert.equal(result.filters.length, 1);
       assert.equal(result.filters[0].search.length, 2);
       assert.deepInclude(result.filters, {

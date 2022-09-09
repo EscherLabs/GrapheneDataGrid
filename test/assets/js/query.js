@@ -26,8 +26,9 @@ _.mixin({
           let raw = _.trim(s, " ");
 
           let quoted = /"+?([^"]+)"+/.test(raw);
-
-          raw = _.trim(s, '"');
+          let singled = /'+?([^']+)'+/.test(raw);
+          quoted = quoted || singled;
+          raw = _.trim(s, ['"', "'"]);
           let looseEnd = /\*$/.test(raw);
           let looseStart = /^\*/.test(raw);
           let action = "~"; //fuzzy
@@ -44,17 +45,21 @@ _.mixin({
               if (quoted && !looseEnd && looseStart) action = "$";
               //exactly
               if (quoted && !looseEnd && !looseStart) action = "=";
+
               break;
           }
 
           raw = _.trim(raw, "*");
 
-          return {
+          let result = {
             action,
             string: raw + "",
-            lower: (raw + "").toLowerCase(),
             raw,
           };
+
+          result.lower = result.string.toLowerCase();
+          if (singled) result.toLower = singled;
+          return result;
         });
         token.invert = !!token.invert;
         searches.push(token);
@@ -132,7 +137,6 @@ _.mixin({
     if (search.length) {
       var searches = [].concat.apply([], _.map(search, "search"));
 
-      debugger;
       _.reduce(
         fields || [],
         (filters, field) => {
@@ -153,13 +157,24 @@ _.mixin({
                 : "~";
             return search;
           });
+          // filter.search = _.map(filter.search, search => ({
+          //   ...search,
+          //   action:
+          //     filter.action == "~" && ["~", "="].indexOf(search.action) >= 0
+          //       ? "~"
+          //       : search.action,
+          // }));
+
           filter.search = _.map(filter.search, search => ({
             ...search,
             action:
               filter.action == "~" && ["~", "="].indexOf(search.action) >= 0
                 ? "~"
+                : filter.action == "=" && ["~", "="].indexOf(search.action) >= 0
+                ? "="
                 : search.action,
           }));
+
           filters.push(filter);
           return filters;
         },
@@ -174,61 +189,82 @@ _.mixin({
   },
   applyFilter: function (model, options, filter) {
     let { keys = [], path = null } = options;
-    let _model = path !== null ? model[path] : model;
+    let _model = model;
+    path !== null ? model[path] : model;
     let atts = _.reduce(
       keys,
       (atts, key) => {
-        let att = model[key][filter.key];
-
+        let att = null;
+        if (key == "" && filter.key in model) {
+          att = model[filter.key];
+        } else {
+          if (typeof model[key] == "undefined" || !(filter.key in model[key]))
+            return atts;
+          att = model[key][filter.key];
+        }
         att = typeof att == "object" ? _.map(att, a => a + "") : [att + ""];
+
         return atts.concat(att);
       },
       []
     );
 
-    if (filter.action == "=") {
-      let strArray = _.map(filter.search, "string");
+    // if (filter.action == "=") {
+    //   let strArray = _.map(filter.search, "string");
 
-      return !_.intersection(strArray, atts).length != !filter.invert;
-    } else {
-      //not exact
+    //   console.log(atts);
+    //   return !_.intersection(strArray, atts).length != !filter.invert;
+    // } else {
+    //not exact
 
-      let mapfunc;
-      let finding = (_model[filter.key] || "").replace(/\s+/g, " ");
-      //.toLowerCase();
+    let mapfunc;
+    let matchString = (
+      (filter.key in model ? model[filter.key] : model[path][filter.key]) + ""
+    ).replace(/\s+/g, " ");
+    // .toLowerCase();
 
-      if (filter.action == "~") {
-        mapfunc = search => _.score(finding, search.lower) > 0.4;
-      } else {
-        mapfunc = search => {
-          let index = finding.indexOf(search.string);
+    // if (filter.action == "~") {
+    //   mapfunc = search => _.score(finding, search.lower) > 0.4;
+    // } else {
 
-          switch (search.action) {
-            case "~": //fuzzy
-              return _.score(finding.toLowerCase(), search.lower) > 0.4;
-            case "*": //contains
-              return index >= 0;
-            case "^": //startsWith
-              return index == 0;
-            case "$": //endsWith
-              return index == finding.length - search.string.length;
-            case "=": //exactly
-              return finding == search.string;
-            default:
-              return finding.indexOf(search.string) >= 0;
-          }
-        };
+    mapfunc = search => {
+      let finding = matchString;
+
+      let searchString = search.string;
+      if (search.toLower || search.action == "~") {
+        searchString = search.lower;
+        finding = finding.toLowerCase();
       }
 
-      return !_.some(filter.search, mapfunc) != !filter.invert;
-    }
+      let index = finding.indexOf(searchString);
+      switch (search.action) {
+        case "~": //fuzzy
+          return _.score(finding, searchString) > 0.4;
+        case "*": //contains
+          return index >= 0;
+        case "^": //startsWith
+          return index == 0;
+        case "$": //endsWith
+          return index == finding.length - searchString.length;
+        case "=": //exactly
+          return finding == searchString;
+        default:
+          return finding.indexOf(searchString) >= 0;
+      }
+    };
+    // }
+
+    return !_.some(filter.search, mapfunc) != !filter.invert;
+    // }
   },
   query: (models, parameters, config = {}) => {
-    debugger;
-    let { path = "", bools = [], fields = [], sort, ...options } = config;
+    let { bools = [], fields = [], sort, ...options } = config;
+    let { path = "" } = options;
+
     if (typeof parameters == "string") {
       parameters = _.tokenize(parameters);
     }
+    debugger;
     if (typeof parameters !== "object" && fields.length) {
       return [];
     }

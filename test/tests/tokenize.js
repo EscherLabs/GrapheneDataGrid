@@ -43,6 +43,7 @@ exports.tokenize = function suite() {
       });
     });
   });
+
   describe("Start/End/Contain tokens", function () {
     it("should return a startswith search token", function () {
       let result = _.tokenize('title:"add*"');
@@ -91,6 +92,28 @@ exports.tokenize = function suite() {
         search: [
           {
             action: "*",
+            lower: "add",
+            raw: "add",
+            string: "add",
+          },
+        ],
+      });
+    });
+  });
+
+  describe("Lowercase tokens", function () {
+    it("should return a search token for exacly case insensitive", function () {
+      let result = _.tokenize("title:'add'");
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "title");
+      assert.deepInclude(result, {
+        invert: false,
+        key: "title",
+        action: ":",
+        search: [
+          {
+            action: "=",
+            toLower: true,
             lower: "add",
             raw: "add",
             string: "add",
@@ -156,6 +179,76 @@ exports.tokenize = function suite() {
       });
       assert.deepInclude(result, {
         invert: false,
+        key: "search",
+        action: ":",
+        search: [
+          {
+            action: "~",
+            lower: "stuff",
+            raw: "stuff",
+            string: "stuff",
+          },
+        ],
+      });
+    });
+  });
+
+  describe("Search tokens - exclude", function () {
+    it("should return a default search token", function () {
+      let result = _.tokenize("-search:Hello");
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "search");
+      assert.deepInclude(result, {
+        invert: true,
+        key: "search",
+        action: ":",
+        search: [
+          {
+            action: "~",
+            lower: "hello",
+            raw: "Hello",
+            string: "Hello",
+          },
+        ],
+      });
+    });
+    it("should return an exact match default search token", function () {
+      let result = _.tokenize('-search:"get stuff"');
+      assert.equal(result.length, 1);
+      assert.equal(result[0].key, "search");
+      assert.deepInclude(result, {
+        invert: true,
+        key: "search",
+        action: ":",
+        search: [
+          {
+            action: "=",
+            lower: "get stuff",
+            raw: "get stuff",
+            string: "get stuff",
+          },
+        ],
+      });
+    });
+    it("should return two search tokens", function () {
+      let result = _.tokenize("-search:get title:sg -search:stuff");
+      assert.equal(result[0].key, "search");
+      assert.equal(result[2].key, "search");
+      assert.deepInclude(result, {
+        invert: true,
+        key: "search",
+        action: ":",
+        search: [
+          {
+            action: "~",
+            lower: "get",
+            raw: "get",
+            string: "get",
+          },
+        ],
+      });
+      assert.deepInclude(result, {
+        invert: true,
         key: "search",
         action: ":",
         search: [

@@ -46,14 +46,11 @@ exactly
  key="created stuff"
  key=created
 
-
-
-
-
-
 case_insensitive
- key="created stuff"
- key=created
+ key='created stuff'
+ key='created'
+
+
 
 count
  at least (3 or more)
