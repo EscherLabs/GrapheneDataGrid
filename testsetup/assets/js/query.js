@@ -78,7 +78,7 @@ _.mixin({
 
     const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
 
-    _.each(options.bools, key => {
+    _.each(bools, key => {
       if (searchFields[key]) {
         modelFilter[key] = !(
           searchFields[key][0].invert ==
@@ -188,13 +188,21 @@ _.mixin({
   },
   applyFilter: function (model, options, filter) {
     let { keys = [], path = null } = options;
-    let _model = path !== null ? model[path] : model;
+    let _model = model;
+    path !== null ? model[path] : model;
     let atts = _.reduce(
       keys,
       (atts, key) => {
-        let att = model[key][filter.key];
-
+        let att = null;
+        if (key == "" && filter.key in model) {
+          att = model[filter.key];
+        } else {
+          if (typeof model[key] == "undefined" || !(filter.key in model[key]))
+            return atts;
+          att = model[key][filter.key];
+        }
         att = typeof att == "object" ? _.map(att, a => a + "") : [att + ""];
+
         return atts.concat(att);
       },
       []
@@ -209,7 +217,9 @@ _.mixin({
     //not exact
 
     let mapfunc;
-    let matchString = (_model[filter.key] + "").replace(/\s+/g, " ");
+    let matchString = (
+      (filter.key in model ? model[filter.key] : model[path][filter.key]) + ""
+    ).replace(/\s+/g, " ");
     // .toLowerCase();
 
     // if (filter.action == "~") {
@@ -217,7 +227,7 @@ _.mixin({
     // } else {
 
     mapfunc = search => {
-      let finding = matchString.toLowerCase();
+      let finding = matchString;
 
       let searchString = search.string;
       if (search.toLower || search.action == "~") {
@@ -256,6 +266,7 @@ _.mixin({
     if (typeof parameters !== "object" && fields.length) {
       return [];
     }
+    debugger;
     const filters = _.createFilters(parameters, {
       fields,
       sort,
@@ -289,6 +300,66 @@ _.mixin({
         (orCollection.length ? _.some(orCollection, modelFilter) : true)
       );
     });
+  },
+  queryString: tokens => {
+    return _.trim(
+      _.reduce(
+        tokens,
+        (result, { invert, key, action, search }) => {
+          if (!invert && key == "search") {
+            result += _.map(search, ({ string }) => string).join(" ") + " ";
+            return result;
+          }
+          let strings = _.map(search, ({ string, action, toLower }) => {
+            let morphed = "";
+            let quoteType = toLower ? "'" : '"';
+            switch (action) {
+              case "^":
+                morphed = quoteType + string + "*" + quoteType;
+                break;
+
+              case "$":
+                morphed = quoteType + "*" + string + quoteType;
+                break;
+              case "*":
+                morphed = quoteType + "*" + string + "*" + quoteType;
+                break;
+
+              case "=":
+                morphed = quoteType + string + quoteType;
+                break;
+
+              default:
+                morphed = string;
+            }
+            return morphed;
+          }).join(",");
+          if (strings.length) {
+            result += (invert ? "-" : "") + `${key}${action}${strings} `;
+          }
+          return result;
+        },
+        ""
+      )
+    );
+  },
+  queryTags: tokens => {
+    return _.trim(
+      _.reduce(
+        tokens,
+        (result, search) => {
+          result += gform.renderString(
+            " {{#inverted}}-{{/inverted}}{{key}}{{action}}{{strings}}",
+            {
+              ...search,
+              strings: _.map(search.search, ({ string }) => string).join(","),
+            }
+          );
+          return result;
+        },
+        ""
+      )
+    );
   },
 
   score: function (base, abbr, offset) {

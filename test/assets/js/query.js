@@ -79,13 +79,14 @@ _.mixin({
 
     const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
 
-    _.each(options.bools, key => {
+    _.each(bools, key => {
       if (searchFields[key]) {
         modelFilter[key] = !(
           searchFields[key][0].invert ==
           (searchFields[key][0].search[0].string == "true")
         );
       }
+      debugger;
       delete searchFields[key];
     });
 

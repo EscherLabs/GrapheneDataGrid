@@ -29,13 +29,145 @@ GrapheneDataGrid = function (options) {
     },
   ];
   this.resource = options.resource;
-  this.queryString = "";
   this.eventBus = new gform.eventBus(
     { owner: "grid", item: "model", handlers: options.events || {} },
     this
   );
   this.on = this.eventBus.on;
   this.trigger = this.eventBus.dispatch;
+  this.multiSort = () => {
+    let sorters = _.filter(this._query.tokens, { key: "sort" });
+    // this.applyQuery(this.models, this._query.tokens);
+
+    // this.filter.trigger(["change","input"]);;
+
+    this.$el
+      .find(".reverse, [data-sort]")
+      .removeClass("text-primary")
+      .find("i")
+      .attr("class", "fa fa-sort text-muted");
+    let sortSection = this.$el.find(".table-sort")[0];
+
+    _.each(sorters, ({ key, invert, search }) => {
+      _.each(search, ({ raw }) => {
+        let localsearch = _.reduce(
+          this.filterMap,
+          (result, value, key) => {
+            result[value] = key;
+            return result;
+          },
+          {}
+        )[raw];
+        let targetEl = sortSection.querySelector(
+          `[data-sort=${localsearch}] i`
+        );
+        gform.addClass(targetEl, invert ? "fa-sort-desc" : "fa-sort-asc");
+        gform.addClass(targetEl, "text-primary");
+      });
+    });
+  };
+  this._query = {
+    _obj: [],
+    _string: "",
+    load: value => {
+      this._query.data = this._query.string = value;
+    },
+    tags: tokens =>
+      _.reduce(
+        tokens || this._query.tokens,
+        (result, search) => {
+          let strings = _.map(search.search, ({ string }) => string).join(", ");
+          if (strings.length) {
+            result += _.trim(
+              gform.renderString(
+                '<span data-key="{{key}}" {{#invert}}data-invert=true{{/invert}} class="query-tag query-tag-{{#invert}}invert{{/invert}}{{^invert}}key{{/invert}}"><span>{{key}} {{action}} {{strings}} </span><svg class="_remove" style=";" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>',
+                {
+                  ...search,
+                  strings,
+                }
+              ),
+              ","
+            );
+          }
+          return result;
+        },
+        ""
+      ),
+  };
+
+  Object.defineProperty(this._query, "data", {
+    get: () => this.filter.toJSON(),
+    set: tokens => {
+      debugger;
+      let filterData = _.reduce(
+        typeof tokens == "string" ? _.tokenize(tokens) : tokens,
+        (r, item) => {
+          r[item.key] = r[item.key] || [];
+          r[item.key].push(item);
+          return r;
+        },
+        {}
+      );
+      this.filterValues = {};
+      _.each(
+        filterData,
+        function (item, index) {
+          let field = _.find(this.options.filterFields, { search: index });
+          if (typeof field !== "undefined") {
+            if (typeof item !== "string") {
+              // this.filterValues[_field.id] = JSON.stringify(item);
+
+              this.filterValues[field.id] =
+                field.type == "text"
+                  ? _.join(
+                      _.map(item[0].search, ({ raw }) => raw),
+                      " "
+                    )
+                  : JSON.stringify(item);
+            } else {
+              this.filterValues[field.id] = item;
+            }
+          }
+        }.bind(this)
+      );
+      debugger;
+      this.filter.set();
+      this.filter.set(this.filterValues);
+      this.filter.trigger(["change"]);
+      // this.filterValues = this.filter.toJSON();
+    },
+  });
+
+  Object.defineProperty(this._query, "tokens", {
+    get: () => [...this._query._obj],
+    set: value => {
+      if (!_.isEqual(value, this._query._obj)) {
+        this._query._obj = value;
+      }
+      this._query._string = _.queryString(value);
+      this.multiSort();
+
+      let qEL = this.$el.find('[name="query"]');
+      if (qEL[0] !== document.activeElement) {
+        qEL.val(_.trimStart(this._query._string));
+      } else {
+        this._query.data = this._query.tokens;
+      }
+
+      this.draw();
+    },
+  });
+  Object.defineProperty(this._query, "string", {
+    get: () => this._query._string || "",
+    set: value => {
+      if (_.trim(value) == _.trim(this._query._string)) return;
+      this._query.tokens = _.tokenize(value);
+
+      // this.multiSort();
+      // let qEL = this.$el.find('[name="query"]');
+      // if (qEL[0] !== document.activeElement) qEL.val(_.trimStart(value));
+    },
+  });
 
   options = _.extend(
     {
@@ -97,15 +229,14 @@ GrapheneDataGrid = function (options) {
       }.bind(this)
     );
 
-    // if(this.$el.find('.filter').length){
-    options.search = this.filterValues;
+    options.search = _.compact(this.filterValues);
     _.each(options.search, function (item, index) {
       if (!item && item !== 0) {
         delete options.search[index];
       }
     });
     var pagebuffer = options.pagebuffer || 2;
-    if (!models && this.queryString == "") {
+    if (!models && this._query.string == "") {
       if (
         this.$el.find('[name="search"]').length &&
         this.$el.find('[name="search"]').val().length
@@ -115,11 +246,10 @@ GrapheneDataGrid = function (options) {
         this.search(options);
       }
     } else {
-      this.resetSearch();
-      this.queryString =
-        typeof models == "string" ? models : this.queryString || "";
-      models = this.queryString
-        ? this.query(this.models, this.queryString)
+      this._query.string =
+        typeof models == "string" ? models : this._query.string || "";
+      models = this._query.string
+        ? this.applyQuery(this.models, this._query.string)
         : models;
       this.lastGrabbed = models.length;
       this.filtered = models;
@@ -189,6 +319,7 @@ GrapheneDataGrid = function (options) {
     this.renderObj = renderObj;
     // this.$el.find('.paginate-footer').html(templates['data_grid_footer'].render(this.renderObj, templates));
     this.updateCount();
+    this.$el.find("#tags").html(this._query.tags());
 
     this.$el
       .find(".paginate-footer")
@@ -349,14 +480,20 @@ GrapheneDataGrid = function (options) {
         var temp = _.pick(val, ["options", "max", "min", "path", "format"]);
         val = _.omit(val, ["options", "max", "min", "path", "format"]);
         temp.type = "optgroup";
-        val.options = [
-          {
-            type: "optgroup",
-            options: [{ label: "No Filter", value: "" }],
-            format: { label: "{{label}}" },
-          },
-          temp,
-        ];
+        if (options.query) {
+          val.options = [temp];
+          val.type = "filter";
+        } else {
+          val.options = [
+            {
+              type: "optgroup",
+              options: [{ label: "No Filter", value: "" }],
+              format: { label: "{{label}}" },
+            },
+            temp,
+          ];
+        }
+
         break;
 
       case "fieldset":
@@ -809,7 +946,6 @@ GrapheneDataGrid = function (options) {
 
   function onload($el) {
     this.$el = $el;
-
     if ($el.find(".filter").length) {
       this.filter = new gform(
         {
@@ -835,6 +971,52 @@ GrapheneDataGrid = function (options) {
         function () {
           this.$el.find('[name="search"]').val("");
           this.filterValues = this.filter.toJSON();
+          // if (options.query) {
+          let filterString = _.reduce(
+            this._query.data,
+            (result, item, key) => {
+              if (typeof item !== "object") {
+                let quotes = item.indexOf(" ") >= 0;
+                result += (item + "").length
+                  ? " " +
+                    this.filterMap[key] +
+                    ":" +
+                    (quotes ? '"' : "") +
+                    item +
+                    (quotes ? '"' : "")
+                  : "";
+              } else {
+                _.each(item, search => {
+                  result += gform.renderString(
+                    " {{#invert}}-{{/invert}}{{key}}{{action}}{{strings}}",
+                    {
+                      ...search,
+                      strings: _.map(
+                        search.search,
+                        ({ string }) => string
+                      ).join(","),
+                    }
+                  );
+                });
+              }
+              // console.log(result);
+              return result;
+            },
+            ""
+          );
+          this._query.string =
+            filterString +
+            " " +
+            _.queryString(
+              _.filter(
+                this._query.tokens,
+                ({ key }) => ["sort", "search"].indexOf(key) > -1
+              )
+            );
+
+          // this.$el.find("#tags").html(this.tags);
+          // this.$el.find("#tags").html(this._query.tags());
+          // this.$el.find('[name="query"]').val(_.trim(this._query.string), " ");
           this.draw();
         }.bind(this)
       );
@@ -928,6 +1110,11 @@ GrapheneDataGrid = function (options) {
           }.bind(this)
         ).reverse();
       }
+
+      if (loaded) {
+        this.state.set(loaded);
+        loaded = false;
+      }
       this.draw();
     };
 
@@ -961,6 +1148,106 @@ GrapheneDataGrid = function (options) {
     );
     this.$el.on("click", '[name="bt-download"]', this.getCSV.bind(this));
     this.$el.on("click", "[data-page]", changePage.bind(this));
+    this.$el.on("click", "#tags", e => {
+      if (e.target instanceof SVGElement) {
+        switch (e.target.parentElement.dataset.key) {
+          case "sort":
+            let index = _.findIndex(this._query.tokens, {
+              invert: !!e.target.parentElement.dataset.invert,
+              key: e.target.parentElement.dataset.key,
+            });
+            if (e.target.classList.contains("_remove")) {
+              e.currentTarget.removeChild(e.target.parentElement);
+              let tokens = this._query.tokens;
+              tokens.splice(index, 1);
+              this._query.tokens = tokens;
+            } else {
+            }
+
+            break;
+
+          case "search":
+            let temp = this._query.string
+              .split(
+                _.trim(e.target.parentElement.textContent.split("search :")[1])
+              )
+              .join("");
+            this._query.string = temp;
+            break;
+          default:
+            let item = _.reduce(
+              this.filterMap,
+              (result, value, key) => {
+                result[value] = key;
+                return result;
+              },
+              {}
+            )[e.target.parentElement.dataset.key];
+            if (this.filter.find(item).type == "filter") {
+              console.log(
+                typeof e.target.parentElement.dataset.invert == "undefined"
+              );
+              _.each(
+                _.filter(this.filter.find(item)._items, {
+                  value:
+                    (typeof e.target.parentElement.dataset.invert ==
+                      "undefined") +
+                    "",
+                }),
+                field => {
+                  field.set("");
+                }
+              );
+            } else {
+              this.filter.find(item).set(null);
+            }
+
+            this.filter.trigger(["change", "input"]);
+        }
+        // if (e.target.parentElement.dataset.key == "sort") {
+        //   e.currentTarget.removeChild(e.target.parentElement);
+        //   let index = _.findIndex(this._query.tokens, {
+        //     invert:
+        //       e.target.parentElement.classList.contains("query-tag-invert"),
+        //     key: e.target.parentElement.dataset.key,
+        //   });
+        //   let tokens = this._query.tokens;
+        //   tokens.splice(index, 1);
+        //   this._query.tokens = tokens;
+        //   // this.filter.trigger(["change","input"]);;
+
+        //   // multiSort();
+        // } else {
+        //   let item = _.reduce(
+        //     this.filterMap,
+        //     (result, value, key) => {
+        //       result[value] = key;
+        //       return result;
+        //     },
+        //     {}
+        //   )[e.target.parentElement.dataset.key];
+
+        //   this.filter
+        //     .find(item)
+        //     .set(this.filter.find(item).type == "filter" ? null : "");
+        //   this.filter.trigger(["change","input"]);;
+        // }
+      } else {
+        if (
+          e.target.parentElement.classList.contains("query-tag") &&
+          e.target instanceof HTMLSpanElement
+        ) {
+          // let el = document.createElement("input");
+          // el.value = e.target.innerText;
+          // e.target.parentElement.insertBefore(
+          //   el,
+          //   e.target.parentElement.lastChild
+          // );
+          // el.focus();
+          // e.target.parentElement.removeChild(e.target);
+        }
+      }
+    });
 
     this.$el.on(
       "click",
@@ -1011,7 +1298,9 @@ GrapheneDataGrid = function (options) {
       '[name="query"]',
       _.debounce(
         function (e) {
-          this.queryString = e.currentTarget.value;
+          this._query.string = e.currentTarget.value;
+          // this.filter.trigger(["change","input"]);;
+
           this.draw();
         }.bind(this),
         300
@@ -1039,17 +1328,22 @@ GrapheneDataGrid = function (options) {
     this.resetSearch = function () {
       this.$el.find('[name="search"]').val("");
 
-      //reset filter form if it exists
+      // reset filter form if it exists
+      // if (!options.query) {
       if (this.filter) {
         this.filter.set();
       }
+      // }
+
+      this.filter.trigger(["change", "input"]);
       this.filterValues = {};
     };
     this.$el.on("click", '[name="reset-search"]', () => {
       this.resetSearch();
 
-      this.queryString = "";
-      processSort();
+      this._query.string = "";
+      // processSort();
+      this.draw();
     });
 
     // this.$el.on('click', '[data-event="mark"]', function(e) {
@@ -1094,22 +1388,72 @@ GrapheneDataGrid = function (options) {
       }.bind(this)
     );
 
-    this.$el.on(
-      "click",
-      "[data-sort]",
-      function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        var sortField = _.find(this.options.filterFields, {
-          name: e.currentTarget.dataset.sort,
-        }).search;
-        if (this.options.reverse && this.options.sort == sortField) {
-          processSort();
+    // this.$el.on(
+    //   "click",
+    //   "[data-sort]",
+    //   function (e) {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     var sortField = _.find(this.options.filterFields, {
+    //       name: e.currentTarget.dataset.sort,
+    //     }).search;
+    //     if (this.options.reverse && this.options.sort == sortField) {
+    //       processSort();
+    //     } else {
+    //       processSort(sortField);
+    //     }
+    //   }.bind(this)
+    // );
+
+    this.$el.on("click", "[data-sort]", e => {
+      e.stopPropagation();
+      e.preventDefault();
+      let sort = this.filterMap[e.currentTarget.dataset.sort];
+      let tokenIndex = null;
+      let searchIndex = null;
+      let sortTokenIndexes = [];
+      let invert = _.reduce(
+        this._query.tokens,
+        (result, token, token_key) => {
+          if (token.key !== "sort") return result;
+          sortTokenIndexes.push({ invert: token.invert, index: token_key });
+
+          _.each(token.search, ({ raw }, index) => {
+            if (raw == sort) {
+              tokenIndex = token_key;
+              searchIndex = index;
+              result = token.invert;
+            }
+          });
+
+          return result;
+        },
+        null
+      );
+      let targetSort = "";
+
+      let tokens = this._query.tokens;
+
+      if (tokenIndex !== null && searchIndex !== null) {
+        tokens[tokenIndex].search.splice(searchIndex, 1);
+      }
+
+      if (!invert) {
+        let shouldInvert = invert == false;
+        targetSort = (shouldInvert ? "-" : "") + "sort:" + sort;
+        let target = _.find(sortTokenIndexes, { invert: shouldInvert });
+        let token = _.tokenize(targetSort)[0];
+
+        if (target) {
+          tokens[target.index].search.push(token.search[0]);
         } else {
-          processSort(sortField);
+          tokens.push(token);
         }
-      }.bind(this)
-    );
+      }
+
+      this._query.tokens = tokens;
+      // multiSort();
+    });
 
     //Mobile
     this.$el.on(
@@ -1231,198 +1575,7 @@ GrapheneDataGrid = function (options) {
     return newModel;
   };
 
-  // this.tokenize = string => {
-  //   return _.reduce(
-  //     string.match(/(?:[^\s"]+|"[^"]*")+/g),
-
-  //     (searches, search) => {
-  //       var temp =
-  //         search.length > 3
-  //           ? search.match(
-  //               /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-  //             )
-  //           : { groups: false };
-
-  //       let token =
-  //         !!temp.groups && temp.groups.action
-  //           ? temp.groups
-  //           : {
-  //               key: "search",
-  //               search: search,
-  //               invert: false,
-  //               action: "~",
-  //             };
-
-  //       token.search = _.map(token.search.split(","), s => {
-  //         let raw = _.trim(s, " ");
-
-  //         let quoted = /"+?([^"]+)"+/.test(raw);
-
-  //         raw = _.trim(s, '"');
-  //         let looseEnd = /\*$/.test(raw);
-  //         let looseStart = /^\*/.test(raw);
-
-  //         let action = "~"; //fuzzy
-  //         if (quoted && looseEnd && looseStart) action = "*"; //contains
-  //         if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
-  //         if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
-  //         if (quoted && !looseEnd && !looseStart) action = "="; //endsWith
-
-  //         return {
-  //           action,
-  //           string: raw + "",
-  //           lower: (raw + "").toLowerCase(),
-  //           raw,
-  //         };
-  //       });
-  //       token.invert = !!token.invert;
-  //       searches.push(token);
-  //       return searches;
-  //     },
-  //     []
-  //   );
-  // };
-
-  // this.createFilters = (parameters, options = { keys: [] }) => {
-  //   const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
-
-  //   let modelFilter = { deleted: false };
-
-  //   _.each(options.keys, key => {
-  //     if (searchFields[key]) {
-  //       modelFilter[key] = !(
-  //         searchFields[key][0].invert ==
-  //         (searchFields[key][0].search[0].string == "true")
-  //       );
-  //     }
-  //     delete searchFields[key];
-  //   });
-
-  //   let sortarray = _.reduce(
-  //     sort,
-  //     (result, { invert, search }) => {
-  //       _.each(search, ({ raw }) => {
-  //         result.push({ invert, sort: raw });
-  //       });
-
-  //       return result;
-  //     },
-  //     []
-  //   );
-
-  //   let filters = _.compact(
-  //     _.map(_.flatMap(searchFields), filter => {
-  //       let { key, search } = filter;
-  //       let field = _.find(options.fields, { key: key });
-  //       if (!field) return false;
-  //       filter.logic = "&&";
-  //       filter.exact = field.base !== "input";
-  //       return filter;
-  //     })
-  //   );
-
-  //   if (search.length) {
-  //     var searches = [].concat.apply([], _.map(search, "search"));
-  //     _.reduce(
-  //       options.filterFields,
-  //       (filters, field) => {
-  //         let filter = {
-  //           exact: false,
-  //           key: field.search,
-  //           logic: "||",
-  //           search: searches,
-  //         };
-  //         filters.push(filter);
-  //         return filters;
-  //       },
-  //       filters
-  //     );
-  //   }
-
-  //   return {
-  //     model: modelFilter,
-  //     sort: sortarray,
-  //     or: _.filter(filters, { logic: "||" }),
-  //     and: _.filter(filters, { logic: "&&" }),
-  //   };
-  // };
-
-  // this.applyFilter = function (model, filter) {
-  //   if (filter.exact) {
-  //     let atts = model.attributes[filter.key];
-
-  //     return _.includes(
-  //       _.map(filter.search, "string"),
-  //       model.display[filter.key]
-  //     ) ||
-  //       (typeof atts == "object"
-  //         ? _.intersection(
-  //             _.map(filter.search, "string"),
-  //             _.map(atts, a => a + "")
-  //           ).length
-  //         : _.includes(_.map(filter.search, "string"), atts + ""))
-  //       ? !filter.invert
-  //       : filter.invert;
-  //   } else {
-  //     let mapfunc;
-  //     let finding = model.display[filter.key]
-  //       .replace(/\s+/g, " ")
-  //       .toLowerCase();
-  //     switch (filter.action) {
-  //       case "~":
-  //         mapfunc = search => _.score(finding, search) > 0.4;
-  //         break;
-  //       case "=":
-  //         mapfunc = search => finding.indexOf(search) >= 0;
-  //         break;
-  //       default:
-  //     }
-  //     if (filter.action == "~") {
-  //       mapfunc = search => _.score(finding, search) > 0.4;
-  //     } else {
-  //       mapfunc = search => finding.indexOf(search) >= 0;
-  //     }
-
-  //     // return _.some(_.map(filter.search, "lower"), mapfunc)
-  //     //   ? !filter.invert
-  //     //   : filter.invert;
-
-  //     return !_.some(_.map(filter.search, "lower"), mapfunc) != !filter.invert;
-  //   }
-  // };
-
-  // this.inquire = (
-  //   parameters,
-  //   models,
-  //   options = { path: "", keys: [], fields: [] }
-  // ) => {
-  //   debugger;
-  //   if (typeof parameters == "string") {
-  //     parameters = this.tokenize(parameters);
-  //   }
-  //   if (typeof parameters !== "object" || !options.fields.length) {
-  //     return [];
-  //   }
-  //   const filters = this.createFilters(parameters, options);
-
-  //   filters.sort = filters.sort || [
-  //     options.sort || { invert: false, search: options.fields[0].key },
-  //   ];
-  //   let ordered = _.orderBy(
-  //     _.filter(models, filters.model),
-  //     _.map(filters.sort, ({ sort }) => options.path + sort),
-  //     _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
-  //   );
-  //   return _.filter(ordered, model => {
-  //     let modelFilter = _.partial(this.applyFilter, model);
-  //     return (
-  //       (filters.and.length ? _.every(filters.and, modelFilter) : true) &&
-  //       (filters.or.length ? _.some(filters.or, modelFilter) : true)
-  //     );
-  //   });
-  // };
-
-  this.query = _.partialRight(_.query, {
+  this.applyQuery = _.partialRight(_.query, {
     path: "attributes",
     bools: ["checked", "deleted"],
     modelFilter: { deleted: false },
@@ -1679,6 +1832,7 @@ GrapheneDataGrid = function (options) {
           return _.find(this.options.filterFields, { id: id }).search;
         }.bind(this)
       );
+      temp.query = this._query.string;
       return temp;
     }.bind(this),
     set: function (settings) {
@@ -1709,28 +1863,53 @@ GrapheneDataGrid = function (options) {
           );
         }
       }
-      if (typeof settings.filters !== "undefined") {
-        this.filterValues = {};
-        _.each(
-          settings.filters,
-          function (item, index) {
-            this.filterValues[
-              _.find(this.options.filterFields, { search: index }).id
-            ] = item;
-          }.bind(this)
-        );
-      }
+      if (this.options.query && typeof settings.query == "string") {
+        if (typeof settings.filters !== "undefined") {
+          this.filterValues = {};
+          _.each(
+            settings.filters,
+            function (item, index) {
+              if (typeof item !== "string") {
+                this.filterValues[
+                  _.find(this.options.filterFields, { search: index }).id
+                ] = JSON.stringify(item);
+              } else {
+                this.filterValues[
+                  _.find(this.options.filterFields, { search: index }).id
+                ] = item;
+              }
+            }.bind(this)
+          );
+        }
 
-      if (typeof settings.sort !== "undefined") {
-        processSort(settings.sort || options.sort, settings.reverse);
-      }
+        this._query.string = settings.query;
+        // debugger;
+        this._query.data = settings.query;
+      } else {
+        if (typeof settings.filters !== "undefined") {
+          this.filterValues = {};
+          _.each(
+            settings.filters,
+            function (item, index) {
+              this.filterValues[
+                _.find(this.options.filterFields, { search: index }).id
+              ] = item;
+            }.bind(this)
+          );
+        }
+        if (typeof settings.sort !== "undefined") {
+          processSort(settings.sort || options.sort, settings.reverse);
+        }
 
-      if (typeof this.filter !== "undefined") {
-        this.filter.set(this.filterValues);
-        this.filterValues = this.filter.toJSON();
-      }
-      if (typeof settings.search !== "undefined" && settings.search !== "") {
-        this.$el.find('[name="search"]').val(settings.search);
+        if (typeof settings.search !== "undefined" && settings.search !== "") {
+          this.$el.find('[name="search"]').val(settings.search);
+        }
+
+        if (typeof this.filter !== "undefined") {
+          this.filter.set(this.filterValues);
+          // this.filter.trigger(["change","input"]);;
+          this.filterValues = this.filter.toJSON();
+        }
       }
 
       this.options.page = settings.page || this.options.page;
@@ -1758,7 +1937,6 @@ GrapheneDataGrid = function (options) {
     if (typeof title !== "string") {
       title = this.options.title;
     }
-
     _.csvify(
       _.map(this.filtered, function (item) {
         return item.attributes;
@@ -1784,14 +1962,15 @@ GrapheneDataGrid = function (options) {
 
     onload.call(this, $(container));
   }
-
+  if (loaded) {
+    this.state.set(loaded);
+    loaded = false;
+  }
   this.$el.find('[name="search"]').focus();
 
   this.$el.find(".table-container > div").css("overflow", "auto");
   $(window).on("resize orientationChange", this.fixStyle.bind(this));
-  if (loaded) {
-    this.state.set(loaded);
-  }
+
   Object.defineProperty(this, "isDirty", {
     get: () => !_.isEqual(this.options.data, this.toJSON()),
     set: status => {
@@ -1801,378 +1980,445 @@ GrapheneDataGrid = function (options) {
     },
   });
 };
+
 GrapheneDataGrid.version = "1.0.5";
+gform.stencils["filterItem"] = `
+<a id="{{id}}" href="#" class="" style="display: block;text-decoration:none ">
+<div type="button" class="" name="{{name}}" style="display:flex;align-items:center;gap:.5em">
+  {{#options}}
+  {{#optgroup}}
+    {{#options}}
+    <svg style="width:1.25em;height:1.25em;" data-id="{{optgroup.id}}" name="{{id}}" data-id="{{optgroup.id}}" class="{{^selected}} {{defaultClass}}{{/selected}}{{#selected}} {{selectedClass}}{{/selected}}" value="{{i}}" data-value="{{value}}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{{{label}}}</svg>
+    {{/options}}
+  {{/optgroup}}
+  {{/options}}
+  <span data-id="{{optgroup.id}} {{^editable}}disabled{{/editable}} {{^visible}}hidden{{/visible}}">{{label}}</span>
+</div>
+</a>
+`;
+gform.stencils[
+  "filter"
+] = `<div  style="margin-bottom: 15px;" name="{{name}}" id="{{id}}" data-type="{{type}}">
+{{^hideLabel}}<label>{{{label}}}{{^label}}&nbsp;{{/label}}</label>{{/hideLabel}}
+<span class="badge count" style="position: absolute;top: -7px;left: 7px;background:#466769"></span>
+<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;display: flex;justify-content: space-between;align-items: center;">
+  {{{label}}}{{^label}}&nbsp;{{/label}} <span class="caret"></span>
+</button>
+<ul class="dropdown-menu" style="left:initial;padding: 5px 0 0;">
+  <li style="position:relative"><input type="text" placeholder="Search..." style="margin:-3px 2px 2px;width:auto" class="form-control"/> <div class="gclear" >
 
-// _.mixin({
-//   tokenize: string => {
-//     return _.reduce(
-//       string.match(/(?:[^\s"]+|"[^"]*")+/g),
+<svg class="" style="width:1.25em;height:1.25em;cursor:pointer;transition-duration: 300ms;transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);transition-property: color;color:#333;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+</svg>
 
-//       (searches, search) => {
-//         var temp =
-//           search.length > 3
-//             ? search.match(
-//                 /(?<invert>-)?(?<key>[^\s:<>=~]+)(?<action>[:<>=~]?)(?<search>[^\s"]+|"[^"]*")+/
-//               )
-//             : { groups: false };
+    </div></li>
+<ul style="padding-left:0"></ul>
+    <li class="greset text-danger"><a href="#" style="color: inherit">Reset {{label}} Filters</a></li>
+</ul></div>
+</div></div>`;
+gform.types["filterItem"] = _.extend(
+  {},
+  gform.types["input"],
+  gform.types["collection"],
+  {
+    set: function (value) {
+      let target = this.el.querySelector('[data-value="' + value + '"]');
+      var elem = this.el.querySelector(
+        "." + this.selectedClass.split(" ").join(".")
+      );
+      elem.setAttribute("class", this.defaultClass);
+      target.setAttribute("class", this.selectedClass);
 
-//         let token =
-//           !!temp.groups && temp.groups.action
-//             ? temp.groups
-//             : {
-//                 key: "search",
-//                 search: search,
-//                 invert: false,
-//                 action: "~",
-//               };
+      this.el.dataset.value = value;
+    },
+    defaults: {
+      selectedClass: "active",
+      defaultClass: "hidden",
+    },
+    get: function () {
+      if (!("el" in this)) {
+        return this.internalValue;
+      }
+      // return this.el.dataset.value + "";
 
-//         token.search = _.map(token.search.split(","), s => {
-//           let raw = _.trim(s, " ");
+      if (this.value != "") debugger;
+      let cv = (
+        this.el.querySelector(
+          "." + this.selectedClass.split(" ").join(".")
+        ) || { dataset: { value: "" } }
+      ).dataset.value;
+      // console.log(cv);
+      return cv;
+    },
+    next: function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      let val = (
+        _.find(this.mapOptions.getoptions(), {
+          value: this.value + "",
+        }) || { i: 1 }
+      ).i;
+      if (e.ctrlKey || e.metaKey) val = 2;
+      if (e.shiftKey) val = 0;
 
-//           let quoted = /"+?([^"]+)"+/.test(raw);
+      this.set(this.mapOptions.getoptions()[val % 3].value);
 
-//           raw = _.trim(s, '"');
-//           let looseEnd = /\*$/.test(raw);
-//           let looseStart = /^\*/.test(raw);
+      this.owner.trigger("change", this);
+      this.owner.trigger("input", this);
+    },
+    initialize: function () {
+      this.el.addEventListener("click", gform.types[this.type].next.bind(this));
+      gform.types[this.type].setLabel.call(this);
+    },
+    create: function () {
+      var tempEl = document.createElement("li");
+      tempEl.setAttribute("id", "el_" + this.id);
+      gform.addClass(tempEl, "filterItem-select");
+      tempEl.innerHTML = this.render();
+      return tempEl;
+    },
+    edit: function (state) {
+      this.editable = state;
 
-//           let action = "~"; //fuzzy
-//           if (quoted && looseEnd && looseStart) action = "*"; //contains
-//           if (quoted && looseEnd && !looseStart) action = "^"; //startsWith
-//           if (quoted && !looseEnd && looseStart) action = "$"; //endsWith
-//           if (quoted && !looseEnd && !looseStart) action = "="; //exactly
-//           raw = _.trim(raw, "*");
+      this.el.disabled = !state;
+    },
+  }
+);
+gform.types["filter"] = _.extend(
+  {},
+  gform.types["input"],
+  gform.types["section"],
+  {
+    render: function () {
+      if (this.section) {
+        return gform.render(this.owner.options.sections + "filter", this);
+      } else {
+        return gform.render("filter", this);
+      }
+    },
 
-//           return {
-//             action,
-//             string: raw + "",
-//             lower: (raw + "").toLowerCase(),
-//             raw,
-//           };
-//         });
-//         token.invert = !!token.invert;
-//         searches.push(token);
-//         return searches;
-//       },
-//       []
-//     );
-//   },
-//   createFilters: (parameters, config = {}) => {
-//     let {
-//       bools = [],
-//       keys = [],
-//       fields = [],
-//       modelFilter = {},
-//       ...options
-//     } = config;
+    rowTemplate: '<li class="filterable"></li>',
+    // rowSelector: ".list-group-item",
+    rowClass: "filterItem-select",
+    create: function () {
+      var tempEl = gform.create(this.render());
+      this.container = tempEl.querySelector("ul");
 
-//     const { sort, search = "", ...searchFields } = _.groupBy(parameters, "key");
+      gform.addClass(
+        tempEl,
+        gform.columnClasses[this.columns || gform.prototype.options.columns]
+      );
+      gform.addClass(
+        tempEl,
+        gform.offsetClasses[this.offset || gform.prototype.options.offset]
+      );
+      gform.toggleClass(tempEl, "gform_isArray", !!this.array);
 
-//     _.each(options.bools, key => {
-//       if (searchFields[key]) {
-//         modelFilter[key] = !(
-//           searchFields[key][0].invert ==
-//           (searchFields[key][0].search[0].string == "true")
-//         );
-//       }
-//       delete searchFields[key];
-//     });
+      return tempEl;
+    },
+    get: function (name) {
+      //this is not right ----
+      if (typeof name !== "undefined") {
+        return gform.toJSON.call(this, name);
+      }
+      let temp = _.selectPath(gform.toJSON.call(this), this.map);
+      let result = _.map(temp, (item, key) =>
+        item !== null && item.length ? { invert: item !== "true", key } : null
+      );
 
-//     let sortarray = _.reduce(
-//       sort,
-//       (result, { invert, search }) => {
-//         _.each(search, ({ raw }) => {
-//           result.push({ invert, sort: raw });
-//         });
+      let inverted = _.map(_.filter(result, { invert: true }), "key");
+      let selected = _.map(_.filter(result, { invert: false }), "key");
 
-//         return result;
-//       },
-//       []
-//     );
+      let tokens = [];
 
-//     let filters = _.compact(
-//       _.map(_.flatMap(searchFields), filter => {
-//         let { key, search } = filter;
-//         if (!fields.length) {
-//           filter.logic = "&&";
-//           filter.exact = false;
-//         } else {
-//           let field = _.find(fields, { key: key });
-//           if (!field) return false;
-//           filter.logic = "&&";
-//           filter.exact = field.base !== "input";
-//         }
+      if (selected.length) {
+        tokens.push({
+          key: this.search,
+          invert: false,
+          action: ":",
+          search: _.map(selected, s => ({
+            action: "~",
+            lower: s.toLowerCase(),
+            raw: s,
+            string: s + "",
+          })),
+        });
+      }
+      if (inverted.length) {
+        tokens.push({
+          key: this.search,
+          invert: true,
+          action: ":",
+          search: _.map(inverted, s => ({
+            action: "~",
+            lower: s.toLowerCase(),
+            raw: s,
+            string: s + "",
+          })),
+        });
+      }
+      return tokens;
+    },
+    set: function (value, silent) {
+      if (this.mapOptions.waiting) {
+        this.waitingValue = value;
+        return true;
+      }
+      if (typeof value == "string") {
+        value = JSON.parse(value);
+        if (value.length) {
+          value = [].concat.apply(
+            [],
+            _.map(value, ({ search, invert }) =>
+              _.map(search, ({ raw }) => ({ raw, invert }))
+            )
+          );
+          value = _.transform(
+            value,
+            (result, item) => {
+              result[item.raw] = !item.invert + "";
+              return result;
+            },
+            {}
+          );
+          value = _.reduce(
+            this.fields,
+            (result, field) => {
+              result.push(field.name in value ? value[field.name] : "");
+              return result;
+            },
+            []
+          );
+        }
+        // value = _.map(JSON.parse(value)[0].search, "raw");
+        // value = [].concat.apply([],_.map(JSON.parse(value),({search,invert})=>_.map(search,({raw})=>({raw,invert}))))
+      }
 
-//         return filter;
-//       })
-//     );
+      if (_.isEmpty(value)) {
+        gform.each.call(this, function (field) {
+          field.set("");
+        });
+        this.update({}, true);
+      } else {
+        _.each(
+          value,
+          function (item, index) {
+            let field = this.items[index];
+            if (typeof field == "undefined" || field == null) return;
+            field.set(item);
+          }.bind(this)
+        );
+      }
+      this.render();
+      if (!silent) {
+        this.owner.trigger(["change", "input"], this);
+      }
+      return true;
+    },
+    edit: function (state) {
+      this.editable = state;
 
-//     if (search.length) {
-//       var searches = [].concat.apply([], _.map(search, "search"));
-//       _.reduce(
-//         options.filterFields || [],
-//         (filters, field) => {
-//           let filter = {
-//             exact: false,
-//             key: field.search,
-//             logic: "||",
-//             search: searches,
-//           };
-//           filters.push(filter);
-//           return filters;
-//         },
-//         filters
-//       );
-//     }
-//     return {
-//       modelFilter,
-//       sort: sortarray,
-//       filters,
-//       // or: _.filter(filters, { logic: "||" }),
-//       // and: _.filter(filters, { logic: "&&" }),
-//     };
-//   },
-//   applyFilter: function (model, options, filter) {
-//     let { keys } = options;
-//     let atts = _.reduce(
-//       keys,
-//       (atts, key) => {
-//         let att = model[key][filter.key];
+      this.el.disabled = !state;
+    },
+    initialize: function () {
+      //handle rows
 
-//         att = typeof att == "object" ? _.map(att, a => a + "") : [att + ""];
-//         return atts.concat(att);
-//       },
-//       []
-//     );
+      this.rowManager = gform.rowManager(this);
+      // this.initialValue = this.value
+      Object.defineProperty(this, "value", {
+        get: function () {
+          // return true;
+          return this.get();
+        },
+        enumerable: true,
+      });
+      function processFilter(searchTerm, collection) {
+        _.each(collection, field => {
+          if (
+            _.score(
+              field.el.innerText.replace(/\s+/g, " ").toLowerCase(),
+              searchTerm
+            ) > 0.4
+          ) {
+            gform.removeClass(field.el, "hidden");
+          } else {
+            gform.addClass(field.el, "hidden");
+          }
+        });
+      }
+      this.el.querySelector(".gclear").addEventListener("click", e => {
+        e.stopPropagation();
+        this.el.querySelector("input").value = "";
+        _.each(this.fields, field => gform.removeClass(field.el, "hidden"));
+        this.el.querySelector("input").focus();
+      });
+      this.el.querySelector(".greset").addEventListener("click", e => {
+        e.stopPropagation();
+        this.el.querySelector("input").value = "";
+        _.each(this.fields, field => gform.removeClass(field.el, "hidden"));
+        this.el.querySelector("input").focus();
+        _.each(this.fields, field => field.set(""));
 
-//     if (filter.exact) {
-//       let strArray = _.map(filter.search, "string");
+        this.owner.trigger("change", this);
+        this.owner.trigger("input", this);
+      });
 
-//       return !_.intersection(strArray, atts).length != !filter.invert;
-//     } else {
-//       //not exact
+      this.el.querySelector("input").addEventListener("input", e => {
+        processFilter(event.currentTarget.value.toLowerCase(), this.fields);
+      });
+      $(this.el)
+        .on("shown.bs.dropdown", () => {
+          this.el.querySelector("input").focus();
+        })
+        .on("hidden.bs.dropdown", () => {
+          this.el.querySelector("input").value = "";
+          _.each(this.fields, field => gform.removeClass(field.el, "hidden"));
+        });
+      gform.types[this.type].setLabel.call(this);
+      this.mapOptions = new gform.mapOptions(
+        this,
+        this.value,
+        0,
+        this.owner.collections
+      );
+      this.mapOptions.on(
+        "collection",
+        function (e) {
+          let fields = _.map(
+            _.map(this.mapOptions.getoptions(), ({ value, label }) => ({
+              name: value + "",
+              label,
+              row: false,
+              target: () => this.el.querySelector("ul > ul"),
+            })),
+            function (field) {
+              return {
+                options: [
+                  {
+                    type: "optgroup",
+                    format: { label: "{{{label}}}" },
+                    options: [
+                      {
+                        label:
+                          '<circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>',
+                        value: "false",
+                      },
+                      {
+                        label: "",
+                        value: "",
+                      },
+                      {
+                        label: '<polyline points="20 6 9 17 4 12"></polyline>',
+                        value: "true",
+                      },
+                    ],
+                  },
+                ],
+                type: "filterItem",
+                ...field,
+              };
+            }
+          );
 
-//       let mapfunc;
-//       let finding = model.attributes[filter.key].replace(/\s+/g, " ");
-//       //.toLowerCase();
+          this._items = _.map(
+            fields,
+            this.owner.fieldMethods.cultivate.bind(null, {
+              data: this.owner.options.data,
+              parent: this,
+            })
+          );
+          // field._items = _.map(
+          //   field.fields,
+          //   form.fieldMethods.cultivate.bind(null, {
+          //     data: options.data,
+          //     parent: field,
+          //   })
+          // );
+          _.each(this.items, item => {
+            this.owner.call("show", item, item.visible);
+            this.owner.call("edit", item, item.editable);
+          });
+          this.reflow();
+          if (this.mapOptions.waiting) return;
+          else if (typeof this.waitingValue == "string") {
+            this.set(this.waitingValue);
+            this.waitingValue = null;
+          }
+          // this.options = this.mapOptions.getoptions();
+          // if (this.shown) {
+          //   this.renderMenu();
+          // }
+          // if (typeof this.value !== "undefined") {
+          //   gform.types[this.type].set.call(this, this.value);
+          // }
+        }.bind(this)
+      );
+      // _.map(this.mapOptions.getoptions(), item =>
+      // _.pick(item, "label", "value")
+      // )
+      let self = this;
+      this.owner.on("change", s => {
+        if (
+          "field" in s &&
+          "parent" in s.field &&
+          s.field.parent.id == self.id
+        ) {
+          if (this.el.querySelector(".count") != null) {
+            var count =
+              _.reduce(
+                _.map(this.value, "search"),
+                (r, s) => {
+                  r += s.length;
+                  return r;
+                },
+                0
+              ) || "";
 
-//       if (filter.action == "~") {
-//         mapfunc = search => _.score(finding, search) > 0.4;
-//       } else {
-//         mapfunc = search => {
-//           let index = finding.indexOf(search.string);
+            this.el.querySelector(".count").innerHTML = `${count}`;
+          }
+        }
+      });
+      this.fields = _.map(
+        _.map(this.mapOptions.getoptions(), ({ value, label }) => ({
+          name: value + "",
+          label,
+          row: false,
+          target: () => this.el.querySelector("ul > ul"),
+        })),
+        function (field) {
+          return {
+            options: [
+              {
+                type: "optgroup",
+                format: { label: "{{{label}}}" },
+                options: [
+                  {
+                    label:
+                      '<circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>',
+                    // value: "-{{name}}:{{field.name}}",
+                    value: "false",
+                  },
+                  {
+                    label: "",
+                    value: "",
+                  },
+                  {
+                    label: '<polyline points="20 6 9 17 4 12"></polyline>',
+                    // value: "{{name}}:{{field.name}}",
+                    value: "true",
+                  },
+                ],
+              },
+            ],
+            type: "filterItem",
+            ...field,
+          };
+        }
+      );
+    },
+  }
+);
 
-//           switch (search.action) {
-//             case "~": //fuzzy
-//               return _.score(finding.toLowerCase(), search.lower) > 0.4;
-//             case "*": //contains
-//               return index >= 0;
-//             case "^": //startsWith
-//               return index == 0;
-//             case "$": //endsWith
-//               return index == finding.length - search.string.length;
-//             case "=": //exactly
-//               return finding == search.string;
-//             default:
-//               return finding.indexOf(search.string) >= 0;
-//           }
-//         };
-//       }
-
-//       return !_.some(filter.search, mapfunc) != !filter.invert;
-//     }
-//   },
-//   query: (models, parameters, config = {}) => {
-//     let { path = "", bools = [], fields = [], sort, ...options } = config;
-//     if (typeof parameters == "string") {
-//       parameters = _.tokenize(parameters);
-//     }
-//     if (typeof parameters !== "object" && fields.length) {
-//       return [];
-//     }
-//     const filters = _.createFilters(parameters, {
-//       fields,
-//       sort,
-//       bools,
-//       modelFilter: options.modelFilter,
-//     });
-
-//     filters.sort = filters.sort.length
-//       ? filters.sort
-//       : [
-//           sort || {
-//             invert: false,
-//             search: (fields.length ? fields : [{ key: "id" }])[0].key,
-//           },
-//         ];
-//     let ordered = _.orderBy(
-//       _.filter(models, filters.modelFilter),
-//       _.map(filters.sort, ({ sort }) => {
-//         return path.split(".").concat([sort]).join(".");
-//       }),
-//       _.map(filters.sort, ({ invert }) => (!!invert ? "asc" : "desc"))
-//     );
-
-//     return _.filter(ordered, model => {
-//       let modelFilter = _.partial(_.applyFilter, model, options);
-
-//       let orCollection = _.filter(filters, { logic: "||" });
-//       let andCollection = _.filter(filters, { logic: "&&" });
-
-//       return (
-//         (andCollection.length ? _.every(andCollection, modelFilter) : true) &&
-//         (orCollection.length ? _.some(orCollection, modelFilter) : true)
-//       );
-//     });
-//   },
-
-//   score: function (base, abbr, offset) {
-//     offset = offset || 0; // TODO: I think this is unused... remove
-
-//     if (abbr.length === 0) return 0.9;
-//     if (abbr.length > base.length) return 0.0;
-
-//     for (var i = abbr.length; i > 0; i--) {
-//       var sub_abbr = abbr.substring(0, i);
-//       var index = base.indexOf(sub_abbr);
-
-//       if (index < 0) continue;
-//       if (index + abbr.length > base.length + offset) continue;
-
-//       var next_string = base.substring(index + sub_abbr.length);
-//       var next_abbr = null;
-
-//       if (i >= abbr.length) {
-//         next_abbr = "";
-//       } else {
-//         next_abbr = abbr.substring(i);
-//       }
-//       // Changed to fit new (jQuery) format (JSK)
-//       var remaining_score = _.score(next_string, next_abbr, offset + index);
-
-//       if (remaining_score > 0) {
-//         var score = base.length - next_string.length;
-
-//         if (index !== 0) {
-//           var c = base.charCodeAt(index - 1);
-//           if (c == 32 || c == 9) {
-//             for (var j = index - 2; j >= 0; j--) {
-//               c = base.charCodeAt(j);
-//               score -= c == 32 || c == 9 ? 1 : 0.15;
-//             }
-//           } else {
-//             score -= index;
-//           }
-//         }
-
-//         score += remaining_score * next_string.length;
-//         score /= base.length;
-//         return score;
-//       }
-//     }
-//     // return(0.0);
-//     return false;
-//   },
-
-//   // csvToArray: function(csvString) {
-//   //   var trimQuotes = function (stringArray) {
-//   //     if(stringArray !== null && typeof stringArray !== "undefined")
-//   //     for (var i = 0; i < stringArray.length; i++) {
-//   //         // stringArray[i] = _.trim(stringArray[i], '"');
-//   //         if(stringArray[i][0] == '"' && stringArray[i][stringArray[i].length-1] == '"'){
-//   //           stringArray[i] = stringArray[i].substr(1,stringArray[i].length-2)
-//   //         }
-//   //         stringArray[i] = stringArray[i].split('""').join('"')
-//   //     }
-//   //     return stringArray;
-//   //   }
-//   //   var csvRowArray    = csvString.split(/\r?\n/);
-//   //   var headerCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-//   //   var objectArray     = [];
-//   //   while (csvRowArray.length) {
-
-//   //       var rowCellArray = trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g));
-//   //       if(rowCellArray !== null){
-//   //           var rowObject    = _.zipObject(headerCellArray, rowCellArray);
-//   //           objectArray.push(rowObject);
-//   //       }
-//   //   }
-//   //   return(objectArray);
-//   // },
-
-//   //https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
-//   processCsvLine: function (text) {
-//     var re_valid =
-//       /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-//     var re_value =
-//       /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-//     // Return NULL if input string is not well formed CSV string.
-//     if (!re_valid.test(text)) return null;
-//     var a = []; // Initialize array to receive values.
-//     text.replace(
-//       re_value, // "Walk" the string using replace with callback.
-//       function (m0, m1, m2, m3) {
-//         // Remove backslash from \' in single quoted values.
-//         if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-//         // Remove backslash from \" in double quoted values.
-//         else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-//         else if (m3 !== undefined) a.push(m3);
-//         return ""; // Return empty string.
-//       }
-//     );
-//     // Handle special case of empty last value.
-//     if (/,\s*$/.test(text)) a.push("");
-//     return a;
-//   },
-//   csvToArray: function (csvString, options) {
-//     options = options || { skip: 0 };
-//     var csvRowArray = csvString.split(/\n/).slice(options.skip);
-//     var headerCellArray = _.processCsvLine(csvRowArray.shift()); //trimQuotes(csvRowArray.shift().match(/(".*?"|[^",]*)(?=\s*,|\s*$)/g));
-
-//     return _.map(csvRowArray, function (row) {
-//       return _.zipObject(headerCellArray, _.processCsvLine(row));
-//     });
-//   },
-//   csvify: function (data, columns, title) {
-//     var csv = '"' + _.map(columns, "label").join('","') + '"\n';
-//     labels = _.map(columns, "name");
-//     var empty = _.zipObject(
-//       labels,
-//       _.map(labels, function () {
-//         return "";
-//       })
-//     );
-//     csv += _.map(
-//       data,
-//       function (d) {
-//         return JSON.stringify(
-//           _.map(_.values(_.extend(empty, _.pick(d, labels))), function (item) {
-//             if (typeof item == "string") {
-//               return item.split('"').join('""');
-//             } else {
-//               return _.isArray(item) ? item.join() : item;
-//             }
-//           })
-//         );
-//         //return JSON.stringify(_.values(_.extend(empty,_.pick(d,labels))))
-//       },
-//       this
-//     )
-//       .join("\n")
-//       .replace(/(^\[)|(\]$)/gm, "");
-//     // .split('\"').join("")
-
-//     var link = document.createElement("a");
-//     link.setAttribute(
-//       "href",
-//       "data:text/csv;charset=utf-8," + encodeURIComponent(csv)
-//     );
-//     link.setAttribute("download", (title || "GrapheneDataGrid") + ".csv");
-//     document.body.appendChild(link); // Required for FF
-//     link.click();
-//     document.body.removeChild(link);
-//     return true;
-//   },
-// });
 var CSVParser = (function () {
   "use strict";
   function captureFields(fields) {
@@ -2491,6 +2737,7 @@ gform.stencils.mobile_row = `<tr><td colspan="100%" class="filterable">
 </td></tr>`;
 gform.stencils.mobile_data_grid = `<div class="well table-well">
 <style>
+
 .dropdown-menu>li>a.disabled{
   cursor:not-allowed;
   color:#999;
@@ -2591,7 +2838,134 @@ gform.stencils.mobile_data_grid = `<div class="well table-well">
 </div>
 <div class="paginate-footer" style="overflow:hidden;margin-top:10px"></div>
 </div>`;
-gform.stencils.data_grid = `<div class="well table-well">
+gform.stencils.data_grid = `<div class="well table-well"><style>  
+hidden{display:none}
+#tags{display: flex;
+  font-weight:bold;
+  gap:.75em;
+  flex-wrap: wrap;
+  margin-bottom:10px;
+  min-height:23px
+}
+.query-tag {
+  display: flex;
+  white-space: nowrap;
+  border-radius: 2em;
+  background:#4488ee;
+  gap:.5em;
+  align-items:center;
+  border:solid 1px #1155bb;
+  padding-left:0.75em;
+
+}
+.query-tag-invert{
+  background:#be4949;
+  border-color:#832f2f;
+}
+
+.query-tag-key{
+  background:#46a44d;
+  border-color:#37813c;
+}
+.query-tag[data-key="sort"] {
+  background:#fbf2e3;
+  background:#fff;
+  border:solid 1px darkorange;
+}
+.query-tag[data-key="sort"] span{
+  color:darkorange
+}
+.query-tag[data-key="sort"]:before {
+ content:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" height="16" width="16"  viewBox="0 -4 24 24" fill="none" stroke="darkorange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up"><polyline points="18 15 12 9 6 15"></polyline>/%3E%3C/svg%3E ')
+}
+.query-tag-invert.query-tag[data-key="sort"]:before {
+  content:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -4 24 24" fill="none" stroke="darkorange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline>/%3E%3C/svg%3E ')
+ }
+.query-tag span{
+  color: #fff;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.query-tag span:hover{
+  max-width: 100%;
+
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: max-width;
+}
+.query-tag svg{
+
+  color: #fff;
+  width:1.5em;
+  height:1.5em;
+  padding:.2em;
+  border-radius:2em;
+  cursor:pointer;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: color,background;
+}
+.query-tag svg:hover{
+background:rgba(200,200,200,.3)
+}
+.query-tag svg *{
+  pointer-events: none;
+}
+
+.query-tag[data-key="sort"] svg{
+  color:darkorange;
+}
+
+li.filterItem-select[data-value=true] > a{
+color: #787;
+background-color:#fafffa;
+}
+li.filterItem-select[data-value=false] > a{
+color: #877;
+background-color:#fffafa;
+}
+li.filterItem-select > a{
+  border-bottom:solid 1px #eee;
+  padding:5px 15px;
+  color:#777;
+}
+li.filterItem-select > a:hover{
+  color:#555
+}
+
+
+input:placeholder-shown + div.gclear {
+  opacity: 0;
+  pointer-events: none;
+}
+.gclear {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0.5em;
+  display: flex;
+  align-items: center;
+}
+.gclear svg {
+  opacity: 0.4;
+  cursor: pointer;
+}
+.gclear svg:hover {
+  opacity: 0.8;
+}
+.greset{
+}
+.greset a{
+  padding: 4px;
+  text-align: center;
+  opacity: .7;    border-radius: 0 0 5px 5px;
+}
+.greset a:hover{
+  opacity: 1;
+}
+</style>
 <div>
 </div>
 <input type="file" class="csvFileInput" accept=".csv" style="display:none">
@@ -2600,7 +2974,8 @@ gform.stencils.data_grid = `<div class="well table-well">
 <div style="overflow:hidden">
 <div name="actions" class=" pull-left" style="margin-bottom:10px;" ></div>
 </div>	
-<div>
+
+<div style="min-height:3.25em">
 
 <div class="btn-group pull-right" style="margin-bottom:10px;margin-left:10px" role="group" aria-label="...">
 
@@ -2618,7 +2993,7 @@ gform.stencils.data_grid = `<div class="well table-well">
 					<i class="fa fa-list"></i>
 					<span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu pull-right" style="padding-top:10px;padding-left:10px" aria-labelledby="enables_{{options.id}}">
+			<ul class="dropdown-menu pull-right" style="padding-top:10px;padding-left:10px;" aria-labelledby="enables_{{options.id}}">
 					{{#items}}
 					{{#visible}}
 					<li><label data-field="{{id}}" style="width:100%;font-weight:normal"><input type="checkbox" {{#isEnabled}}checked="checked"{{/isEnabled}}> {{label}}</label></li>
@@ -2639,6 +3014,7 @@ gform.stencils.data_grid = `<div class="well table-well">
 <div class="paginate-footer hidden-xs" style="overflow:hidden;margin-top:10px;clear:both"></div>
 {{/options.autoSize}}
 
+<div id="tags"></div>
 <div class="table-container" style="width:100%;overflow:auto">
 {{#options.autoSize}}
 <table class="table {{^options.noborder}}table-bordered{{/options.noborder}}" style="margin-bottom:0px">
